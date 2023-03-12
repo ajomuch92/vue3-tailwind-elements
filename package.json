@@ -1,5 +1,11 @@
 {
   "name": "vue3-tailwind-elements",
+  "license": "MIT",
+  "homepage": "https://vue-tailwind-elements.netlify.app/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ajomuch92/vue3-tailwind-elements.git"
+  },
   "scripts": {
     "dev": "vite",
     "build": "vite build && vue-tsc --declaration --emitDeclarationOnly",
