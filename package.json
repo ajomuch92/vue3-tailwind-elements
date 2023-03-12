@@ -2,7 +2,7 @@
   "name": "vue3-tailwind-elements",
   "scripts": {
     "dev": "vite",
-    "build": "vue-tsc && vite build",
+    "build": "vite build && vue-tsc --declaration --emitDeclarationOnly",
     "preview": "vite preview"
   },
   "dependencies": {

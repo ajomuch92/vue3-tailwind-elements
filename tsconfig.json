@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    //...
+    "target": "ES5",
     "allowJs": true,
     "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
@@ -8,6 +8,8 @@
     "declaration": true,
     "outDir": "dist",
     "declarationDir": "dist",
+    "skipLibCheck": true,
+    "lib": ["es2015", "es2015.promise", "dom"],
     "baseUrl": ".",
     "paths": {
       "@/*": [
