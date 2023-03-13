@@ -1,7 +1,1 @@
-import type { App } from 'vue';
-
-export default {
-  install: (app: App) => {
-
-  }
-};
+export { default as TeAccordion } from './teAccordion.vue';

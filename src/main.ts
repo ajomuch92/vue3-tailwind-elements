@@ -1,5 +1,12 @@
-import { createApp } from 'vue'
-import './style.css'
-import App from './App.vue';
+import type { App } from 'vue';
+import { TeAccordion } from "./components";
 
-createApp(App).mount('#app')
+export default {
+  install: (app: App) => {
+    app.component('TeAccordion', TeAccordion);
+  }
+};
+
+export { 
+  TeAccordion
+};
