@@ -9,7 +9,7 @@
     "outDir": "dist",
     "declarationDir": "dist",
     "skipLibCheck": true,
-    "lib": ["es2015", "es2015.promise", "dom"],
+    "lib": ["es2015", "es2015.promise", "dom", "es2016"],
     "baseUrl": ".",
     "paths": {
       "@/*": [
