@@ -1,4 +1,4 @@
-module.exports = function (theme) {
+export default function (theme) {
   return {
     'a.page-link': {
       position: 'relative',

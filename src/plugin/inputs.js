@@ -1,4 +1,4 @@
-module.exports = function (theme) {
+export default function (theme) {
   const file = {
     'input.file-control': {
       display: 'block',

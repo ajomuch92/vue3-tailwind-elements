@@ -1,4 +1,4 @@
-module.exports = function(theme) {
+export default function(theme) {
   const toast = {
     '.toast-wrapper': {
       boxShadow: theme('boxShadow.lg'),
