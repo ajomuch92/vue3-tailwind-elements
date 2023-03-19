@@ -11,7 +11,7 @@
   },
   "scripts": {
     "dev": "vite",
-    "build": "vite build && vue-tsc --declaration --emitDeclarationOnly && ncp ./src/plugin ./dist/plugin",
+    "build": "vite build && vue-tsc --declaration --emitDeclarationOnly",
     "preview": "vite preview"
   },
   "dependencies": {
@@ -31,7 +31,7 @@
     "vue-tsc": "^1.0.24"
   },
   "private": false,
-  "version": "0.0.5-beta",
+  "version": "0.0.6-beta",
   "type": "module",
   "files": [
     "dist"
@@ -46,10 +46,6 @@
     "./dist/main.css": {
       "import": "./dist/main.css",
       "require": "./dist/main.css"
-    },
-    "./dist/plugin/index.js": {
-      "import": "./dist/plugin/index.js",
-      "require": "./dist/plugin/index.js"
     }
   },
   "types": "./dist/main.d.ts"
