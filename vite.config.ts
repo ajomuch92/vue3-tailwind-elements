@@ -28,7 +28,7 @@ export default defineConfig({
     cssCodeSplit: true,
     lib: {
       // Could also be a dictionary or array of multiple entry points
-      entry: 'src/components/index.ts',
+      entry: 'src/main.ts',
       name: 'vue3-tailwind-elements',
       formats: ['es', 'cjs', 'umd'],
       fileName: format => `vue3-tailwind-elements.${format}.js`
@@ -37,7 +37,7 @@ export default defineConfig({
       // make sure to externalize deps that should not be bundled
       // into your library
       input: {
-        main: path.resolve(__dirname, 'src/components/index.ts')
+        main: path.resolve(__dirname, 'src/main.ts')
       },
       external: ['vue'],
       output: {
