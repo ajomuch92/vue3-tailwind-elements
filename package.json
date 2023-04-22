@@ -26,6 +26,10 @@
     "./dist/style.css": {
       "import": "./dist/style.css",
       "require": "./dist/style.css"
+    },
+    "./src/plugin/index.js": {
+      "import": "./src/plugin/index.js",
+      "require": "./src/plugin/index.js"
     }
   },
   "scripts": {
