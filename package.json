@@ -1,0 +1,26 @@
+{
+  "name": "vue3-tailwind-elements",
+  "private": false,
+  "version": "0.0.8-beta",
+  "type": "module",
+  "main": "./dist/vue3-tailwind-elements.umd.cjs",
+  "module": "./dist/vue3-tailwind-elements.js",
+  "exports": {
+    ".": {
+      "import": "./dist/vue3-tailwind-elements.js",
+      "require": "./dist/vue3-tailwind-elements.umd.cjs"
+    }
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "vue": "^3.2.47"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^4.1.0",
+    "vite": "^4.3.0"
+  }
+}
