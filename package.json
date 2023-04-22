@@ -1,7 +1,7 @@
 {
   "name": "vue3-tailwind-elements",
   "private": false,
-  "version": "0.0.12-beta",
+  "version": "0.0.13-beta",
   "author": {
     "name": "Aarón Montes"
   },
