@@ -1,7 +1,7 @@
 {
   "name": "vue3-tailwind-elements",
   "private": false,
-  "version": "0.0.11-beta",
+  "version": "0.0.12-beta",
   "author": {
     "name": "Aarón Montes"
   },
@@ -27,9 +27,9 @@
       "import": "./dist/style.css",
       "require": "./dist/style.css"
     },
-    "./src/plugin/index.js": {
-      "import": "./src/plugin/index.js",
-      "require": "./src/plugin/index.js"
+    "./src/plugin": {
+      "import": "./src/plugin",
+      "require": "./src/plugin"
     }
   },
   "scripts": {
