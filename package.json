@@ -1,7 +1,7 @@
 {
   "name": "vue3-tailwind-elements",
   "private": false,
-  "version": "0.0.8-beta",
+  "version": "0.0.9-beta",
   "author": {
     "name": "Aarón Montes"
   },
@@ -12,6 +12,9 @@
     "url": "https://github.com/ajomuch92/vue3-tailwind-elements.git"
   },
   "type": "module",
+  "files": [
+    "dist"
+  ],
   "main": "./dist/vue3-tailwind-elements.umd.cjs",
   "module": "./dist/vue3-tailwind-elements.js",
   "exports": {
