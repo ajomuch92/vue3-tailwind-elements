@@ -1,7 +1,7 @@
 {
   "name": "vue3-tailwind-elements",
   "private": false,
-  "version": "0.0.10-beta",
+  "version": "0.0.11-beta",
   "author": {
     "name": "Aarón Montes"
   },
@@ -22,6 +22,10 @@
     ".": {
       "import": "./dist/vue3-tailwind-elements.js",
       "require": "./dist/vue3-tailwind-elements.umd.cjs"
+    },
+    "./dist/style.css": {
+      "import": "./dist/style.css",
+      "require": "./dist/style.css"
     }
   },
   "scripts": {
