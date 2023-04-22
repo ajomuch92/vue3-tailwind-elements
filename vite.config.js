@@ -1,11 +1,14 @@
-import { defineConfig } from 'vite'
-import { resolve } from 'path'
-// import vue from '@vitejs/plugin-vue'
+import { defineConfig } from 'vite';
+import { resolve } from 'path';
+import vue from '@vitejs/plugin-vue';
 
 export default defineConfig({
+  plugins: [
+    vue(),
+  ],
   build: {
     lib: {
-      entry: resolve(__dirname, 'lib/index.js'),
+      entry: resolve(__dirname, 'src/index.js'),
       name: 'Vue3TailwindElements',
       fileName: 'vue3-tailwind-elements',
     },
