@@ -7,8 +7,7 @@ const spinners = require('./spinners');
 const alerts = require( './alerts');
 const toasts = require('./toasts');
 
-module.exports = plugin(
-  ({ addComponents, theme }) => {
+const plugin = (({ addComponents, theme }) => {
     addComponents(styles);
     addComponents(buttons(theme));
     addComponents(pagination(theme));
@@ -19,3 +18,5 @@ module.exports = plugin(
   },
   {}
 );
+
+export default plugin;
