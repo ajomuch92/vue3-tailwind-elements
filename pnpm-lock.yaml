@@ -9,6 +9,9 @@ devDependencies:
   '@vitejs/plugin-vue':
     specifier: ^4.1.0
     version: 4.1.0(vite@4.3.0)(vue@3.2.47)
+  ncp:
+    specifier: ^2.0.0
+    version: 2.0.0
   tailwindcss:
     specifier: ^3.3.1
     version: 3.3.1(postcss@8.4.23)
@@ -663,6 +666,11 @@ packages:
     resolution: {integrity: sha512-BGcqMMJuToF7i1rt+2PWSNVnWIkGCU78jBG3RxO/bZlnZPK2Cmi2QaffxGO/2RvWi9sL+FAiRiXMgsyxQ1DIDA==}
     engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
     hasBin: true
+
+  /ncp@2.0.0:
+    resolution: {integrity: sha512-zIdGUrPRFTUELUvr3Gmc7KZ2Sw/h1PiVM0Af/oHB6zgnV1ikqSfRk+TOufi79aHYCW3NiOXmr1BP5nWbzojLaA==}
+    hasBin: true
+    dev: true
 
   /normalize-path@3.0.0:
     resolution: {integrity: sha512-6eZs5Ls3WtCisHWp9S2GUy8dqkpGi4BVSz3GaqiE6ezub0512ESztXUwUB6C6IKbQkY2Pnb/mD4WYojCRwcwLA==}
