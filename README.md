@@ -4,7 +4,12 @@ Currently, project under CONSTRUCTION, do not use for production.
 For Vuejs 2, refer to [this package](https://www.npmjs.com/package/vue-tailwind-elements).
 
 ### Migrated Components
+* Accordion
+* Alert
+* Badge
+* Breadcrumb
 * Button
+* Button group
 * Spinner
 
 <!-- ### New Features 💥
@@ -53,7 +58,7 @@ createApp(App)
 
 ```
 
-See an example [here](https://github.com/ajomuch92/vue3-tailwind-elements/tree/main/example).
+See an example [here](https://github.com/ajomuch92/vue3-tailwind-elements/tree/main/example) or documentation [here](https://vue-tailwind-elements.netlify.app/).
 
 ## Nuxt:
 Put the last configuration into a plugin file and the use it into the nuxt.config.js file like this:
