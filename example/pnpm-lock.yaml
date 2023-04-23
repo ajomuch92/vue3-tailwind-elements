@@ -5,8 +5,8 @@ dependencies:
     specifier: ^3.2.47
     version: 3.2.47
   vue3-tailwind-elements:
-    specifier: 0.0.13-beta
-    version: 0.0.13-beta
+    specifier: 0.0.14-beta
+    version: 0.0.14-beta
 
 devDependencies:
   '@vitejs/plugin-vue':
@@ -1044,8 +1044,8 @@ packages:
       fsevents: 2.3.2
     dev: true
 
-  /vue3-tailwind-elements@0.0.13-beta:
-    resolution: {integrity: sha512-lV2QKuH/bphKrsYQZiuBBdSLTX3Z8Fwxv115Cv1XP30Bc9Dq3A1nXOw7ibv5/Be8Ku8wJ7IBGjVa21QWauVm2w==}
+  /vue3-tailwind-elements@0.0.14-beta:
+    resolution: {integrity: sha512-4ywjU8WuKTyN95wSrm/Aai70TvjfWQj023IKFwuJfqxCM6/cBcVzz+Vc2og1W/wcAb1XZqhtJ/RiYDk/qrcSEg==}
     dependencies:
       vue: 3.2.47
     dev: false

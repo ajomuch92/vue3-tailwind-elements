@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "vue": "^3.2.47",
-    "vue3-tailwind-elements": "0.0.13-beta"
+    "vue3-tailwind-elements": "0.0.14-beta"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^4.1.0",
