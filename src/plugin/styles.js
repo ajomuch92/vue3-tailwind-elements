@@ -4293,4 +4293,4 @@ const styles = {
   }
 };
 
-export default styles;
+module.exports = styles

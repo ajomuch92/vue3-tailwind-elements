@@ -37,7 +37,7 @@
         </button>
       </h2>
       <div
-        :ref="refs[key]"
+        ref="collapseRefs[key]"
         :id="`collapse-${key}`"
         class="accordion-collapse"
         :class="{'border-0': flush}"
@@ -51,13 +51,15 @@
   </div>
 </template>
 
-<script setup lang="ts">
-import { onMounted, ref, watch, toRefs, defineProps } from 'vue';
+<script setup>
+import { computed, onMounted, ref, watch } from 'vue';
+
+const emit = defineEmits(['open', 'close']);
 
 const props = defineProps({
   items: {
-    type: Array<any>,
-    default: () => [],
+    type: Array,
+    default: () => []
   },
   flush: {
     type: Boolean,
@@ -66,36 +68,43 @@ const props = defineProps({
   singleOpen: {
     type: Boolean,
     default: false,
+  },
+  defaultOpen: {
+    type: Array,
+    default: () => [],
   }
 });
 
 const itemsOpened = ref([]);
 const isMounted = ref(false);
-const refs = ref([]);
-
-const { singleOpen } = toRefs(props);
+const collapseRefs = ref([]);
 
 onMounted(() => {
   isMounted.value = true;
+  itemsOpened.value = props.defaultOpen;
 });
+
+const singleOpen = computed(() => props.singleOpen);
 
 watch(singleOpen, () => {
   itemsOpened.value = [];
 });
 
-function toggle(key: number) {
+function toggle(key) {
   if (!itemsOpened.value.includes(key)) {
-    if (props.singleOpen) itemsOpened.value = [];
+    if (singleOpen.value) itemsOpened.value = [];
     itemsOpened.value.push(key);
+    emit('open', key);
   } else {
     const index = itemsOpened.value.indexOf(key)
     itemsOpened.value.splice(index, 1);
+    emit('close', key);
   }
 }
 
-function getItemStyle(key: number) {
+function getItemStyle(key) {
   if (!isMounted.value) return {};
-  const ref = refs.value[key];
+  const ref = collapseRefs[key];
   return itemsOpened.value.includes(key) ? { maxHeight: `${ref.scrollHeight}px` } : {}
 }
 </script>

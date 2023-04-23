@@ -1,4 +1,4 @@
-export default function (theme) {
+module.exports = function (theme) {
   const alerts = {
     '.alert': {
       margin: `${theme('margin.3')} 0px`,

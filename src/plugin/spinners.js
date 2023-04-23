@@ -1,4 +1,4 @@
-export default function spinners(theme) {
+module.exports =  function buttons(theme) {
   const progress = {
     '.progress': {
       fontSize: theme('fontSize.xs'),

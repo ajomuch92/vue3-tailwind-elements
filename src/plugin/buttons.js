@@ -1,4 +1,4 @@
-export default function buttons(theme) {
+module.exports =  function buttons(theme) {
   return {
     '.btn': {
       fontWeight: theme('fontWeight.bold'),

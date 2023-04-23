@@ -1,14 +1,13 @@
-import { plugin } from 'tailwindcss/plugin';
-import styles from './styles';
-import buttons from './buttons';
-import pagination from './pagination';
-import inputs from './inputs';
-import spinners from './spinners';
-import alerts from './alerts';
-import toasts from './toasts';
+const styles = require('./styles');
+const plugin = require('tailwindcss/plugin');
+const buttons = require( './buttons');
+const pagination = require('./pagination');
+const inputs = require('./inputs');
+const spinners = require('./spinners');
+const alerts = require( './alerts');
+const toasts = require('./toasts');
 
-export default plugin(
-  ({ addComponents, theme }) => {
+const Plugin = plugin(({ addComponents, theme }) => {
     addComponents(styles);
     addComponents(buttons(theme));
     addComponents(pagination(theme));
@@ -19,3 +18,5 @@ export default plugin(
   },
   {}
 );
+
+export default Plugin;
