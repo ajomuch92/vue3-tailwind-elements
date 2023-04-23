@@ -7,7 +7,7 @@
     :type="buttonType"
     @click="clickHandler"
   >
-    <!-- <te-spinner  v-if="loading" :color="type=='light'? 'primary': 'light'" class="mx-1 align-sub" size="small"/> -->
+    <te-spinner  v-if="loading" :color="type=='light'? 'primary': 'light'" class="mx-1 align-sub" size="small"/>
     <slot name="default" />
     <span v-if="showRipple&&ripple" class="ripple" :style="styleRipple"/>
   </button>
@@ -15,7 +15,7 @@
 
 <script setup>
 import { computed, ref } from 'vue';
-// import teSpinner from './teSpinner.vue';
+import teSpinner from './teSpinner.vue';
 
 const emit = defineEmits(['click']);
 
