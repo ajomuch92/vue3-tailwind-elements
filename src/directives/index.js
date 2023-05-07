@@ -1,0 +1,1 @@
+export { default as outside } from './v-outside';
