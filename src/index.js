@@ -6,8 +6,10 @@ import TeButton from './components/teButton.vue';
 import TeButtonGroup from './components/teButtonGruop.vue';
 import TeSpinner from './components/teSpinner.vue';
 
+import useOptions from './options';
 
-export default function install(vueApp) {
+export default function install(vueApp, options = {}) {
+  useOptions().setOptions(options);
   vueApp.component('te-accordion', TeAccordion);
   vueApp.component('te-alert', TeAlert);
   vueApp.component('te-badge', TeBadge);
