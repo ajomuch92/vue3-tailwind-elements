@@ -5,6 +5,12 @@ import TeBreadcrumb from './components/teBreadcrumb.vue';
 import TeButton from './components/teButton.vue';
 import TeButtonGroup from './components/teButtonGruop.vue';
 import TeSpinner from './components/teSpinner.vue';
+import TeCard from './components/teCard.vue';
+import TeCheckbox from './components/teCheckbox.vue';
+import TeChip from './components/teChip.vue';
+import TeIcon from './components/teIcon.vue';
+
+import clickOutside from './directives/v-outside';
 
 import useOptions from './options';
 
@@ -17,4 +23,10 @@ export default function install(vueApp, options = {}) {
   vueApp.component('te-button', TeButton);
   vueApp.component('te-button-group', TeButtonGroup);
   vueApp.component('te-spinner', TeSpinner);
+  vueApp.component('te-card', TeCard);
+  vueApp.component('te-checkbox', TeCheckbox);
+  vueApp.component('te-chip', TeChip);
+  vueApp.component('te-icon', TeIcon);
+
+  vueApp.directive('click-outside', clickOutside);
 }
