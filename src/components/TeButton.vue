@@ -13,6 +13,12 @@
   </button>
 </template>
 
+<script>
+  export default {
+    name: 'TeButton'
+  }
+</script>
+
 <script setup>
 import { computed, ref } from 'vue';
 import teSpinner from './teSpinner.vue';

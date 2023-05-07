@@ -12,6 +12,12 @@
   </span>
 </template>
 
+<script>
+  export default {
+    name: 'TeBadge'
+  }
+</script>
+
 <script setup>
 import { computed } from 'vue';
 

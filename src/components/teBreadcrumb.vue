@@ -12,6 +12,12 @@
   </nav>
 </template>
 
+<script>
+  export default {
+    name: 'TeBreadcrumb'
+  }
+</script>
+
 <script setup>
 const props = defineProps({
   options: {

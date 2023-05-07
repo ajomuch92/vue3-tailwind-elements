@@ -51,6 +51,12 @@
   </div>
 </template>
 
+<script>
+  export default {
+    name: 'TeAccordion'
+  }
+</script>
+
 <script setup>
 import { computed, onMounted, ref, watch } from 'vue';
 

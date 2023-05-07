@@ -16,6 +16,12 @@
   </div>
 </template>
 
+<script>
+  export default {
+    name: 'TeButtonGroup'
+  }
+</script>
+
 <script setup>
 import TeButton from './teButton.vue';
 
