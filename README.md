@@ -15,6 +15,7 @@ For Vuejs 2, refer to [this package](https://www.npmjs.com/package/vue-tailwind-
 * Checkbox
 * Chip
 * Icon
+* Datepicker
 
 <!-- ### New Features 💥
 * Adding openend default items on accordion component
