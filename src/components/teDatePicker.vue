@@ -202,7 +202,7 @@
 
 <script setup>
 import { computed, ref, watch } from 'vue';
-import clickOutside from './directives/v-outside';
+import { clickOutside as vClickOutside} from './directives';
 
 const emit = defineEmits(['update:modelValue'])
 

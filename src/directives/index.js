@@ -1,1 +1,1 @@
-export { default as outside } from './v-outside';
+export { default as clickOutside } from './v-outside';
