@@ -47,8 +47,8 @@ const props = defineProps({
 })
 
 const widthImgClass = computed(() => ({
-  'w-9': this.size === 'small',
-  'w-11': this.size === 'medium',
-  'w-14': this.size === 'large',
+  'w-9': props.size === 'small',
+  'w-11': props.size === 'medium',
+  'w-14': props.size === 'large',
 }));
 </script>
