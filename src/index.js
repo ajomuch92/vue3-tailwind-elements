@@ -9,6 +9,7 @@ import TeCard from './components/teCard.vue';
 import TeCheckbox from './components/teCheckbox.vue';
 import TeChip from './components/teChip.vue';
 import TeIcon from './components/teIcon.vue';
+import TeDatePicker from './components/teDatePicker.vue';
 
 import clickOutside from './directives/v-outside';
 
@@ -27,6 +28,7 @@ export default function install(vueApp, options = {}) {
   vueApp.component('te-checkbox', TeCheckbox);
   vueApp.component('te-chip', TeChip);
   vueApp.component('te-icon', TeIcon);
+  vueApp.component('te-date-picker', TeDatePicker);
 
   vueApp.directive('click-outside', clickOutside);
 }
