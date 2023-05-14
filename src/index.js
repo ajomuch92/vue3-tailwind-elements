@@ -13,6 +13,7 @@ import TeDatePicker from './components/teDatePicker.vue';
 import TeFile from './components/teFile.vue';
 import TeInput from './components/teInput.vue';
 import TeListGroup from './components/teListGroup.vue';
+import TeLoading from './components/teLoading.vue';
 
 import clickOutside from './directives/v-outside';
 
@@ -35,6 +36,7 @@ export default function install(vueApp, options = {}) {
   vueApp.component('te-file', TeFile);
   vueApp.component('te-input', TeInput);
   vueApp.component('te-list-group', TeListGroup);
+  vueApp.component('te-loading', TeLoading);
 
   vueApp.directive('click-outside', clickOutside);
 }
