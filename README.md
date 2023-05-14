@@ -16,12 +16,15 @@ For Vuejs 2, refer to [this package](https://www.npmjs.com/package/vue-tailwind-
 * Chip
 * Icon
 * Datepicker
+* File picker
+* Icon
+* Input
+* List group
+* Loading
+* Spinner
+* v outside directive
 
-<!-- ### New Features 💥
-* Adding openend default items on accordion component
-* Updating way to install our package to avoid extra dependencies **(Breaking change)**.
-* Now compatible with Tailwind v3 -->
-
+The last two components are not available as standalone components.
 # Instalation
 
 1. Install Tailwind. Follow this [guide](https://tailwindcss.com/docs/guides/vite#vue) to do it.
