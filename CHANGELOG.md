@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.0.1
+
+### Fixed
+
+- `te-accordion` left a strip of the panel content visible while collapsed.
+  `overflow` clips at the padding box, and the collapsing grid item carried the
+  body's `py-4` padding, which set a 32px floor on its height. The padding now
+  lives on an inner element so a collapsed panel measures 0px.
+
 ## 1.0.0
 
 First stable release. This version requires **Vue 3.5+** and **Tailwind CSS v4**,
