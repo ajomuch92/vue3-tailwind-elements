@@ -7,12 +7,6 @@ export type Size = (typeof SIZES)[number];
 export const VARIANTS = ['normal', 'primary', 'secondary', 'success', 'info', 'warning', 'danger', 'pink', 'purple', 'light', 'dark'] as const;
 export type Variant = (typeof VARIANTS)[number];
 
-export const ALERT_TYPES = ['normal', 'primary', 'success', 'info', 'warning', 'danger'] as const;
-export type AlertType = (typeof ALERT_TYPES)[number];
-
-export const BADGE_TYPES = ['normal', 'primary', 'success', 'info', 'warning', 'danger', 'pink', 'purple'] as const;
-export type BadgeType = (typeof BADGE_TYPES)[number];
-
 export const SPINNER_TYPES = ['normal', 'growing'] as const;
 export type SpinnerType = (typeof SPINNER_TYPES)[number];
 
