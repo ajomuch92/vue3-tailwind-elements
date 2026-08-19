@@ -63,14 +63,16 @@
         <div class="flex justify-between items-center mb-2">
           <div>
             <select
-              name="hours"
+              name="month"
+              aria-label="Month"
               class="bg-transparent text-lg font-bold text-gray-800 appearance-none focus:outline-2 focus:outline-blue-500"
               v-model="month"
             >
               <option v-for="(month, key) in monthNames" :key="key" :value="key">{{ month }}</option>
             </select>
             <select
-              name="hours"
+              name="year"
+              aria-label="Year"
               class="bg-transparent text-lg font-normal text-gray-600 appearance-none focus:outline-2 focus:outline-blue-500"
               v-model="year"
             >
