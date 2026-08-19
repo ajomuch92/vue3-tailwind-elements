@@ -1,33 +1,17 @@
 # Vue Tailwind Elements
 A light library of components based on [Tailwind Elements](https://tailwind-elements.com/) and [Tailwind](https://tailwindcss.com/) for Vuejs 3.
-Currently, project under CONSTRUCTION, do not use for production. 
+Requires **Vue 3.5+** and **Tailwind CSS v4**.
 For Vuejs 2, refer to [this package](https://www.npmjs.com/package/vue-tailwind-elements).
 
-### Migrated Components
-* Accordion
-* Alert
-* Badge
-* Breadcrumb
-* Button
-* Button group
-* Spinner
-* Card
-* Checkbox
-* Chip
-* Icon
-* Datepicker
-* File picker
-* Icon
-* Input
-* List group
-* Loading
-* Spinner
-* v outside directive
+### Components
+`te-accordion` · `te-alert` · `te-badge` · `te-breadcrumb` · `te-button` ·
+`te-button-group` · `te-card` · `te-checkbox` · `te-chip` · `te-date-picker` ·
+`te-file` · `te-icon` · `te-input` · `te-list-group` · `te-loading` ·
+`te-spinner`
 
-The last two components are not available as standalone components.
+Plus the `v-click-outside` directive. All of them are registered globally by
+the plugin and can also be imported by name.
 # Installation
-
-Requires **Vue 3.5+** and **Tailwind CSS v4**.
 
 1. Install Tailwind v4 following [this guide](https://tailwindcss.com/docs/installation/using-vite).
 
@@ -57,6 +41,29 @@ createApp(App)
 @import "vue3-tailwind-elements/css";
 ```
 
+### Icons
+
+`te-icon` renders [Bootstrap Icons](https://icons.getbootstrap.com/) class
+names (`bi bi-*`) by default, so install the font if you use it:
+
+```bash
+npm install bootstrap-icons
+```
+```css
+@import "bootstrap-icons/font/bootstrap-icons.css";
+```
+
+`social` icons are inline SVG and need no font. To use a different set, pass
+`family` and register it when installing the plugin:
+
+```ts
+app.use(Vue3TailwindElements, {
+  customIcons: {
+    fa: { prefix: 'fa-', icons: { star: 'star' } },
+  },
+});
+```
+
 That is the whole setup. There is no `tailwind.config.js` and no `content`
 array to maintain — the stylesheet carries its own `@source`, so Tailwind
 finds the classes this library uses on its own.
@@ -71,6 +78,35 @@ no extra setup. Individual components can also be imported directly:
 import { TeButton, TeDatePicker } from 'vue3-tailwind-elements';
 import type { Variant, Size } from 'vue3-tailwind-elements';
 ```
+
+## Upgrading from 0.0.x
+
+1.0.0 requires Tailwind v4 and replaces the JavaScript plugin with a
+stylesheet. In short:
+
+```diff
+  /* tailwind.config.js — usually deletable now */
+- content: ['./node_modules/vue3-tailwind-elements/**/*.{js,ts,vue}'],
+- plugins: [require('vue3-tailwind-elements/dist/plugin')],
+```
+```diff
+  /* your stylesheet */
+- @tailwind base;
+- @tailwind components;
+- @tailwind utilities;
++ @import "tailwindcss";
++ @import "vue3-tailwind-elements/css";
+```
+```diff
+  /* main.ts */
+- import 'vue3-tailwind-elements/dist/style.css';
++ import 'vue3-tailwind-elements/style.css';
+```
+
+`vue` and `tailwindcss` are peer dependencies now, and the bundled Bootstrap 5
+stylesheet (`.modal`, `.offcanvas`, `.navbar`, `--bs-*`, …) has been removed.
+See the [CHANGELOG](./CHANGELOG.md) for the full list of breaking changes and
+fixes.
 
 See an example [here](https://github.com/ajomuch92/vue3-tailwind-elements/tree/main/example) or documentation [here](https://vue-tailwind-elements.netlify.app/).
 
