@@ -599,6 +599,30 @@
 }
 
 /* ---------------------------------------------------------------------------
+ * Loading backdrop
+ * ------------------------------------------------------------------------ */
+
+@layer components {
+  /* te-loading used to paint a class that nothing defined — the overlay was
+     invisible — and positioned itself `absolute`, so it only covered the
+     nearest positioned ancestor instead of the viewport. */
+  .te-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 0.75rem;
+    /* A light scrim keeps the default (dark) spinner and label readable.
+       Override .te-backdrop in your own CSS for a dark one. */
+    background-color: color-mix(in oklab, var(--color-white) 70%, transparent);
+    backdrop-filter: blur(2px);
+  }
+}
+
+/* ---------------------------------------------------------------------------
  * Utilities carried over
  * ------------------------------------------------------------------------ */
 
