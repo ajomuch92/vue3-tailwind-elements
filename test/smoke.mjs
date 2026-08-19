@@ -30,7 +30,7 @@ const cases = {
   'te-icon': { name: 'star', family: 'fa' },
   'te-input': { modelValue: 'abc', helperText: 'help', rightIcon: 'star', invalid: true },
   'te-list-group': { items: ['one', { label: 'two', disabled: true }], activeItem: 1 },
-  'te-loading': { text: 'loading' },
+  'te-loading': { text: 'loading', modelValue: true },
   'te-spinner': { type: 'growing', color: 'danger' },
 };
 
@@ -60,6 +60,18 @@ test('te-accordion opens its default item', async () => {
   const shut = await render('te-accordion', { items: ['a'] });
   assert.match(open, /is-open/);
   assert.doesNotMatch(shut, /is-open/);
+});
+
+test('te-loading is driven by v-model', async () => {
+  assert.match(await render('te-loading', { modelValue: true }), /te-backdrop/);
+  assert.equal(await render('te-loading', { modelValue: false }), '<!---->');
+});
+
+test('te-input needs no secure context for its id', async () => {
+  const html = await render('te-input', { modelValue: 'x', floating: true, placeholder: 'Name' });
+  const id = html.match(/id="([^"]+)"/)?.[1];
+  assert.ok(id, 'input rendered without an id');
+  assert.match(html, new RegExp(`for="${id}"`), 'label is not bound to the input id');
 });
 
 test('te-icon resolves a custom family', async () => {

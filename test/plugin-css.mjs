@@ -83,7 +83,7 @@ test('component-critical rules survive', () => {
   for (const rule of [
     '.spinner-border', '.spinner-grow', '@keyframes te-spinner-grow',
     '.visually-hidden', '.form-floating', '.accordion-button', '.chip',
-    '.form-check-input', '.file-control', '.badge',
+    '.form-check-input', '.file-control', '.badge', '.te-backdrop',
   ]) {
     assert.ok(has(rule), `missing ${rule}`);
   }
@@ -96,6 +96,12 @@ test('no utilities removed in Tailwind v4 remain in templates', () => {
   for (const dead of ['bg-opacity-', 'text-opacity-', 'border-opacity-', 'flex-shrink-', 'shadow-outline']) {
     assert.ok(!templates.includes(dead), `${dead} was removed in Tailwind v4`);
   }
+});
+
+test('the loading backdrop covers the viewport and is visible', () => {
+  const b = block('.te-backdrop');
+  assert.match(b, /position: fixed/, 'backdrop is not fixed to the viewport');
+  assert.match(b, /background-color: color-mix/, 'backdrop has no scrim');
 });
 
 test('the Bootstrap dump is gone', () => {
