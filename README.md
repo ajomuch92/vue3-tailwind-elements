@@ -25,51 +25,57 @@ For Vuejs 2, refer to [this package](https://www.npmjs.com/package/vue-tailwind-
 * v outside directive
 
 The last two components are not available as standalone components.
-# Instalation
+# Installation
 
-1. Install Tailwind. Follow this [guide](https://tailwindcss.com/docs/guides/vite#vue) to do it.
+Requires **Vue 3.5+** and **Tailwind CSS v4**.
 
-2. Install the package from NPM:  
+1. Install Tailwind v4 following [this guide](https://tailwindcss.com/docs/installation/using-vite).
+
+2. Install the package:
 ```bash
 npm install vue3-tailwind-elements
 ```
-3. Import in your main.js (or index.js) file and install it:
 
-```javascript
-...
+3. Register the plugin in your `main.ts` (or `main.js`):
+
+```ts
+import { createApp } from 'vue';
+import App from './App.vue';
 import Vue3TailwindElements from 'vue3-tailwind-elements';
-import 'vue3-tailwind-elements/dist/style.css';
+import 'vue3-tailwind-elements/style.css';
+import './style.css';
 
 createApp(App)
   .use(Vue3TailwindElements)
   .mount('#app');
-...
 ```
 
-4. And add these lines to your tailwind.config.js file:
+4. Add one import to your stylesheet:
 
-```javascript
-...
-  module.exports = {
-    content: [
-      ...
-      './node_modules/vue-tailwind-elements/**/*.{js,ts,vue}'
-    ],
-    theme: {
-      extend: {},
-    },
-    plugins: [
-      require('vue-tailwind-elements/dist/plugin'),
-    ],
-  }
-...
+```css
+@import "tailwindcss";
+@import "vue3-tailwind-elements/css";
+```
 
+That is the whole setup. There is no `tailwind.config.js` and no `content`
+array to maintain — the stylesheet carries its own `@source`, so Tailwind
+finds the classes this library uses on its own.
+
+## TypeScript
+
+Types ship with the package. Global components are typed too, so
+`<te-button type="primary">` is checked and autocompleted in templates with
+no extra setup. Individual components can also be imported directly:
+
+```ts
+import { TeButton, TeDatePicker } from 'vue3-tailwind-elements';
+import type { Variant, Size } from 'vue3-tailwind-elements';
 ```
 
 See an example [here](https://github.com/ajomuch92/vue3-tailwind-elements/tree/main/example) or documentation [here](https://vue-tailwind-elements.netlify.app/).
 
 ## Nuxt:
-Put the last configuration into a plugin file and the use it into the nuxt.config.js file like this:
+Put the plugin registration into a plugin file and use it in `nuxt.config.ts` like this:
 
 ```javascript
 ...
