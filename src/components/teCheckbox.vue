@@ -1,6 +1,6 @@
 <template>
   <label class="inline-flex items-center">
-    <input v-model="model" type="checkbox" class="form-checkbox h-4 w-4" :disabled="disabled" :value="nativeValue" />
+    <input v-model="model" type="checkbox" class="h-4 w-4" :disabled="disabled" :value="nativeValue" />
     <span class="ml-2" :class="{'opacity-50': disabled}">
       <slot name="default" :selected="model">
         {{label}}

@@ -2,7 +2,7 @@
   <div class="input-container">
     <div class="relative" :class="{'form-floating': floating}">
       <input
-        :id="id"
+        :id="inputId"
         v-model="model"
         :type="type"
         :name="name"
@@ -56,14 +56,14 @@
         :name="leftIcon"
         @click="leftIconClickable && emit('left-icon-click', $event)"
       />
-      <label v-if="floating" :for="id" class="text-gray-700">{{placeholder}}</label>
+      <label v-if="floating" :for="inputId" class="text-gray-700">{{placeholder}}</label>
     </div>
     <div v-if="helperText" class="text-sm mt-1" :class="{'text-red-500':invalid, 'text-gray-700': !invalid}">{{helperText}}</div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, useId } from 'vue';
 import teIcon from './teIcon.vue';
 import { oneOf, SIZES } from '../types';
 
@@ -84,7 +84,7 @@ const emit = defineEmits<{
 const model = defineModel<string | number>({ default: '' });
 
 const props = defineProps({
-  id: { type: String, default: () => `te-input-${crypto.randomUUID()}` },
+  id: { type: String, default: undefined },
   type: { ...oneOf(['text', 'number', 'email', 'search', 'password', 'tel', 'url'] as const), default: 'text' },
   disabled: { type: Boolean, default: false },
   form: { type: String, default: undefined },
@@ -111,6 +111,11 @@ const props = defineProps({
   leftIconFamily: { type: String, default: undefined },
   leftIconClass: { type: String, default: 'text-2xl' },
 });
+
+/* useId() is SSR-stable and needs no secure context, unlike
+   crypto.randomUUID(), which is undefined over plain HTTP. */
+const uid = useId();
+const inputId = computed(() => props.id ?? uid);
 
 const sizeClass = computed(() => ({
   small: 'px-2 py-1 text-sm',

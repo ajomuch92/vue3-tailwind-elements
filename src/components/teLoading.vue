@@ -1,7 +1,7 @@
 <template>
-  <div class="backdrop absolute top-0 left-0 flex flex-col justify-center items-center h-screen w-full">
+  <div v-if="model" class="te-backdrop" role="status" aria-live="polite" :aria-label="text || 'Loading'">
     <te-spinner :type="type" :size="size" :color="color"/>
-    <label>{{text}}</label>
+    <label v-if="text">{{text}}</label>
   </div>
 </template>
 
@@ -10,6 +10,10 @@ import teSpinner from './teSpinner.vue';
 import { oneOf, SIZES, SPINNER_TYPES, VARIANTS } from '../types';
 
 defineOptions({ name: 'TeLoading' });
+
+/* Visibility is the close API: `<te-loading v-model="loading" />`. Defaults to
+   true so the plain `<te-loading v-if="...">` usage keeps working. */
+const model = defineModel<boolean>({ default: true });
 
 defineProps({
   type: { ...oneOf(SPINNER_TYPES), default: 'normal' },
