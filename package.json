@@ -42,7 +42,7 @@
     "typecheck": "vue-tsc --noEmit",
     "build": "vue-tsc --noEmit && vite build && ncp ./src/plugin dist/plugin",
     "preview": "vite preview",
-    "test": "npm run build && node --test test/"
+    "test": "npm run build && node --test"
   },
   "devDependencies": {
     "@types/node": "^26.2.0",
