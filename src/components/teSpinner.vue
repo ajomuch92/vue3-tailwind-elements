@@ -4,34 +4,20 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { computed } from 'vue';
+import { oneOf, SIZES, SPINNER_TYPES, VARIANTS } from '../types';
+
+defineOptions({ name: 'TeSpinner' });
+
 const props = defineProps({
-  type: {
-    type: String,
-    default: 'normal',
-    validator: (value) => ['normal', 'growing'].includes(value)
-  },
-  size: {
-    type: String,
-    default: 'medium',
-    validator: (value) => ['small', 'medium', 'large'].includes(value)
-  },
-  color: {
-    type: String,
-    default: 'primary',
-    validator: (value) => ['normal', 'primary', 'secondary', 'success', 'warning', 'danger', 'pink', 'purple', 'light', 'dark'].includes(value)
-  },
+  type: { ...oneOf(SPINNER_TYPES), default: 'normal' },
+  size: { ...oneOf(SIZES), default: 'medium' },
+  color: { ...oneOf(VARIANTS), default: 'primary' },
 });
 
-const typeClass = computed(() => (
-  {
-    'spinner-border animate-spin border-4': props.type === 'normal',
-    'spinner-grow bg-current opacity-0': props.type === 'growing',
-  }
-));
+const typeClass = computed(() => ({
+  'spinner-border animate-spin border-4': props.type === 'normal',
+  'spinner-grow bg-current opacity-0': props.type === 'growing',
+}));
 </script>
-
-<style scoped>
-
-</style>

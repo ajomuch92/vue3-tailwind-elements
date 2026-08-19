@@ -6,29 +6,16 @@
   </div>
 </template>
 
-<script>
-  export default {
-    name: 'TeAlert'
-  }
-</script>
-
-<script setup>
+<script setup lang="ts">
 import { computed } from 'vue';
+import { oneOf, VARIANTS } from '../types';
+
+defineOptions({ name: 'TeAlert' });
 
 const props = defineProps({
-  text: {
-    type: String,
-    default: '',
-  },
-  type: {
-    type: String,
-    default: 'normal',
-    validator: (value) => ['normal','primary', 'success', 'info', 'warning', 'danger'].includes(value)
-  },
-  solid: {
-    type: Boolean,
-    default: false,
-  }
+  text: { type: String, default: '' },
+  type: { ...oneOf(VARIANTS), default: 'normal' },
+  solid: { type: Boolean, default: false },
 });
 
 const getClass = computed(() => ({

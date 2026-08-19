@@ -9,62 +9,33 @@
   >
 </template>
 
-<script setup>
+<script setup lang="ts">
+import { oneOf, SIZES } from '../types';
 
-const emit = defineEmits(['update:modelValue']);
+defineOptions({ name: 'TeFile' });
 
-const props = defineProps({
-  modelValue: {
-    type: [String, Array],
-    default: ''
-  },
-  accept: {
-    type: String,
-    default: ''
-  },
-  disabled: {
-    type: Boolean,
-    default: false
-  },
-  multiple: {
-    type: Boolean,
-    default: false
-  },
-  size: {
-    type: String,
-    default: 'medium',
-    validator: (value) => ['small', 'medium', 'large'].includes(value)
-  },
+const model = defineModel<string | string[]>({ default: '' });
+
+defineProps({
+  accept: { type: String, default: '' },
+  disabled: { type: Boolean, default: false },
+  multiple: { type: Boolean, default: false },
+  size: { ...oneOf(SIZES), default: 'medium' },
 });
 
-function getBase64(file) {
-  return new Promise ((resolve, reject) => {
+function getBase64(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.readAsDataURL(file);
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = (error) => reject(error);
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = () => reject(reader.error);
   });
 }
 
-async function fileChange(e) {
-  const files = e.target.files || e.dataTransfer.files;
-  if(files.length) {
-    const filesConverted = [];
-    for(const file of files) {
-      const base64 = await getBase64(file);
-      filesConverted.push(base64);
-    }
-    if(filesConverted.length === 1) {
-      emit('update:modelValue', filesConverted[0]);
-    } else if (filesConverted.length > 1) {
-      emit('update:modelValue', filesConverted);
-    }
-  }
-}
-</script>
-
-<script>
-export default {
-  name: 'teFile',
+async function fileChange(event: Event) {
+  const files = (event.target as HTMLInputElement).files;
+  if (!files?.length) return;
+  const filesConverted = await Promise.all([...files].map(getBase64));
+  model.value = filesConverted.length === 1 ? filesConverted[0] : filesConverted;
 }
 </script>

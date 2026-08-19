@@ -1,7 +1,7 @@
 {
   "name": "vue3-tailwind-elements",
   "private": false,
-  "version": "0.0.18-beta",
+  "version": "1.0.0",
   "author": {
     "name": "Aarón Montes"
   },
@@ -20,34 +20,52 @@
   "module": "./dist/vue3-tailwind-elements.js",
   "exports": {
     ".": {
+      "types": "./dist/index.d.ts",
       "import": "./dist/vue3-tailwind-elements.js",
       "require": "./dist/vue3-tailwind-elements.umd.cjs"
     },
-    "./dist/style.css": {
-      "import": "./dist/style.css",
-      "require": "./dist/style.css"
-    },
-    "./dist/plugin/index.js": {
-      "import": "./dist/plugin/index.js",
-      "require": "./dist/plugin/index.js"
-    },
-    "./dist/plugin": {
-      "import": "./dist/plugin/index.js",
-      "require": "./dist/plugin/index.js"
-    }
+    "./dist/style.css": "./dist/vue3-tailwind-elements.css",
+    "./css": "./dist/plugin/index.css",
+    "./dist/plugin/index.css": "./dist/plugin/index.css",
+    "./style.css": "./dist/vue3-tailwind-elements.css",
+    "./dist/vue3-tailwind-elements.css": "./dist/vue3-tailwind-elements.css"
   },
   "scripts": {
     "dev": "vite",
-    "build": "vite build && ncp ./src/plugin dist/plugin",
-    "preview": "vite preview"
-  },
-  "dependencies": {
-    "vue": "^3.2.47"
+    "typecheck": "vue-tsc --noEmit",
+    "build": "vue-tsc --noEmit && vite build && ncp ./src/plugin dist/plugin",
+    "preview": "vite preview",
+    "test": "npm run build && node --test",
+    "prepublishOnly": "npm test"
   },
   "devDependencies": {
-    "@vitejs/plugin-vue": "^4.1.0",
+    "@happy-dom/global-registrator": "^20.11.2",
+    "@tailwindcss/cli": "^4.3.3",
+    "@types/node": "^26.2.0",
+    "@vitejs/plugin-vue": "^6.0.8",
+    "happy-dom": "^20.11.2",
     "ncp": "^2.0.0",
-    "tailwindcss": "^3.3.1",
-    "vite": "^4.3.0"
-  }
+    "tailwindcss": "^4.3.3",
+    "typescript": "~5.9",
+    "vite": "^7.3.6",
+    "vite-plugin-dts": "^4.5.4",
+    "vue-tsc": "^3.3.10"
+  },
+  "types": "./dist/index.d.ts",
+  "peerDependencies": {
+    "tailwindcss": "^4.0.0",
+    "vue": "^3.5.0"
+  },
+  "engines": {
+    "node": "^20.19.0 || >=22.12.0"
+  },
+  "keywords": [
+    "vue",
+    "vue3",
+    "tailwind",
+    "tailwindcss",
+    "components",
+    "ui",
+    "typescript"
+  ]
 }

@@ -21,40 +21,18 @@
   </div>
 </template>
 
-<script>
-  export default {
-    name: 'TeCard'
-  }
-</script>
-
-<script setup>
+<script setup lang="ts">
 import { computed } from 'vue';
 
+defineOptions({ name: 'TeCard' });
+
 const props = defineProps({
-  imgSrc: {
-    type: String,
-    default: '',
-  },
-  width: {
-    type: [String, Number],
-    default: '350px',
-  },
-  hasHeader: {
-    type: Boolean,
-    default: false
-  },
-  hasFooter: {
-    type: Boolean,
-    default: false
-  },
-  shadowless: {
-    type: Boolean,
-    default: false
-  },
-  title: {
-    type: String,
-    default: ''
-  }
+  imgSrc: { type: String, default: '' },
+  width: { type: [String, Number], default: '350px' },
+  hasHeader: { type: Boolean, default: false },
+  hasFooter: { type: Boolean, default: false },
+  shadowless: { type: Boolean, default: false },
+  title: { type: String, default: '' },
 });
 
 const widthComputed = computed(() => typeof props.width === 'string' ? props.width : `${props.width}px`);

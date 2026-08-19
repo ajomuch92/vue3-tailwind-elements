@@ -8,48 +8,30 @@
       :outlined="outlined"
       no-rounded
       :class="{'rounded-l': n===1, 'rounded-r': n===quantity}"
-      :disabled="disabled[n-1]||false"
-      @click="emit('click', {index: n, event: $event})"
+      :disabled="disabled[n-1] || false"
+      @click="emit('click', { index: n, event: $event })"
     >
-      <slot :name="`button-${n}`" v-bind:index="n" />
+      <slot :name="`button-${n}`" :index="n" />
     </te-button>
   </div>
 </template>
 
-<script>
-  export default {
-    name: 'TeButtonGroup'
-  }
-</script>
+<script setup lang="ts">
+import type { PropType } from 'vue';
+import teButton from './teButton.vue';
+import { oneOf, SIZES, VARIANTS } from '../types';
 
-<script setup>
-import TeButton from './teButton.vue';
+defineOptions({ name: 'TeButtonGroup' });
 
-const emit = defineEmits(['click']);
+const emit = defineEmits<{
+  click: [payload: { index: number; event: MouseEvent }];
+}>();
 
 defineProps({
-  quantity: {
-    type: Number,
-    default: 1,
-  },
-  type: {
-    type: String,
-    default: 'primary',
-    validator: (value) => ['normal', 'primary', 'success', 'info', 'warning', 'danger', 'pink', 'purple'].includes(value)
-  },
-  size: {
-    type: String,
-    default: 'medium',
-    validator: (value) => ['small', 'medium','large'].includes(value)
-  },
-  outlined: {
-    type: Boolean,
-    default: false,
-  },
-  disabled: {
-    type: Array,
-    default: () => []
-  },
+  quantity: { type: Number, default: 1 },
+  type: { ...oneOf(VARIANTS), default: 'primary' },
+  size: { ...oneOf(SIZES), default: 'medium' },
+  outlined: { type: Boolean, default: false },
+  disabled: { type: Array as PropType<boolean[]>, default: () => [] },
 });
-
 </script>
