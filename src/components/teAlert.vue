@@ -8,13 +8,13 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import { ALERT_TYPES, oneOf } from '../types';
+import { oneOf, VARIANTS } from '../types';
 
 defineOptions({ name: 'TeAlert' });
 
 const props = defineProps({
   text: { type: String, default: '' },
-  type: { ...oneOf(ALERT_TYPES), default: 'normal' },
+  type: { ...oneOf(VARIANTS), default: 'normal' },
   solid: { type: Boolean, default: false },
 });
 

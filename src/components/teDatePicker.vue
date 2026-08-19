@@ -15,7 +15,7 @@
             py-3
             leading-none
             rounded-lg
-            focus:outline-none focus:shadow-outline
+            focus:outline-none
             text-gray-600
             font-medium
             border-2
@@ -64,14 +64,14 @@
           <div>
             <select
               name="hours"
-              class="bg-transparent text-lg font-bold text-gray-800 appearance-none outline-none"
+              class="bg-transparent text-lg font-bold text-gray-800 appearance-none focus:outline-2 focus:outline-blue-500"
               v-model="month"
             >
               <option v-for="(month, key) in monthNames" :key="key" :value="key">{{ month }}</option>
             </select>
             <select
               name="hours"
-              class="bg-transparent text-lg font-normal text-gray-600 appearance-none outline-none"
+              class="bg-transparent text-lg font-normal text-gray-600 appearance-none focus:outline-2 focus:outline-blue-500"
               v-model="year"
             >
               <option v-for="($year, key) in years" :key="key" :value="$year">{{ $year }}</option>
