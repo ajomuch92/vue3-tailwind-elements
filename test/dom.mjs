@@ -144,6 +144,18 @@ test('te-accordion toggles a panel and emits open/close', async () => {
   w.unmount();
 });
 
+test('te-accordion clips on an element without padding', () => {
+  // `overflow` clips at the padding box, so the collapsing element must carry
+  // no padding — otherwise the collapsed panel keeps a strip of content
+  // visible. happy-dom does no layout, so this guards the structure instead.
+  const w = mount('te-accordion', { items: ['a'] });
+  const clip = w.$('.accordion-collapse > .accordion-clip');
+  assert.ok(clip, 'the padding-free clipping wrapper is gone');
+  assert.ok(clip.querySelector('.accordion-body'), '.accordion-body is not inside the clip');
+  assert.ok(![...clip.classList].some((c) => /^p[xyltrb]?-/.test(c)), 'the clip element gained padding');
+  w.unmount();
+});
+
 test('te-accordion singleOpen keeps only one panel open', async () => {
   const w = mount('te-accordion', { items: ['a', 'b', 'c'], singleOpen: true });
   const headers = w.$$('button.accordion-button');

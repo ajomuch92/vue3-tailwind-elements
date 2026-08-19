@@ -43,8 +43,10 @@
         class="accordion-collapse"
         :class="{'border-0': flush, 'is-open': itemsOpened.includes(key)}"
       >
-        <div class="accordion-body py-4 px-5">
-          <slot :name="`content-${key+1}`" />
+        <div class="accordion-clip">
+          <div class="accordion-body py-4 px-5">
+            <slot :name="`content-${key+1}`" />
+          </div>
         </div>
       </div>
     </div>
@@ -101,8 +103,11 @@ function toggle(key: number) {
     grid-template-rows: 1fr;
   }
 
-  .accordion-collapse > .accordion-body {
-    box-sizing: border-box;
+  /* The clipping element must carry no padding of its own: `overflow` clips at
+     the padding box, so padding here would set a floor on the collapsed height
+     and leave a strip of content showing. The padding lives on .accordion-body
+     inside it. */
+  .accordion-clip {
     overflow: hidden;
     min-height: 0;
   }
