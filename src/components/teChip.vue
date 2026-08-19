@@ -16,35 +16,26 @@
   </span>
 </template>
 
-<script>
-  export default {
-    name: 'TeChip'
-  }
-</script>
-
-<script setup>
+<script setup lang="ts">
 import { computed } from 'vue';
+import { oneOf, SIZES, VARIANTS } from '../types';
+
+defineOptions({ name: 'TeChip' });
+
+const emit = defineEmits<{ close: [event: MouseEvent] }>();
 
 const props = defineProps({
-  type: {
-    type: String,
-    default: 'light',
-    validator: (value) => ['normal', 'primary', 'secondary', 'success', 'warning', 'danger', 'pink', 'purple', 'light', 'dark'].includes(value)
-  },
-  size: {
-    type: String,
-    default: 'medium',
-    validator: (value) => ['small', 'medium','large'].includes(value)
-  },
-  closable: {
-    type: Boolean,
-    default: false,
-  },
-  imgUrl: {
-    type: String,
-    default: '',
-  }
-})
+  type: { ...oneOf(VARIANTS), default: 'light' },
+  size: { ...oneOf(SIZES), default: 'medium' },
+  closable: { type: Boolean, default: false },
+  imgUrl: { type: String, default: '' },
+});
+
+const sizeClass = computed(() => ({
+  'h-9': props.size === 'small',
+  'h-11': props.size === 'medium',
+  'h-14': props.size === 'large',
+}));
 
 const widthImgClass = computed(() => ({
   'w-9': props.size === 'small',

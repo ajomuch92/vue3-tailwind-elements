@@ -29,19 +29,19 @@
           "
           :class="{'collapsed': !itemsOpened.includes(key)}"
           type="button"
+          :aria-expanded="itemsOpened.includes(key)"
+          :aria-controls="`collapse-${key}`"
           @click="toggle(key)"
         >
-          <slot v-bind:title="item" :name="`header-${key+1}`">
+          <slot :title="item" :name="`header-${key+1}`">
             {{item}}
           </slot>
         </button>
       </h2>
       <div
-        ref="collapseRefs[key]"
         :id="`collapse-${key}`"
         class="accordion-collapse"
-        :class="{'border-0': flush}"
-        :style="getItemStyle(key)"
+        :class="{'border-0': flush, 'is-open': itemsOpened.includes(key)}"
       >
         <div class="accordion-body py-4 px-5">
           <slot :name="`content-${key+1}`" />
@@ -51,44 +51,25 @@
   </div>
 </template>
 
-<script>
-  export default {
-    name: 'TeAccordion'
-  }
-</script>
+<script setup lang="ts">
+import { computed, ref, watch } from 'vue';
+import type { PropType } from 'vue';
 
-<script setup>
-import { computed, onMounted, ref, watch } from 'vue';
+defineOptions({ name: 'TeAccordion' });
 
-const emit = defineEmits(['open', 'close']);
+const emit = defineEmits<{
+  open: [key: number];
+  close: [key: number];
+}>();
 
 const props = defineProps({
-  items: {
-    type: Array,
-    default: () => []
-  },
-  flush: {
-    type: Boolean,
-    default: false,
-  },
-  singleOpen: {
-    type: Boolean,
-    default: false,
-  },
-  defaultOpen: {
-    type: Array,
-    default: () => [],
-  }
+  items: { type: Array as PropType<unknown[]>, default: () => [] },
+  flush: { type: Boolean, default: false },
+  singleOpen: { type: Boolean, default: false },
+  defaultOpen: { type: Array as PropType<number[]>, default: () => [] },
 });
 
-const itemsOpened = ref([]);
-const isMounted = ref(false);
-const collapseRefs = ref([]);
-
-onMounted(() => {
-  isMounted.value = true;
-  itemsOpened.value = props.defaultOpen;
-});
+const itemsOpened = ref<number[]>([...props.defaultOpen]);
 
 const singleOpen = computed(() => props.singleOpen);
 
@@ -96,29 +77,33 @@ watch(singleOpen, () => {
   itemsOpened.value = [];
 });
 
-function toggle(key) {
-  if (!itemsOpened.value.includes(key)) {
-    if (singleOpen.value) itemsOpened.value = [];
-    itemsOpened.value.push(key);
+function toggle(key: number) {
+  const index = itemsOpened.value.indexOf(key);
+  if (index === -1) {
+    itemsOpened.value = props.singleOpen ? [key] : [...itemsOpened.value, key];
     emit('open', key);
   } else {
-    const index = itemsOpened.value.indexOf(key)
     itemsOpened.value.splice(index, 1);
     emit('close', key);
   }
 }
-
-function getItemStyle(key) {
-  if (!isMounted.value) return {};
-  const ref = collapseRefs[key];
-  return itemsOpened.value.includes(key) ? { maxHeight: `${ref.scrollHeight}px` } : {}
-}
 </script>
 
 <style scoped>
+  /* Grid 0fr -> 1fr animates to the content's natural height with no JS measuring. */
   .accordion-collapse {
-    max-height: 0;
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.2s ease-out;
+  }
+
+  .accordion-collapse.is-open {
+    grid-template-rows: 1fr;
+  }
+
+  .accordion-collapse > .accordion-body {
+    box-sizing: border-box;
     overflow: hidden;
-    transition: max-height 0.2s ease-out;
+    min-height: 0;
   }
 </style>

@@ -12,42 +12,19 @@
   </span>
 </template>
 
-<script>
-  export default {
-    name: 'TeBadge'
-  }
-</script>
-
-<script setup>
+<script setup lang="ts">
 import { computed } from 'vue';
+import { BADGE_TYPES, oneOf } from '../types';
+
+defineOptions({ name: 'TeBadge' });
 
 const props = defineProps({
-  text: {
-    type: String,
-    default: '',
-  },
-  type: {
-    type: String,
-    default: 'normal',
-    validator: (value) => ['normal','primary', 'success', 'info', 'warning', 'danger', 'pink', 'purple'].includes(value)
-  },
-  size: {
-    type: String,
-    default: 'small',
-    validator: (value) => ['small','large'].includes(value)
-  },
-  solid: {
-    type: Boolean,
-    default: false,
-  },
-  rounded: {
-    type: Boolean,
-    default: false,
-  },
-  outlined: {
-    type: Boolean,
-    default: false,
-  }
+  text: { type: String, default: '' },
+  type: { ...oneOf(BADGE_TYPES), default: 'normal' },
+  size: { ...oneOf(['small', 'large'] as const), default: 'small' },
+  solid: { type: Boolean, default: false },
+  rounded: { type: Boolean, default: false },
+  outlined: { type: Boolean, default: false },
 });
 
 const getClass = computed(() => ({

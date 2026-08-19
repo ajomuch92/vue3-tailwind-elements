@@ -109,43 +109,30 @@
   <i v-else :class="iconName" />
 </template>
 
-<script>
-  export default {
-    name: 'TeIcon'
-  }
-</script>
-
-<script setup>
+<script setup lang="ts">
 import { computed } from 'vue';
 import useOptions from '../options';
+
+defineOptions({ name: 'TeIcon' });
 
 const { options } = useOptions();
 
 const props = defineProps({
-  name: {
-    type: String,
-    required: true,
-  },
-  social: {
-    type: Boolean,
-    default: false,
-  },
-  family: {
-    type: String,
-    default: undefined,
-  }
+  name: { type: String, required: true },
+  social: { type: Boolean, default: false },
+  family: { type: String, default: undefined },
 });
 
 const iconName = computed(() => {
   if (props.family) {
-    const { customIcons } = options.value;
-    const { icons, prefix } = customIcons[props.family];
-    return `${prefix}${icons[props.name]}`;
+    const family = options.value.customIcons?.[props.family];
+    if (!family) {
+      console.warn(`[te-icon] unknown icon family "${props.family}"`);
+      return '';
+    }
+    return `${family.prefix}${family.icons[props.name] ?? props.name}`;
   }
-  let name = props.name;
-  if (!name.includes('bi')) {
-    name = `bi-${name}`
-  }
+  const name = props.name.includes('bi') ? props.name : `bi-${props.name}`;
   return `bi ${name}`;
 });
 </script>

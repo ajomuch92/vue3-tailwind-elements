@@ -5,7 +5,7 @@
         <input
           type="text"
           readonly
-          v-model="datepickerValue"
+          :value="datepickerValue"
           @click="showDatepicker = !showDatepicker"
           @keydown.esc="showDatepicker = false"
           class="
@@ -150,7 +150,7 @@
         </div>
 
         <div class="flex flex-wrap -mx-1">
-          <template v-for="(blankday, key) in blankdays" :key="`bd-${key}`">
+          <template v-for="key in blankdays.length" :key="`bd-${key}`">
             <div
               style="width: 14.28%"
               class="
@@ -194,204 +194,133 @@
   </div>
 </template>
 
-<script>
-  export default {
-    name: 'TeDatePicker'
-  };
-</script>
-
-<script setup>
+<script setup lang="ts">
 import { computed, ref, watch } from 'vue';
-import { clickOutside as vClickOutside} from '../directives';
+import type { PropType } from 'vue';
+import { clickOutside as vClickOutside } from '../directives';
 
-const emit = defineEmits(['update:modelValue'])
+defineOptions({ name: 'TeDatePicker' });
+
+const model = defineModel<Date | null>({ default: null });
 
 const props = defineProps({
-  modelValue: {
-    type: Date,
-    default: null,
-  },
   monthNames: {
-    type: Array,
+    type: Array as PropType<string[]>,
     default: () => [
-      'January',
-      'February',
-      'March',
-      'April',
-      'May',
-      'June',
-      'July',
-      'August',
-      'September',
-      'October',
-      'November',
-      'December',
+      'January', 'February', 'March', 'April', 'May', 'June',
+      'July', 'August', 'September', 'October', 'November', 'December',
     ],
   },
   days: {
-    type: Array,
-    default: () => ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+    type: Array as PropType<string[]>,
+    default: () => ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
   },
-  disabled: {
-    type: Boolean,
-    default: false,
-  },
-  placeholder: {
-    type: String,
-    default: 'Select a date'
-  },
-  maxDate: {
-    type: Date,
-    default: null
-  },
-  minDate: {
-    type: Date,
-    default: null
-  },
+  disabled: { type: Boolean, default: false },
+  placeholder: { type: String, default: 'Select a date' },
+  maxDate: { type: Date, default: null },
+  minDate: { type: Date, default: null },
   notAllowedDates: {
-    type: Array,
+    type: Array as PropType<Date[]>,
     default: () => [],
-    validator: (value) => value.length === 0 || value.every(r => r instanceof Date && r.getTime())
+    validator: (value: unknown) =>
+      Array.isArray(value) && value.every((r) => r instanceof Date && !Number.isNaN(r.getTime())),
   },
 });
 
-const datepickerValue = ref('');
 const showDatepicker = ref(false);
 const month = ref(0);
 const year = ref(0);
-const noOfDays = ref([]);
-const blankdays = ref([]);
+const noOfDays = ref<number[]>([]);
+const blankdays = ref<number[]>([]);
+
+const datepickerValue = computed(() => model.value ? model.value.toLocaleDateString() : '');
+
+function toDate(date: number | Date) {
+  return date instanceof Date ? date : new Date(year.value, month.value, date);
+}
 
 function initDate() {
-  const today = props.modelValue || new Date();
+  const today = model.value ?? new Date();
   month.value = today.getMonth();
   year.value = today.getFullYear();
-  if (props.modelValue) {
-    datepickerValue.value = today.toLocaleDateString();
-  }
 }
 
-function isToday(date) {
-  const d = new Date(year.value, month.value, date);
-  const today = props.modelValue || new Date();
-  return today.toDateString() === d.toDateString();
+function isToday(date: number) {
+  const today = model.value ?? new Date();
+  return today.toDateString() === toDate(date).toDateString();
 }
 
-function isNotAllowedDate(date) {
-  const d = date instanceof Date && date.getTime()? date : new Date(year.value, month.value, date);
-  return props.notAllowedDates.map(r => r.getTime()).includes(d.getTime());
+function isNotAllowedDate(date: number | Date) {
+  return props.notAllowedDates.some((r) => r.getTime() === toDate(date).getTime());
 }
 
-function isOutOfRange(date) {
-  if (props.minDate || props.maxDate) {
-    const d = date instanceof Date && date.getTime() ? date : new Date(year.value, month.value, date);
-    return d < props.minDate || d > props.maxDate;
-  }
-  return false;
+function isOutOfRange(date: number | Date) {
+  if (!props.minDate && !props.maxDate) return false;
+  const d = toDate(date);
+  return (!!props.minDate && d < props.minDate) || (!!props.maxDate && d > props.maxDate);
 }
 
-function getDateValue(date) {
-  const selectedDate = new Date(year.value, month.value, date);
-  emit('update:modelValue', selectedDate);
-  datepickerValue.value = selectedDate.toLocaleDateString();
+function getDateValue(date: number) {
+  model.value = new Date(year.value, month.value, date);
   showDatepicker.value = false;
 }
 
 function addMonth() {
-  if (month.value == 11) {
-    month.value = -1;
+  if (month.value === 11) {
+    month.value = 0;
     year.value += 1;
+  } else {
+    month.value += 1;
   }
-  month.value += 1;
-  getNoOfDays();
 }
 
 function deductMonth() {
   if (month.value === 0) {
-    month.value = 12;
+    month.value = 11;
     year.value -= 1;
+  } else {
+    month.value -= 1;
   }
-  month.value -= 1;
-  getNoOfDays();
 }
 
 function getNoOfDays() {
-  const daysInMonth = new Date(
-    year.value,
-    month.value + 1,
-    0
-  ).getDate();
-  const dayOfWeek = new Date(year.value, month.value).getDay();
-  const blankdaysArray = [];
-  for (var i = 1; i <= dayOfWeek; i++) {
-    blankdaysArray.push(i);
-  }
-  const daysArray = [];
-  for (var i = 1; i <= daysInMonth; i++) {
-    daysArray.push(i);
-  }
-  blankdays.value = blankdaysArray;
-  noOfDays.value = daysArray;
+  const daysInMonth = new Date(year.value, month.value + 1, 0).getDate();
+  const dayOfWeek = new Date(year.value, month.value, 1).getDay();
+  blankdays.value = Array.from({ length: dayOfWeek }, (_, i) => i + 1);
+  noOfDays.value = Array.from({ length: daysInMonth }, (_, i) => i + 1);
 }
 
 function hideCalendar() {
   showDatepicker.value = false;
 }
 
-const computedValue = computed(() => props.modelValue);
-
 const years = computed(() => {
-  let years = [];
-  if (year.value) {
-    const initYear = year.value - 100;
-    years = (new Array(110).fill().map((_, i) => initYear + i)).reverse();
-    if (props.minDate) {
-      years = years.filter(r => r >= props.minDate.getFullYear());
-    }
-    if (props.maxDate) {
-      years = years.filter(r => r <= props.maxDate.getFullYear());
-    }
+  if (!year.value) return [];
+  const initYear = year.value - 100;
+  let list = Array.from({ length: 110 }, (_, i) => initYear + i).reverse();
+  if (props.minDate) {
+    const min = props.minDate.getFullYear();
+    list = list.filter((r) => r >= min);
   }
-  return years;
+  if (props.maxDate) {
+    const max = props.maxDate.getFullYear();
+    list = list.filter((r) => r <= max);
+  }
+  return list;
 });
 
 const isPreviousAllowed = computed(() => {
-  if (props.minDate) {
-    const date = new Date(year.value, month.value, 1);
-    date.setDate(1);
-    date.setMonth(date.getMonth() - 1);
-    const lastDayOfPrevMonth = new Date(date.getFullYear(), date.getMonth() + 1, 0);
-    if (isOutOfRange(lastDayOfPrevMonth) || (isOutOfRange(date) && isOutOfRange(lastDayOfPrevMonth))) {
-      return false;
-    } 
-  }
-  return true;
+  if (!props.minDate) return true;
+  return !isOutOfRange(new Date(year.value, month.value, 0));
 });
 
 const isNextAllowed = computed(() => {
-  if (props.maxDate) {
-    const date = new Date(year.value, month.value + 2, 0);
-    const lastDayCurrentMonth = new Date(year.value, month.value + 1, 0);
-    if (isOutOfRange(lastDayCurrentMonth) || (isOutOfRange(date) && isOutOfRange(lastDayCurrentMonth))) {
-      return false;
-    } 
-  }
-  return true;
+  if (!props.maxDate) return true;
+  return !isOutOfRange(new Date(year.value, month.value + 1, 1));
 });
 
-watch(computedValue, () => {
-  initDate();
-});
-
-watch(month, () => {
-  getNoOfDays();
-});
-
-watch(year, (val) => {
-  if (val !== 0) {
-    getNoOfDays();
-  }
-});
+watch(model, initDate);
+watch([month, year], getNoOfDays);
 
 initDate();
 getNoOfDays();
