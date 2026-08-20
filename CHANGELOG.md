@@ -8,6 +8,20 @@
   `overflow` clips at the padding box, and the collapsing grid item carried the
   body's `py-4` padding, which set a 32px floor on its height. The padding now
   lives on an inner element so a collapsed panel measures 0px.
+- `te-input`'s floating label never lined up. The layout needs `1rem` of
+  vertical padding from the component layer, but the `size` prop emitted
+  `py-1.5` as a utility, and Tailwind utilities outrank the component layer
+  regardless of specificity. The size paddings are now left off in floating
+  mode.
+- `te-input`'s icons sat half their own height below centre. The template
+  paired `translate-y-1/2` with a scoped `transform: translateY(-50%)`
+  override; in v4 those are two different properties (`translate` and
+  `transform`), so they cancelled out. Now `-translate-y-1/2`, and the scoped
+  override is gone.
+- `te-input`'s icons were oversized: the flat `text-2xl` default made the glyph
+  32px tall inside a 38px medium field, filling 84% of its height. The default
+  now tracks the `size` prop (roughly half the field height at every size).
+  `leftIconClass` / `rightIconClass` still replace it entirely.
 
 ## 1.0.0
 
