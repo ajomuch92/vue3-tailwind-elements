@@ -2,6 +2,19 @@
 
 ## 1.0.1
 
+### Added
+
+- `te-input` reveals passwords. A `type="password"` field now renders a toggle
+  that switches it to `text` and flips the icon, with no wiring on your side.
+  Opt out with `:revealable="false"`, or set your own `rightIcon` to take the
+  slot over.
+
+### Changed
+
+- A clickable input icon renders as a `<button type="button">` instead of a
+  bare `<i>` with a click handler, so it is reachable by keyboard. The reveal
+  toggle carries `aria-label` and `aria-pressed`.
+
 ### Fixed
 
 - `te-accordion` left a strip of the panel content visible while collapsed.
