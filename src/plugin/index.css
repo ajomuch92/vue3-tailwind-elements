@@ -599,6 +599,175 @@
 }
 
 /* ---------------------------------------------------------------------------
+ * Checks, switches and close buttons
+ *
+ * These classes were part of the Bootstrap dump that 1.0.0 removed; the
+ * components that use them need them back, written against the v4 theme.
+ * ------------------------------------------------------------------------ */
+
+@layer components {
+  .form-check {
+    display: block;
+    min-height: 1.5rem;
+    padding-left: 1.5rem;
+    margin-bottom: 0.125rem;
+  }
+
+  .form-check .form-check-input {
+    float: left;
+    margin-left: -1.5rem;
+  }
+
+  .form-check-label {
+    cursor: pointer;
+  }
+
+  .form-switch {
+    padding-left: 2.5rem;
+  }
+
+  .form-switch .form-check-input {
+    width: 2rem;
+    height: 1rem;
+    margin-left: -2.5rem;
+    background-color: var(--color-gray-300);
+    background-image: radial-gradient(circle 6px, var(--color-white) 100%, transparent 100%);
+    background-position: left center;
+    background-repeat: no-repeat;
+    border-radius: var(--radius-full, 9999px);
+    transition: background-position 0.15s ease-in-out, background-color 0.15s ease-in-out;
+    appearance: none;
+    cursor: pointer;
+  }
+
+  .form-switch .form-check-input:checked {
+    background-color: var(--color-blue-500);
+    background-position: right center;
+  }
+
+  .form-switch .form-check-input:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .btn-close {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: transparent;
+    background-image: none;
+    cursor: pointer;
+  }
+
+  .btn-close::before {
+    content: "";
+    width: 1em;
+    height: 1em;
+    background-color: currentColor;
+    mask: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath d='M.293.293a1 1 0 0 1 1.414 0L8 6.586 14.293.293a1 1 0 1 1 1.414 1.414L9.414 8l6.293 6.293a1 1 0 0 1-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 0 1-1.414-1.414L6.586 8 .293 1.707a1 1 0 0 1 0-1.414z'/%3e%3c/svg%3e") center / contain no-repeat;
+  }
+
+  .btn-close-white {
+    color: var(--color-white);
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * Pagination items
+ * ------------------------------------------------------------------------ */
+
+@layer components {
+  .page-item {
+    display: flex;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * Tabs
+ * ------------------------------------------------------------------------ */
+
+@layer components {
+  .nav-tabs .nav-link {
+    border-bottom-color: transparent;
+    color: var(--color-gray-600);
+  }
+
+  .nav-tabs .nav-link:hover {
+    border-bottom-color: var(--color-gray-300);
+  }
+
+  .nav-tabs .nav-link.active {
+    border-bottom-color: var(--color-blue-600);
+    color: var(--color-blue-600);
+  }
+
+  .nav-pills .nav-link {
+    border-radius: var(--radius-md);
+    color: var(--color-gray-600);
+  }
+
+  .nav-pills .nav-link:hover {
+    background-color: var(--color-gray-100);
+  }
+
+  .nav-pills .nav-link.active {
+    background-color: var(--color-blue-600);
+    color: var(--color-white);
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * Modal and offcanvas
+ * ------------------------------------------------------------------------ */
+
+@layer components {
+  .modal {
+    z-index: 60;
+    background-color: color-mix(in oklab, var(--color-black) 50%, transparent);
+  }
+
+  .modal-dialog {
+    margin: 1.75rem auto;
+    max-width: 500px;
+  }
+
+  .modal-dialog.modal-sm { max-width: 300px; }
+  .modal-dialog.modal-lg { max-width: 800px; }
+  .modal-dialog.modal-xl { max-width: 1140px; }
+
+  .modal-dialog-centered {
+    display: flex;
+    align-items: center;
+    min-height: calc(100% - 3.5rem);
+  }
+
+  .modal-dialog-scrollable .modal-content {
+    max-height: calc(100vh - 3.5rem);
+    overflow: hidden;
+  }
+
+  .modal-dialog-scrollable .modal-body {
+    overflow-y: auto;
+  }
+
+  .offcanvas {
+    z-index: 60;
+    transition: transform 0.3s ease-in-out;
+  }
+
+  .offcanvas.offcanvas-start { transform: translateX(-100%); }
+  .offcanvas.offcanvas-end { transform: translateX(100%); }
+  .offcanvas.show { transform: none; }
+
+  .offcanvas-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 55;
+    background-color: color-mix(in oklab, var(--color-black) 50%, transparent);
+  }
+}
+
+/* ---------------------------------------------------------------------------
  * Loading backdrop
  * ------------------------------------------------------------------------ */
 
