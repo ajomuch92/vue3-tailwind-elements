@@ -47,12 +47,14 @@ A clickable icon emits its own event instead of focusing the field.
 
 The label uses `placeholder` as its text.
 
-<Demo block>
+<Demo block note="Empty above, filled below — the label shrinks and rises once the field has a value.">
   <te-input floating placeholder="Full name" />
+  <te-input floating placeholder="Full name" model-value="Ada Lovelace" />
 </Demo>
 
 ```vue
 <te-input floating placeholder="Full name" />
+<te-input floating placeholder="Full name" v-model="name" />
 ```
 
 ## Disabled and readonly
@@ -84,7 +86,7 @@ The label uses `placeholder` as its text.
 | `name` `form` `min` `max` `minlength` `maxlength` `step` `pattern` | `string` \| `number` | `undefined` | Forwarded to the native input. |
 | `leftIcon` / `rightIcon` | `string` | `''` | Icon name. `rightIcon` is ignored when `type="number"`. |
 | `leftIconFamily` / `rightIconFamily` | `string` | `undefined` | Custom icon family. |
-| `leftIconClass` / `rightIconClass` | `string` | `'text-2xl'` | Extra classes on the icon. |
+| `leftIconClass` / `rightIconClass` | `string` | derived from `size` | Replaces the default icon sizing classes. |
 | `leftIconClickable` / `rightIconClickable` | `boolean` | `false` | Makes the icon emit a click event. |
 
 ## Events

@@ -42,16 +42,16 @@
       />
       <te-icon
         v-if="rightIcon && type !== 'number'"
-        class="text-gray-400 absolute right-2 top-1/2 translate-y-1/2"
+        class="text-gray-400 absolute right-2 top-1/2 -translate-y-1/2"
         :family="rightIconFamily"
-        :class="[{'cursor-pointer hover:text-gray-500': rightIconClickable}, rightIconClass]"
+        :class="[{'cursor-pointer hover:text-gray-500': rightIconClickable}, rightIconClass ?? iconSizeClass]"
         :name="rightIcon"
         @click="rightIconClickable && emit('right-icon-click', $event)"
       />
       <te-icon
         v-if="leftIcon"
-        class="text-gray-400 absolute left-2 top-1/2 translate-y-1/2"
-        :class="[{'cursor-pointer hover:text-gray-500': leftIconClickable}, leftIconClass]"
+        class="text-gray-400 absolute left-2 top-1/2 -translate-y-1/2"
+        :class="[{'cursor-pointer hover:text-gray-500': leftIconClickable}, leftIconClass ?? iconSizeClass]"
         :family="leftIconFamily"
         :name="leftIcon"
         @click="leftIconClickable && emit('left-icon-click', $event)"
@@ -104,12 +104,12 @@ const props = defineProps({
   floating: { type: Boolean, default: false },
   rightIcon: { type: String, default: '' },
   rightIconFamily: { type: String, default: undefined },
-  rightIconClass: { type: String, default: 'text-2xl' },
+  rightIconClass: { type: String, default: undefined },
   rightIconClickable: { type: Boolean, default: false },
   leftIcon: { type: String, default: '' },
   leftIconClickable: { type: Boolean, default: false },
   leftIconFamily: { type: String, default: undefined },
-  leftIconClass: { type: String, default: 'text-2xl' },
+  leftIconClass: { type: String, default: undefined },
 });
 
 /* useId() is SSR-stable and needs no secure context, unlike
@@ -117,10 +117,23 @@ const props = defineProps({
 const uid = useId();
 const inputId = computed(() => props.id ?? uid);
 
-const sizeClass = computed(() => ({
-  small: 'px-2 py-1 text-sm',
-  medium: 'px-3 py-1.5 text-base',
-  large: 'px-4 py-2 text-xl',
+const sizeClass = computed(() => {
+  const font = { small: 'text-sm', medium: 'text-base', large: 'text-xl' }[props.size];
+  // The floating layout sets its own height and padding in the component layer,
+  // and Tailwind utilities outrank that layer no matter the specificity — so
+  // the size paddings have to be left off entirely, or the label never lines up.
+  if (props.floating) return font;
+  const padding = { small: 'px-2 py-1', medium: 'px-3 py-1.5', large: 'px-4 py-2' }[props.size];
+  return `${padding} ${font}`;
+});
+
+/* The old flat `text-2xl` default made the glyph 32px tall inside a 38px
+   medium field — it filled 84% of the height. Track the input size instead,
+   and pin line-height so the icon box is exactly the glyph. */
+const iconSizeClass = computed(() => ({
+  small: 'text-base leading-none',
+  medium: 'text-lg leading-none',
+  large: 'text-xl leading-none',
 }[props.size]));
 
 const disabledClass = computed(() => ({ 'text-gray-700 bg-gray-100': props.disabled }));
@@ -139,9 +152,5 @@ const paddingForIcons = computed(() => ({
 <style scoped>
   .form-control.invalid {
     box-shadow: none !important;
-  }
-
-  .translate-y-1\/2 {
-    transform: translateY(-50%);
   }
 </style>
