@@ -106,7 +106,17 @@ test('the loading backdrop covers the viewport and is visible', () => {
 
 test('the Bootstrap dump is gone', () => {
   assert.ok(!has('--bs-'), 'Bootstrap custom properties still shipped');
-  for (const dead of ['.modal', '.offcanvas', '.navbar', '.dropdown-menu', '.carousel']) {
+  // .modal and .offcanvas are ours now — te-modal and te-offcanvas use them.
+  // These have no component behind them and only ever came from the dump.
+  for (const dead of ['.navbar', '.dropdown-menu', '.carousel', '.was-validated', '.input-group']) {
     assert.ok(!has(dead), `${dead} still shipped`);
+  }
+});
+
+test('every component class the library renders has a rule', () => {
+  // Guards against a component shipping markup with no styles behind it, the
+  // way .backdrop and .form-checkbox once did.
+  for (const rule of ['.form-check', '.form-switch', '.btn-close', '.page-item', '.nav-tabs', '.nav-pills', '.modal-dialog', '.offcanvas-backdrop']) {
+    assert.ok(has(rule), `missing ${rule}`);
   }
 });

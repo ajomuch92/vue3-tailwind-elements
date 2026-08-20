@@ -32,6 +32,35 @@ const cases = {
   'te-list-group': { items: ['one', { label: 'two', disabled: true }], activeItem: 1 },
   'te-loading': { text: 'loading', modelValue: true },
   'te-spinner': { type: 'growing', color: 'danger' },
+  'te-multiselect': { options: [{ value: 1, text: 'One' }, { value: 2, text: 'Two' }], modelValue: [1] },
+  'te-notification': { text: '3', position: 'top-right' },
+  'te-pagination': { pages: 5, activePage: 2 },
+  'te-progress': { value: 42, showValue: true, size: 'large' },
+  'te-radio': { label: 'Pick me', nativeValue: 'a', modelValue: 'a' },
+  'te-range': { modelValue: 3, min: 0, max: 10 },
+  'te-rating': { modelValue: 3, quantity: 5 },
+  'te-scroll-to-top': {},
+  'te-select': { options: [{ id: 1, label: 'One' }], modelValue: 1, placeholder: 'Pick' },
+  'te-stepper': { steps: [{ label: 'One' }, { label: 'Two' }], modelValue: 0 },
+  'te-switch': { label: 'On', modelValue: true },
+  'te-table': {
+    headers: [{ field: 'name', label: 'Name' }, 'age'],
+    items: [{ name: 'Ada', age: 36 }, { name: 'Alan', age: 41 }],
+    striped: true,
+  },
+  'te-tabs': { titles: ['One', { label: 'Two', disabled: true }], modelValue: 0 },
+  'te-textarea': { modelValue: 'hello', rows: 4 },
+  'te-time-picker': { modelValue: new Date(2024, 0, 1, 13, 30).valueOf() },
+  'te-toast': { title: 'Saved', subtitle: 'just now', message: 'All good', color: 'success' },
+  'te-toast-light': { title: 'Saved', subtitle: 'just now', type: 'success' },
+  'te-tooltip': { position: 'top' },
+};
+
+/* Modal and offcanvas render through <Teleport>, so their markup lands in the
+   SSR context rather than the returned string. */
+const TELEPORTED = {
+  'te-modal': { visible: true, title: 'A modal' },
+  'te-offcanvas': { modelValue: true, title: 'A panel' },
 };
 
 for (const [tag, props] of Object.entries(cases)) {
@@ -42,6 +71,43 @@ for (const [tag, props] of Object.entries(cases)) {
     assert.ok(!html.includes('[object Object]'), `${tag} leaked an object into markup`);
   });
 }
+
+for (const [tag, props] of Object.entries(TELEPORTED)) {
+  test(`${tag} renders into a teleport`, async () => {
+    const context = {};
+    const app = createSSRApp({ render: () => h(resolveComponent(tag), props) });
+    app.use(install);
+    await renderToString(app, context);
+    const html = Object.values(context.teleports ?? {}).join('');
+    assert.ok(html.length > 0, `${tag} teleported nothing`);
+    assert.ok(!html.includes('[object Object]'), `${tag} leaked an object into markup`);
+    assert.match(html, new RegExp(props.title));
+  });
+}
+
+test('te-table renders a row per item and resolves cell values', async () => {
+  const html = await render('te-table', {
+    headers: [{ field: 'name', label: 'Name' }],
+    items: [{ name: 'Ada' }, { name: 'Alan' }],
+  });
+  assert.match(html, /Ada/);
+  assert.match(html, /Alan/);
+  assert.ok(!html.includes('undefined'), 'a cell resolved to undefined');
+});
+
+test('te-select normalises options and keeps falsy values', async () => {
+  const html = await render('te-select', {
+    options: [{ id: 0, label: 'Zero' }, { id: 1, label: 'One' }],
+    modelValue: 0,
+  });
+  assert.match(html, /value="0"/, 'the 0 value was dropped');
+  assert.match(html, /Zero/);
+});
+
+test('te-progress clamps out-of-range values', async () => {
+  assert.match(await render('te-progress', { value: 150 }), /width:\s*100%/);
+  assert.match(await render('te-progress', { value: -20 }), /width:\s*0%/);
+});
 
 test('te-input binds only real DOM attributes', async () => {
   const html = await render('te-input', { modelValue: 'x', helperText: 'help', size: 'large' });
