@@ -16,7 +16,7 @@
           </tr>
           <template v-if="filteredItems.length>0">
             <tr v-for="(item, key) in filteredItems" :key="key" :class="rowClass(key)" v-show="rowVisibility(key+1)">
-              <td v-if="showRowNum">{{key+1}}</td>
+              <td v-if="showRowNum" class="text-sm text-gray-900 font-medium" :class="[paddingClass, {'border-r': bordered}]">{{key+1}}</td>
               <td v-for="(header, index) in normalizedHeaders" :key="index" class="text-sm text-gray-900 font-medium px-6 whitespace-nowrap" :class="[{...paddingClass, 'border-r': bordered}, header.cellClass]">
                 <slot :name="header.field" :value="getCellValue(item, header)" :row="item" :index="key">
                   {{getCellValue(item, header)}}
