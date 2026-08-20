@@ -1,5 +1,69 @@
 # Changelog
 
+## 1.1.0
+
+### Added
+
+Twenty components, migrated from the Vue 2 codebase to Vue 3 with TypeScript:
+`te-modal`, `te-multiselect`, `te-notification`, `te-offcanvas`,
+`te-pagination`, `te-progress`, `te-radio`, `te-range`, `te-rating`,
+`te-scroll-to-top`, `te-select`, `te-stepper`, `te-switch`, `te-table`,
+`te-tabs`, `te-textarea`, `te-time-picker`, `te-toast`, `te-toast-light` and
+`te-tooltip`, plus the imperative `showToast()` helper.
+
+The stylesheet regained the classes they need, which the 1.0.0 Bootstrap purge
+had removed: `.form-check`, `.form-switch`, `.btn-close`, `.page-item`,
+`.nav-tabs`, `.nav-pills`, `.modal-*` and `.offcanvas-*`.
+
+### Migration notes
+
+Every one of these used the Vue 2 contract, so their public API changed:
+
+- `value` + `@input` became `v-model` (`modelValue` + `update:modelValue`).
+  `te-pagination` uses `v-model:active-page`, `te-modal` uses
+  `v-model:visible`.
+- `te-table`'s `:active-page.sync` became `v-model:active-page`; the `.sync`
+  modifier no longer exists.
+- `te-radio`'s `idInput` prop is now `id`, and radios take a `name` so they
+  group and respond to arrow keys.
+- `te-modal`'s `props` / `events` props are now `componentProps` /
+  `componentEvents`.
+- `showToast()` returns `{ close }` instead of a Vue 2 component instance.
+
+### Fixed while migrating
+
+- `te-textarea` imported `./mixins/eventMixin`, `te-stepper` imported
+  `./mixins`, and both `te-stepper` and `te-tabs` imported
+  `./transition/slideTransition.vue` — none of those files existed, so the
+  components could not be built at all. The transition is now a real component;
+  the mixins were replaced by explicit code.
+- `te-table` shipped no `computed` block, yet its template read
+  `filteredItems`, `pages`, `headerBackgroundClass`, `headerCellClass` and
+  `paddingClass`. It threw on first render.
+- `te-multiselect` imported the click-outside directive from a path that does
+  not resolve, and called `Intl.ListFormat` unguarded.
+- `te-progress` referenced an undefined `sizeClass`, so the track had no height.
+- `te-time-picker` used Vue 2 filters (`| lpad`), removed in Vue 3, and
+  converted 1pm to hour 25.
+- `te-scroll-to-top` cleaned up in `beforeDestroy`, a hook Vue 3 never calls —
+  the scroll listener leaked on every unmount.
+- `te-rating` used `@click.native` (removed in Vue 3) and built `mx-${spacing}`
+  at runtime, a class Tailwind never generates.
+- `te-stepper` built `grid-cols-${steps.length}` the same way.
+- `te-offcanvas` created its backdrop with `document.createElement` and
+  appended it to `this.$parent.$el`; it now renders in the template through
+  `<Teleport>`. `te-modal` is teleported too.
+- `te-modal` and the toast handler called `$destroy()`, which Vue 3 removed.
+- `te-select` used `option[valueField] || option`, replacing any `0` or `''`
+  value with the whole option object.
+- `te-pagination` tested for `position === 'lett'`, so left alignment never
+  worked, and kept its page window in `data` patched by three watchers.
+- `te-radio` used `crypto.randomUUID()` in a prop default — undefined outside a
+  secure context and unstable across SSR hydration.
+- `te-switch`'s label had no `for`, so clicking it did nothing.
+- Vue 2 transition classes (`fade-enter`, `zoom-enter`) became
+  `fade-enter-from` / `zoom-enter-from`.
+
 ## 1.0.1
 
 ### Added
