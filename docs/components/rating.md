@@ -1,5 +1,11 @@
 # Rating
 
+<script setup>
+import { ref } from 'vue';
+
+const score = ref(3);
+</script>
+
 `te-rating` is a star rating with optional half values.
 
 ## Basic

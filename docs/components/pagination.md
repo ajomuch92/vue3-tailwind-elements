@@ -1,5 +1,11 @@
 # Pagination
 
+<script setup>
+import { ref } from 'vue';
+
+const page = ref(1);
+</script>
+
 `te-pagination` renders a sliding window of page numbers around the current
 page.
 

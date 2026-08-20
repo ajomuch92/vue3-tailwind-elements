@@ -1,5 +1,12 @@
 # Multiselect
 
+<script setup>
+import { ref } from 'vue';
+
+const picked = ref([1]);
+const one = ref(1);
+</script>
+
 `te-multiselect` is a dropdown with search, select-all and either single or
 multiple selection. It closes on an outside click, so the plugin's
 `v-click-outside` directive has to be registered.

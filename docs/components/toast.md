@@ -6,11 +6,13 @@ strip. Both can be shown imperatively with `showToast`.
 ## te-toast
 
 <Demo block>
+  <te-toast title="A plain toast" subtitle="just now" message="The default `normal` colour, on white." />
   <te-toast color="success" title="Saved" subtitle="just now" message="Your changes are live." />
   <te-toast color="danger" title="Failed" subtitle="just now" message="Something went wrong." />
 </Demo>
 
 ```vue
+<te-toast title="A plain toast" subtitle="just now" message="The default colour." />
 <te-toast color="success" title="Saved" subtitle="just now" message="Your changes are live." />
 <te-toast color="danger" title="Failed" subtitle="just now" message="Something went wrong." />
 ```

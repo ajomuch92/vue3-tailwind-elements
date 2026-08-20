@@ -1,5 +1,11 @@
 # Radio
 
+<script setup>
+import { ref } from 'vue';
+
+const pick = ref('apple');
+</script>
+
 `te-radio` is a native radio button. Give a group the same `name` and bind them
 to the same model.
 

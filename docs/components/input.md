@@ -1,5 +1,12 @@
 # Input
 
+<script setup>
+import { ref } from 'vue';
+
+const name = ref('');
+const password = ref('hunter2');
+</script>
+
 `te-input` wraps a native `<input>`, so every value you pass through reaches
 the real element. Non-HTML props such as `size` or `helperText` are kept off it.
 

@@ -1,5 +1,11 @@
 # Offcanvas
 
+<script setup>
+import { ref } from 'vue';
+
+const open = ref(false);
+</script>
+
 `te-offcanvas` slides a panel in from the side. Like the modal, it is teleported
 to `<body>`.
 

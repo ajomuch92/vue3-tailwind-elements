@@ -1,5 +1,11 @@
 # Tabs
 
+<script setup>
+import { ref } from 'vue';
+
+const tab = ref(0);
+</script>
+
 `te-tabs` switches between panels. Titles can be plain strings or objects.
 
 ## Basic

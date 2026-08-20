@@ -1,5 +1,11 @@
 # Stepper
 
+<script setup>
+import { ref } from 'vue';
+
+const step = ref(0);
+</script>
+
 `te-stepper` walks through a sequence of steps. Completed steps are marked
 automatically.
 

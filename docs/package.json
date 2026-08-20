@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "vue": "^3.5.0",
-    "vue3-tailwind-elements": "^1.1.0",
+    "vue3-tailwind-elements": "^1.0.0",
     "bootstrap-icons": "^1.13.1"
   },
   "devDependencies": {

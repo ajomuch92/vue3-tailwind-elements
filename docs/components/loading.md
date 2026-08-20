@@ -1,17 +1,31 @@
 # Loading
 
+<script setup>
+import { ref } from 'vue';
+
+const loading = ref(false);
+
+function demo() {
+  loading.value = true;
+  setTimeout(() => { loading.value = false; }, 1500);
+}
+</script>
+
 `te-loading` is a full-viewport overlay. Visibility is the close API, so bind it
 with `v-model`.
 
 ## Usage
 
-Not rendered inline here — it covers the whole viewport.
+The overlay covers the whole viewport, so this demo shows it for a second and
+a half rather than leaving it on the page.
 
-<Demo block>
+<Demo>
+  <te-button type="primary" @click="demo">Show for 1.5s</te-button>
   <te-loading v-model="loading" text="Loading…" />
 </Demo>
 
 ```vue
+<te-button @click="loading = true">Save</te-button>
 <te-loading v-model="loading" text="Loading…" />
 ```
 

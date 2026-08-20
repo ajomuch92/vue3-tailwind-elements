@@ -1,5 +1,11 @@
 # Time picker
 
+<script setup>
+import { ref } from 'vue';
+
+const time = ref(new Date(2024, 0, 1, 9, 30).valueOf());
+</script>
+
 `te-time-picker` binds a timestamp in milliseconds, like `Date.prototype.valueOf()`.
 
 ## 12 and 24 hour

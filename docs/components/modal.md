@@ -1,5 +1,11 @@
 # Modal
 
+<script setup>
+import { ref } from 'vue';
+
+const open = ref(false);
+</script>
+
 `te-modal` is a dialog rendered through `<Teleport>` into `<body>`, so it is
 never clipped by a parent's `overflow`.
 

@@ -1,5 +1,11 @@
 # Checkbox
 
+<script setup>
+import { ref } from 'vue';
+
+const picked = ref([]);
+</script>
+
 `te-checkbox` is a native checkbox themed with `accent-color`.
 
 ## Basic

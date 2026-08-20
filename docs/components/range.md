@@ -1,5 +1,11 @@
 # Range
 
+<script setup>
+import { ref } from 'vue';
+
+const volume = ref(4);
+</script>
+
 `te-range` is a native slider bound with `v-model`.
 
 ## Basic
