@@ -1,0 +1,74 @@
+# Multiselect
+
+`te-multiselect` is a dropdown with search, select-all and either single or
+multiple selection. It closes on an outside click, so the plugin's
+`v-click-outside` directive has to be registered.
+
+## Multiple
+
+<Demo block>
+  <te-multiselect
+    v-model="picked"
+    placeholder="Pick some"
+    :options="[{ value: 1, text: 'One' }, { value: 2, text: 'Two' }, { value: 3, text: 'Three' }]"
+  />
+</Demo>
+
+```vue
+<te-multiselect
+  v-model="picked"
+  placeholder="Pick some"
+  :options="[{ value: 1, text: 'One' }, { value: 2, text: 'Two' }, { value: 3, text: 'Three' }]"
+/>
+```
+
+## Single select
+
+<Demo block>
+  <te-multiselect
+    v-model="one"
+    single-select
+    placeholder="Pick one"
+    :options="[{ value: 1, text: 'One' }, { value: 2, text: 'Two' }]"
+  />
+</Demo>
+
+```vue
+<te-multiselect
+  v-model="one"
+  single-select
+  placeholder="Pick one"
+  :options="[{ value: 1, text: 'One' }, { value: 2, text: 'Two' }]"
+/>
+```
+
+## Props
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `modelValue` | `string` \| `number` \| `array` | `undefined` | Supports `v-model`. An array unless `singleSelect`. |
+| `options` | `object[]` | `[]` | Option list. |
+| `displayField` | `string` | `'text'` | Key holding the visible text. |
+| `valueField` | `string` | `'value'` | Key holding the value. |
+| `singleSelect` | `boolean` | `false` | One selection instead of many. |
+| `searchable` | `boolean` | `true` | Shows the search box. |
+| `showSelectAll` | `boolean` | `true` | Shows the select-all checkbox. |
+| `clearable` | `boolean` | `true` | Shows a clear button once something is selected. |
+| `visibleItems` | `number` | `3` | How many labels to list before switching to a count. |
+| `placeholder` | `string` | `''` | Placeholder of the closed field. |
+| `placeholderSearch` | `string` | `'Search...'` | Placeholder of the search box. |
+| `minWidth` | `string` \| `number` | `'250px'` | Minimum width of the field. |
+| `listHeight` | `string` \| `number` | `'250px'` | Height of the scrolling list. |
+| `disabled` | `boolean` | `false` | Disables the field. |
+
+## Events
+
+| Event | Payload | Description |
+|---|---|---|
+| `update:modelValue` | `string` \| `number` \| `array` | Selection changed. |
+
+## Slots
+
+| Slot | Props | Description |
+|---|---|---|
+| `item` | `{ option, key }` | Custom rendering for an option. |
