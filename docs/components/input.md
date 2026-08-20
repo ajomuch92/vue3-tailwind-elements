@@ -35,13 +35,31 @@ A clickable icon emits its own event instead of focusing the field.
 
 <Demo block>
   <te-input placeholder="Search" left-icon="search" />
-  <te-input placeholder="Password" right-icon="eye" right-icon-clickable />
+  <te-input placeholder="Star" right-icon="star" right-icon-clickable />
 </Demo>
 
 ```vue
 <te-input placeholder="Search" left-icon="search" />
-<te-input placeholder="Password" right-icon="eye" right-icon-clickable />
+<te-input placeholder="Star" right-icon="star" right-icon-clickable />
 ```
+
+## Password
+
+A `type="password"` field gets a reveal toggle on its own — no wiring needed.
+Clicking it switches the field to `text` and flips the icon.
+
+<Demo block note="Click the eye. Pass :revealable='false' to suppress it, or set your own right-icon to take over.">
+  <te-input type="password" placeholder="Password" model-value="hunter2" />
+  <te-input type="password" placeholder="No toggle" model-value="hunter2" :revealable="false" />
+</Demo>
+
+```vue
+<te-input v-model="password" type="password" placeholder="Password" />
+<te-input v-model="password" type="password" :revealable="false" />
+```
+
+The toggle is a real `<button>` with `aria-label` and `aria-pressed`, so it is
+reachable by keyboard. Its labels are `Show password` / `Hide password`.
 
 ## Floating label
 
@@ -84,7 +102,8 @@ The label uses `placeholder` as its text.
 | `disabled` | `boolean` | `false` | Disables the field. |
 | `readonly` | `boolean` | `false` | Read-only field. |
 | `name` `form` `min` `max` `minlength` `maxlength` `step` `pattern` | `string` \| `number` | `undefined` | Forwarded to the native input. |
-| `leftIcon` / `rightIcon` | `string` | `''` | Icon name. `rightIcon` is ignored when `type="number"`. |
+| `revealable` | `boolean` | `true` for `type="password"` without a custom `rightIcon` | Shows a reveal toggle that switches the field between `password` and `text`. |
+| `leftIcon` / `rightIcon` | `string` | `''` | Icon name. `rightIcon` is ignored when `type="number"`. A custom `rightIcon` on a password field replaces the reveal toggle. |
 | `leftIconFamily` / `rightIconFamily` | `string` | `undefined` | Custom icon family. |
 | `leftIconClass` / `rightIconClass` | `string` | derived from `size` | Replaces the default icon sizing classes. |
 | `leftIconClickable` / `rightIconClickable` | `boolean` | `false` | Makes the icon emit a click event. |

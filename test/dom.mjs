@@ -355,6 +355,54 @@ test('te-input fires icon clicks only when the icon is clickable', async () => {
   w.unmount();
 });
 
+test('te-input reveals a password and flips the icon back', async () => {
+  const w = mount('te-input', { modelValue: 'hunter2', type: 'password' });
+  const input = w.$('input');
+  const toggle = w.$('button');
+
+  assert.ok(toggle, 'no reveal button on a password field');
+  assert.equal(input.type, 'password');
+  assert.ok(w.$('i.bi-eye'), 'expected the eye icon while hidden');
+  assert.equal(toggle.getAttribute('aria-label'), 'Show password');
+  assert.equal(toggle.getAttribute('aria-pressed'), 'false');
+
+  await click(toggle);
+  assert.equal(input.type, 'text', 'type did not switch on reveal');
+  assert.ok(w.$('i.bi-eye-slash'), 'icon did not flip to eye-slash');
+  assert.equal(toggle.getAttribute('aria-label'), 'Hide password');
+  assert.equal(toggle.getAttribute('aria-pressed'), 'true');
+  assert.equal(input.value, 'hunter2', 'the value was lost across the toggle');
+
+  await click(toggle);
+  assert.equal(input.type, 'password', 'type did not switch back');
+  assert.ok(w.$('i.bi-eye'), 'icon did not flip back');
+  w.unmount();
+});
+
+test('te-input reveal can be turned off and never hijacks a custom icon', async () => {
+  const off = mount('te-input', { modelValue: 'x', type: 'password', revealable: false });
+  assert.equal(off.$('button'), null, 'a reveal button appeared despite revealable=false');
+  assert.equal(off.$('i'), null, 'an icon appeared despite revealable=false');
+  off.unmount();
+
+  const custom = mount('te-input', { modelValue: 'x', type: 'password', rightIcon: 'star' });
+  assert.ok(custom.$('i.bi-star'), 'the custom right icon was replaced by the eye');
+  assert.equal(custom.$('input').type, 'password');
+  custom.unmount();
+
+  const forced = mount('te-input', { modelValue: 'x', type: 'text', revealable: true });
+  assert.ok(forced.$('button'), 'revealable=true was ignored on a non-password field');
+  forced.unmount();
+});
+
+test('te-input reveal is keyboard reachable', async () => {
+  const w = mount('te-input', { modelValue: 'x', type: 'password' });
+  const toggle = w.$('button');
+  assert.equal(toggle.tagName, 'BUTTON', 'the reveal control is not a button');
+  assert.equal(toggle.getAttribute('type'), 'button', 'the toggle would submit a form');
+  w.unmount();
+});
+
 test('te-list-group updates activeItem only when clickable', async () => {
   const w = mount('te-list-group', { items: ['one', 'two', 'three'], activeItem: null });
   await click(w.$$('li')[1]);

@@ -4,7 +4,7 @@
       <input
         :id="inputId"
         v-model="model"
-        :type="type"
+        :type="resolvedType"
         :name="name"
         :form="form"
         :min="min"
@@ -40,21 +40,39 @@
         @keyup="emit('keyup', $event)"
         @click="emit('click', $event)"
       />
+      <!-- A clickable icon is a real control, so it renders as a button: an <i>
+           with a click handler is unreachable by keyboard. -->
+      <button
+        v-if="resolvedRightIcon && type !== 'number' && rightIconInteractive"
+        type="button"
+        class="te-input-icon absolute right-2 top-1/2 -translate-y-1/2"
+        :aria-label="canReveal ? (revealed ? 'Hide password' : 'Show password') : undefined"
+        :aria-pressed="canReveal ? revealed : undefined"
+        @click="onRightIconClick"
+      >
+        <te-icon :family="rightIconFamily" :class="rightIconClass ?? iconSizeClass" :name="resolvedRightIcon" />
+      </button>
       <te-icon
-        v-if="rightIcon && type !== 'number'"
+        v-else-if="resolvedRightIcon && type !== 'number'"
         class="text-gray-400 absolute right-2 top-1/2 -translate-y-1/2"
         :family="rightIconFamily"
-        :class="[{'cursor-pointer hover:text-gray-500': rightIconClickable}, rightIconClass ?? iconSizeClass]"
-        :name="rightIcon"
-        @click="rightIconClickable && emit('right-icon-click', $event)"
+        :class="rightIconClass ?? iconSizeClass"
+        :name="resolvedRightIcon"
       />
+      <button
+        v-if="leftIcon && leftIconClickable"
+        type="button"
+        class="te-input-icon absolute left-2 top-1/2 -translate-y-1/2"
+        @click="emit('left-icon-click', $event)"
+      >
+        <te-icon :family="leftIconFamily" :class="leftIconClass ?? iconSizeClass" :name="leftIcon" />
+      </button>
       <te-icon
-        v-if="leftIcon"
+        v-else-if="leftIcon"
         class="text-gray-400 absolute left-2 top-1/2 -translate-y-1/2"
-        :class="[{'cursor-pointer hover:text-gray-500': leftIconClickable}, leftIconClass ?? iconSizeClass]"
         :family="leftIconFamily"
+        :class="leftIconClass ?? iconSizeClass"
         :name="leftIcon"
-        @click="leftIconClickable && emit('left-icon-click', $event)"
       />
       <label v-if="floating" :for="inputId" class="text-gray-700">{{placeholder}}</label>
     </div>
@@ -63,7 +81,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, useId } from 'vue';
+import { computed, ref, useId } from 'vue';
 import teIcon from './teIcon.vue';
 import { oneOf, SIZES } from '../types';
 
@@ -102,6 +120,9 @@ const props = defineProps({
   size: { ...oneOf(SIZES), default: 'medium' },
   helperText: { type: String, default: undefined },
   floating: { type: Boolean, default: false },
+  /* Reveal toggle. Defaults on for `type="password"` unless a custom
+     `rightIcon` is given; pass `:revealable="false"` to suppress it. */
+  revealable: { type: Boolean, default: undefined },
   rightIcon: { type: String, default: '' },
   rightIconFamily: { type: String, default: undefined },
   rightIconClass: { type: String, default: undefined },
@@ -114,6 +135,20 @@ const props = defineProps({
 
 /* useId() is SSR-stable and needs no secure context, unlike
    crypto.randomUUID(), which is undefined over plain HTTP. */
+const revealed = ref(false);
+
+const canReveal = computed(() => props.revealable ?? (props.type === 'password' && !props.rightIcon));
+const resolvedType = computed(() => (canReveal.value && revealed.value ? 'text' : props.type));
+const resolvedRightIcon = computed(() =>
+  canReveal.value ? (revealed.value ? 'eye-slash' : 'eye') : props.rightIcon
+);
+const rightIconInteractive = computed(() => canReveal.value || props.rightIconClickable);
+
+function onRightIconClick(event: MouseEvent) {
+  if (canReveal.value) revealed.value = !revealed.value;
+  if (props.rightIconClickable) emit('right-icon-click', event);
+}
+
 const uid = useId();
 const inputId = computed(() => props.id ?? uid);
 
@@ -144,12 +179,22 @@ const invalidClass = computed(() => ({
 }));
 
 const paddingForIcons = computed(() => ({
-  'pr-9': !!props.rightIcon,
+  'pr-9': !!resolvedRightIcon.value,
   'pl-9': !!props.leftIcon,
 }));
 </script>
 
 <style scoped>
+  .te-input-icon {
+    display: flex;
+    color: var(--color-gray-400, #99a1af);
+    cursor: pointer;
+  }
+
+  .te-input-icon:hover {
+    color: var(--color-gray-500, #6a7282);
+  }
+
   .form-control.invalid {
     box-shadow: none !important;
   }
