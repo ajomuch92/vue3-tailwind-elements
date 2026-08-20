@@ -6,7 +6,9 @@
     :disabled="disabled"
     :multiple="multiple"
   >
-    <option v-if="placeholder && !multiple" value="" disabled hidden>{{ placeholder }}</option>
+    <!-- Bound to null, not "", so it is the option that matches an empty
+         model and actually shows up as the resting label. -->
+    <option v-if="placeholder && !multiple" :value="null" disabled hidden>{{ placeholder }}</option>
     <option v-for="(option, key) in normalized" :key="key" :value="option.value">
       {{ option.label }}
     </option>

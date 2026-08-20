@@ -28,18 +28,17 @@
       </li>
     </ul>
     <div class="relative w-full overflow-hidden">
-      <slide-transition v-for="index in steps.length" :key="index">
+      <template v-for="index in steps.length" :key="index">
         <div v-show="index - 1 === model" class="step-content relative float-left w-full" role="tabpanel">
           <slot :name="`step-${index}`" />
         </div>
-      </slide-transition>
+      </template>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import type { PropType } from 'vue';
-import SlideTransition from './transition/slideTransition.vue';
 
 defineOptions({ name: 'TeStepper' });
 
@@ -67,6 +66,9 @@ function select(index: number) {
 </script>
 
 <style scoped>
+  /* No <Transition> here: it is single-element only, and wrapping a v-for in
+     one leaves the outgoing panel without its display:none. */
+
   .stepper, .step-wrap {
     height: 4rem;
   }

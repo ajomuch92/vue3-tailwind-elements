@@ -46,7 +46,7 @@
       </li>
     </ul>
     <div class="content relative w-full overflow-hidden">
-      <slide-transition v-for="index in normalizedTitles.length" :key="index" :vertical="vertical">
+      <template v-for="index in normalizedTitles.length" :key="index">
         <div
           v-show="index - 1 === model"
           :id="`tab-content-${index - 1}`"
@@ -55,7 +55,7 @@
         >
           <slot :name="`tab-${index}`" />
         </div>
-      </slide-transition>
+      </template>
     </div>
   </div>
 </template>
@@ -64,7 +64,6 @@
 import { computed } from 'vue';
 import type { PropType } from 'vue';
 import TeNotification from './teNotification.vue';
-import SlideTransition from './transition/slideTransition.vue';
 
 defineOptions({ name: 'TeTabs' });
 
@@ -96,6 +95,9 @@ const navItemClass = computed(() => ({
 </script>
 
 <style scoped>
+  /* No <Transition> here: it is single-element only, and wrapping a v-for in
+     one leaves the outgoing panel without its display:none. */
+
   .tab-panel {
     display: block;
     margin-right: -100%;
