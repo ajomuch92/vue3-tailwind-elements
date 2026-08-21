@@ -68,6 +68,12 @@ function mount(tag, initialProps = {}, slots) {
 }
 
 const click = async (el, init = {}) => {
+  /* Vue drops any event whose timestamp is not strictly newer than the moment
+     its listener was attached, and happy-dom's clock only ticks whole
+     milliseconds — so a click dispatched in the same millisecond as the mount
+     silently never reaches the handler. Browsers time events sub-millisecond
+     and never hit this; one tick of slack keeps the tests honest. */
+  await new Promise((resolve) => setTimeout(resolve, 2));
   const event = new MouseEvent('click', { bubbles: true, cancelable: true, ...init });
   for (const [k, v] of Object.entries(init)) {
     if (!(k in event)) Object.defineProperty(event, k, { value: v });
@@ -578,12 +584,9 @@ test('te-dropdown normalises string items and reports the picked one', async () 
   // calls hidePopover(), never reimplements dismissal.
   const panel = w.$('.dropdown-menu');
   let hidden = 0;
-  let probe = 0;
-  panel.addEventListener('click', () => { probe++; });
   panel.hidePopover = () => { hidden++; };
 
   await click(items[0]);
-  console.error('DBG same node:', panel === w.$('.dropdown-menu'), 'typeof hide:', typeof panel.hidePopover, 'hidden:', hidden, 'probe:', probe);
   assert.deepEqual(w.emitted['select']?.at(-1), [{ label: 'Edit' }, 0]);
   assert.equal(hidden, 1, 'picking an item left the menu open');
 

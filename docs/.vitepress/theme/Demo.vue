@@ -1,5 +1,5 @@
 <template>
-  <div class="my-4 rounded-lg border border-[var(--vp-c-divider)] p-4">
+  <div class="te-demo my-4 rounded-lg border border-[var(--vp-c-divider)] p-4">
     <div :class="block ? 'flex flex-col gap-3' : 'flex flex-wrap items-center gap-3'">
       <slot />
     </div>
