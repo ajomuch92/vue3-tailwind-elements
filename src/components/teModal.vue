@@ -1,49 +1,42 @@
 <template>
-  <Teleport to="body">
+  <dialog
+    ref="dialogRef"
+    class="modal"
+    :aria-label="title || undefined"
+    @close="onNativeClose"
+    @click.self="closeOnBackdrop && dialogRef?.close()"
+  >
     <div
-      v-show="model"
-      class="modal fixed top-0 left-0 w-full h-full outline-none overflow-x-hidden overflow-y-auto"
-      tabindex="-1"
-      role="dialog"
-      :aria-hidden="!model"
-      :aria-label="title"
-      @click.self="closeOnBackdrop && close()"
+      class="modal-dialog relative w-auto pointer-events-none"
+      :class="[sizeClass, {'modal-dialog-scrollable': scrollable, 'modal-dialog-centered': centered}]"
     >
-      <Transition name="te-modal">
-        <div
-          v-show="model"
-          class="modal-dialog relative w-auto pointer-events-none"
-          :class="[sizeClass, {'modal-dialog-scrollable': scrollable, 'modal-dialog-centered': centered}]"
-        >
-          <div class="modal-content border-none shadow-lg relative flex flex-col w-full pointer-events-auto bg-white bg-clip-padding rounded-md outline-none text-current">
-            <div v-if="!hideHeader" class="modal-header flex shrink-0 items-center justify-between p-4 border-b border-gray-200 rounded-t-md">
-              <slot name="header">
-                <h5 class="text-xl font-medium leading-normal text-gray-800">{{ title }}</h5>
-              </slot>
-              <button
-                v-if="showCloseButton"
-                type="button"
-                class="btn-close w-4 h-4 p-1 text-black opacity-50 hover:opacity-75 focus:opacity-100 focus:outline-none"
-                aria-label="Close"
-                @click="close()"
-              />
-            </div>
-            <div class="modal-body relative p-4">
-              <component :is="component" v-if="component" v-bind="componentProps" v-on="componentEvents" />
-              <slot v-else name="default" />
-            </div>
-            <div v-if="!hideFooter" class="modal-footer flex shrink-0 flex-wrap items-center justify-end p-4 border-t border-gray-200 rounded-b-md">
-              <slot name="footer" />
-            </div>
-          </div>
+      <div class="modal-content border-none shadow-lg relative flex flex-col w-full pointer-events-auto bg-white bg-clip-padding rounded-md outline-none text-current">
+        <div v-if="!hideHeader" class="modal-header flex shrink-0 items-center justify-between p-4 border-b border-gray-200 rounded-t-md">
+          <slot name="header">
+            <h5 class="text-xl font-medium leading-normal text-gray-800">{{ title }}</h5>
+          </slot>
+          <button
+            v-if="showCloseButton"
+            type="button"
+            class="btn-close w-4 h-4 p-1 text-black opacity-50 hover:opacity-75 focus:opacity-100 focus:outline-none"
+            aria-label="Close"
+            @click="dialogRef?.close()"
+          />
         </div>
-      </Transition>
+        <div class="modal-body relative p-4">
+          <component :is="component" v-if="component" v-bind="componentProps" v-on="componentEvents" />
+          <slot v-else name="default" />
+        </div>
+        <div v-if="!hideFooter" class="modal-footer flex shrink-0 flex-wrap items-center justify-end p-4 border-t border-gray-200 rounded-b-md">
+          <slot name="footer" />
+        </div>
+      </div>
     </div>
-  </Teleport>
+  </dialog>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import type { Component, PropType } from 'vue';
 import { oneOf } from '../types';
 
@@ -71,23 +64,28 @@ const props = defineProps({
 
 const sizeClass = computed(() => (props.size ? `modal-${props.size}` : ''));
 
-/* The old version called `this.$destroy()` and removed its own element, an
-   API Vue 3 does not have. Closing is just the model now. */
-function close() {
+/* Was a <Teleport> into <body> around a v-show div with a hand-rolled scrim
+   and z-index: 60. A native <dialog> opened with showModal() renders in the
+   top layer instead, which brings Escape, a focus trap, focus restored to the
+   trigger on close, ::backdrop and an inert page for free — none of which the
+   old markup had. */
+const dialogRef = ref<HTMLDialogElement>();
+
+function sync() {
+  const el = dialogRef.value;
+  if (!el) return;
+  if (model.value && !el.open) el.showModal();
+  else if (!model.value && el.open) el.close();
+}
+
+watch(model, sync, { flush: 'post' });
+onMounted(sync);
+
+/* Every close path — the button, the backdrop, Escape, a parent setting the
+   model to false — ends in the dialog's own `close` event, so the model write
+   and the emit live here once instead of in each handler. */
+function onNativeClose() {
   model.value = false;
   emit('close');
 }
 </script>
-
-<style scoped>
-  .te-modal-enter-active,
-  .te-modal-leave-active {
-    transition: transform 0.25s ease, opacity 0.25s ease;
-  }
-
-  .te-modal-enter-from,
-  .te-modal-leave-to {
-    transform: translateY(-50px);
-    opacity: 0;
-  }
-</style>
