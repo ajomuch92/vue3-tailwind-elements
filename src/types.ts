@@ -33,6 +33,11 @@ export interface BreadcrumbOption {
   to?: string | Record<string, unknown>;
 }
 
+export interface DropdownItem {
+  label?: string;
+  disabled?: boolean;
+}
+
 export interface ListGroupItem {
   label?: string;
   name?: string;
