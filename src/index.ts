@@ -5,11 +5,12 @@ import TeAlert from './components/teAlert.vue';
 import TeBadge from './components/teBadge.vue';
 import TeBreadcrumb from './components/teBreadcrumb.vue';
 import TeButton from './components/teButton.vue';
-import TeButtonGroup from './components/teButtonGruop.vue';
+import TeButtonGroup from './components/teButtonGroup.vue';
 import TeCard from './components/teCard.vue';
 import TeCheckbox from './components/teCheckbox.vue';
 import TeChip from './components/teChip.vue';
 import TeDatePicker from './components/teDatePicker.vue';
+import TeDropdown from './components/teDropdown.vue';
 import TeFile from './components/teFile.vue';
 import TeIcon from './components/teIcon.vue';
 import TeInput from './components/teInput.vue';
@@ -53,6 +54,7 @@ const components = {
   'te-checkbox': TeCheckbox,
   'te-chip': TeChip,
   'te-date-picker': TeDatePicker,
+  'te-dropdown': TeDropdown,
   'te-file': TeFile,
   'te-icon': TeIcon,
   'te-input': TeInput,
@@ -93,7 +95,7 @@ export default install;
 
 export {
   TeAccordion, TeAlert, TeBadge, TeBreadcrumb, TeButton, TeButtonGroup,
-  TeCard, TeCheckbox, TeChip, TeDatePicker, TeFile, TeIcon, TeInput,
+  TeCard, TeCheckbox, TeChip, TeDatePicker, TeDropdown, TeFile, TeIcon, TeInput,
   TeListGroup, TeLoading, TeModal, TeMultiselect, TeNotification, TeOffcanvas,
   TePagination, TeProgress, TeRadio, TeRange, TeRating, TeScrollToTop,
   TeSelect, TeSpinner, TeStepper, TeSwitch, TeTable, TeTabs, TeTextarea,
@@ -115,6 +117,7 @@ declare module 'vue' {
     TeCheckbox: typeof TeCheckbox;
     TeChip: typeof TeChip;
     TeDatePicker: typeof TeDatePicker;
+    TeDropdown: typeof TeDropdown;
     TeFile: typeof TeFile;
     TeIcon: typeof TeIcon;
     TeInput: typeof TeInput;
