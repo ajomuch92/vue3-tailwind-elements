@@ -10,7 +10,8 @@ lerna-debug.log*
 node_modules
 dist
 dist-ssr
-.vitepress
+docs/.vitepress/dist
+docs/.vitepress/cache
 *.local
 
 # Editor directories and files

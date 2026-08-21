@@ -20,7 +20,7 @@ Not shown inline — it covers the page.
     This cannot be undone.
     <template #footer>
       <te-button type="light" @click="open = false">Cancel</te-button>
-      <te-button type="danger" @click="remove">Delete</te-button>
+      <te-button type="danger" @click="open = false">Delete</te-button>
     </template>
   </te-modal>
 </Demo>
@@ -32,7 +32,7 @@ Not shown inline — it covers the page.
   This cannot be undone.
   <template #footer>
     <te-button type="light" @click="open = false">Cancel</te-button>
-    <te-button type="danger" @click="remove">Delete</te-button>
+    <te-button type="danger" @click="open = false">Delete</te-button>
   </template>
 </te-modal>
 ```
