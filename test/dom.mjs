@@ -578,10 +578,12 @@ test('te-dropdown normalises string items and reports the picked one', async () 
   // calls hidePopover(), never reimplements dismissal.
   const panel = w.$('.dropdown-menu');
   let hidden = 0;
+  let probe = 0;
+  panel.addEventListener('click', () => { probe++; });
   panel.hidePopover = () => { hidden++; };
 
   await click(items[0]);
-  console.error('DBG same node:', panel === w.$('.dropdown-menu'), 'typeof hide:', typeof panel.hidePopover, 'hidden:', hidden);
+  console.error('DBG same node:', panel === w.$('.dropdown-menu'), 'typeof hide:', typeof panel.hidePopover, 'hidden:', hidden, 'probe:', probe);
   assert.deepEqual(w.emitted['select']?.at(-1), [{ label: 'Edit' }, 0]);
   assert.equal(hidden, 1, 'picking an item left the menu open');
 
