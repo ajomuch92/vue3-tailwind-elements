@@ -6,8 +6,10 @@ import { ref } from 'vue';
 const open = ref(false);
 </script>
 
-`te-offcanvas` slides a panel in from the side. Like the modal, it is teleported
-to `<body>`.
+`te-offcanvas` slides a panel in from the side. Like [`te-modal`](./modal), it is
+a native `<dialog>` opened with `showModal()`, so it comes with <kbd>Esc</kbd>,
+a focus trap, focus restored on close, and an inert page behind it. Clicking the
+backdrop closes it too.
 
 ## Usage
 
@@ -42,6 +44,7 @@ Not shown inline — it is fixed to the viewport edge.
 | Event | Payload | Description |
 |---|---|---|
 | `update:modelValue` | `boolean` | Visibility changed. |
+| `close` | — | The panel closed, by any route: the button, the backdrop, <kbd>Esc</kbd>, or the model. |
 
 ## Slots
 

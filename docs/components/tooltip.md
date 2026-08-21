@@ -1,7 +1,13 @@
 # Tooltip
 
-`te-tooltip` shows its `content` slot on hover. It is CSS-only — no positioning
-library, no JavaScript.
+`te-tooltip` shows its `content` slot on hover **and on keyboard focus** — the
+wrapper is focusable and carries `aria-describedby`, so the tip is announced
+rather than being mouse-only. Still CSS-only: no positioning library, no
+JavaScript.
+
+Because the bubble is positioned `absolute`, an ancestor with `overflow: hidden`
+will clip it. Inside a scrolling container, reach for
+[`te-dropdown`](./dropdown) instead — it renders in the top layer.
 
 ## Positions
 
