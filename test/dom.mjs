@@ -39,8 +39,10 @@ function mount(tag, initialProps = {}, slots) {
       ...state,
       'onUpdate:modelValue': model('modelValue'),
       'onUpdate:activeItem': model('activeItem'),
+      'onUpdate:visible': model('visible'),
       onClick: rec('click'),
       onOpen: rec('open'),
+      onSelect: rec('select'),
       onClose: rec('close'),
       onBlur: rec('blur'),
       onChange: rec('change'),
@@ -461,5 +463,138 @@ test('te-file converts the selected file to base64', async () => {
 test('te-icon resolves a registered custom family', async () => {
   const w = mount('te-icon', { name: 'star', family: 'fa' });
   assert.equal(w.$('i').className, 'fa-star');
+  w.unmount();
+});
+
+/* ------------------------------------------------------- dialog overlays */
+
+/* happy-dom implements showModal/close and the `close` event but not the top
+   layer, so these cover the wiring: that the model drives the native dialog,
+   that every close path funnels through the dialog's own `close` event (which
+   is what Escape fires in a browser), and which clicks count as the backdrop.
+   The focus trap and Escape themselves are the UA's, not ours to test. */
+
+/** happy-dom measures everything as 0x0; give the element a real box. */
+const stubRect = (el, rect) => {
+  Object.defineProperty(el, 'getBoundingClientRect', { value: () => rect, configurable: true });
+};
+
+test('te-modal opens and closes the native dialog from the model', async () => {
+  const w = mount('te-modal', { visible: false, title: 'Hi' });
+  const dialog = w.$('dialog.modal');
+  assert.ok(dialog, 'te-modal did not render a <dialog>');
+  assert.equal(dialog.open, false, 'the dialog opened before it was asked to');
+
+  w.state.visible = true;
+  await nextTick();
+  assert.equal(dialog.open, true, 'the model never reached showModal()');
+
+  w.state.visible = false;
+  await nextTick();
+  assert.equal(dialog.open, false, 'the model never reached close()');
+  w.unmount();
+});
+
+test('te-modal writes back the model when the dialog closes itself', async () => {
+  // Escape, the close button and the backdrop all end here in a real browser.
+  const w = mount('te-modal', { visible: true, title: 'Hi' });
+  await nextTick();
+  const dialog = w.$('dialog.modal');
+  assert.equal(dialog.open, true);
+
+  dialog.close();
+  await nextTick();
+  assert.equal(w.state.visible, false, 'a self-closing dialog left the model true');
+  assert.equal(w.emitted['close']?.length, 1, 'close was not emitted exactly once');
+  w.unmount();
+});
+
+test('te-modal closes on the backdrop but not on its own content', async () => {
+  const w = mount('te-modal', { visible: true, title: 'Hi' });
+  await nextTick();
+  const dialog = w.$('dialog.modal');
+
+  await click(w.$('.modal-content'));
+  assert.equal(dialog.open, true, 'a click inside the modal closed it');
+
+  await click(dialog);
+  assert.equal(dialog.open, false, 'a backdrop click did not close the modal');
+  w.unmount();
+});
+
+test('te-modal with closeOnBackdrop false ignores the backdrop', async () => {
+  const w = mount('te-modal', { visible: true, title: 'Hi', closeOnBackdrop: false });
+  await nextTick();
+  const dialog = w.$('dialog.modal');
+
+  await click(dialog);
+  assert.equal(dialog.open, true, 'the backdrop closed a modal that opted out');
+
+  // The close button still works — opting out of the backdrop is not a trap.
+  await click(w.$('.btn-close'));
+  assert.equal(dialog.open, false, 'the close button stopped working');
+  w.unmount();
+});
+
+test('te-offcanvas tells its backdrop apart from its own padding', async () => {
+  const w = mount('te-offcanvas', { modelValue: true, title: 'Panel' });
+  await nextTick();
+  const dialog = w.$('dialog.offcanvas');
+  assert.equal(dialog.open, true);
+  // A 320px-wide drawer pinned to the left edge.
+  stubRect(dialog, { left: 0, right: 320, top: 0, bottom: 800 });
+
+  await click(dialog, { clientX: 160, clientY: 400 });
+  assert.equal(dialog.open, true, 'a click on the panel itself closed it');
+
+  await click(dialog, { clientX: 600, clientY: 400 });
+  assert.equal(dialog.open, false, 'a click on the backdrop did not close it');
+  assert.equal(w.state.modelValue, false, 'the model was not written back');
+  w.unmount();
+});
+
+/* -------------------------------------------------------------- dropdown */
+
+test('te-dropdown wires the trigger to the panel as a native popover', async () => {
+  const w = mount('te-dropdown', { label: 'Actions', items: ['Edit', 'Delete'] });
+  const trigger = w.$('.dropdown-toggle');
+  const panel = w.$('.dropdown-menu');
+
+  assert.equal(trigger.getAttribute('popovertarget'), panel.id, 'the trigger points nowhere');
+  assert.ok(panel.hasAttribute('popover'), 'the panel is not a popover');
+  assert.equal(trigger.getAttribute('aria-expanded'), 'false');
+  assert.equal(panel.getAttribute('aria-labelledby'), trigger.id);
+  w.unmount();
+});
+
+test('te-dropdown normalises string items and reports the picked one', async () => {
+  const w = mount('te-dropdown', { items: ['Edit', { label: 'Delete', disabled: true }] });
+  const items = w.$$('.dropdown-item');
+  assert.equal(items.length, 2);
+  assert.equal(items[0].textContent.trim(), 'Edit');
+  assert.equal(items[1].disabled, true, 'a disabled item was left clickable');
+
+  // Stubbed because happy-dom ships no Popover API; the component only ever
+  // calls hidePopover(), never reimplements dismissal.
+  const panel = w.$('.dropdown-menu');
+  let hidden = 0;
+  panel.hidePopover = () => { hidden++; };
+
+  await click(items[0]);
+  console.error('DBG same node:', panel === w.$('.dropdown-menu'), 'typeof hide:', typeof panel.hidePopover, 'hidden:', hidden);
+  assert.deepEqual(w.emitted['select']?.at(-1), [{ label: 'Edit' }, 0]);
+  assert.equal(hidden, 1, 'picking an item left the menu open');
+
+  await click(items[1]);
+  assert.equal(hidden, 1, 'a disabled item closed the menu');
+  w.unmount();
+});
+
+test('te-dropdown survives a browser with no Popover API', async () => {
+  // The model watcher must no-op rather than throw where showPopover is absent.
+  const w = mount('te-dropdown', { items: ['Edit'] });
+  w.state.modelValue = true;
+  await nextTick();
+  assert.equal(w.$('.dropdown-menu').isConnected, true);
   w.unmount();
 });

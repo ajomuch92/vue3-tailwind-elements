@@ -26,6 +26,7 @@ const cases = {
   'te-checkbox': { modelValue: true, label: 'ok' },
   'te-chip': { closable: true, imgUrl: 'x.png', size: 'small' },
   'te-date-picker': { modelValue: new Date(2024, 0, 15) },
+  'te-dropdown': { label: 'Actions', items: ['Edit', { label: 'Delete', disabled: true }] },
   'te-file': { accept: 'image/*' },
   'te-icon': { name: 'star', family: 'fa' },
   'te-input': { modelValue: 'abc', helperText: 'help', rightIcon: 'star', invalid: true },
@@ -56,9 +57,11 @@ const cases = {
   'te-tooltip': { position: 'top' },
 };
 
-/* Modal and offcanvas render through <Teleport>, so their markup lands in the
-   SSR context rather than the returned string. */
-const TELEPORTED = {
+/* Modal and offcanvas are native <dialog>s now: no <Teleport>, so their markup
+   comes back in the rendered string like everything else. They render closed
+   on the server — showModal() is a client-only call — and the UA's
+   `dialog:not([open])` rule keeps them hidden until they hydrate. */
+const OVERLAYS = {
   'te-modal': { visible: true, title: 'A modal' },
   'te-offcanvas': { modelValue: true, title: 'A panel' },
 };
@@ -72,16 +75,17 @@ for (const [tag, props] of Object.entries(cases)) {
   });
 }
 
-for (const [tag, props] of Object.entries(TELEPORTED)) {
-  test(`${tag} renders into a teleport`, async () => {
+for (const [tag, props] of Object.entries(OVERLAYS)) {
+  test(`${tag} server-renders a closed <dialog>`, async () => {
     const context = {};
     const app = createSSRApp({ render: () => h(resolveComponent(tag), props) });
     app.use(install);
-    await renderToString(app, context);
-    const html = Object.values(context.teleports ?? {}).join('');
-    assert.ok(html.length > 0, `${tag} teleported nothing`);
+    const html = await renderToString(app, context);
+    assert.match(html, /^<dialog/, `${tag} is no longer a native dialog`);
+    assert.doesNotMatch(html, /\sopen[\s=>]/, `${tag} claimed to be open before hydration`);
     assert.ok(!html.includes('[object Object]'), `${tag} leaked an object into markup`);
     assert.match(html, new RegExp(props.title));
+    assert.deepEqual(context.teleports ?? {}, {}, `${tag} still teleports`);
   });
 }
 

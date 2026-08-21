@@ -106,9 +106,10 @@ test('the loading backdrop covers the viewport and is visible', () => {
 
 test('the Bootstrap dump is gone', () => {
   assert.ok(!has('--bs-'), 'Bootstrap custom properties still shipped');
-  // .modal and .offcanvas are ours now — te-modal and te-offcanvas use them.
-  // These have no component behind them and only ever came from the dump.
-  for (const dead of ['.navbar', '.dropdown-menu', '.carousel', '.was-validated', '.input-group']) {
+  // .modal, .offcanvas and .dropdown-menu are ours now — te-modal,
+  // te-offcanvas and te-dropdown use them. These have no component behind them
+  // and only ever came from the dump.
+  for (const dead of ['.navbar', '.carousel', '.was-validated', '.input-group']) {
     assert.ok(!has(dead), `${dead} still shipped`);
   }
 });
@@ -116,7 +117,24 @@ test('the Bootstrap dump is gone', () => {
 test('every component class the library renders has a rule', () => {
   // Guards against a component shipping markup with no styles behind it, the
   // way .backdrop and .form-checkbox once did.
-  for (const rule of ['.form-check', '.form-switch', '.btn-close', '.page-item', '.nav-tabs', '.nav-pills', '.modal-dialog', '.offcanvas-backdrop']) {
+  for (const rule of ['.form-check', '.form-switch', '.btn-close', '.page-item', '.nav-tabs', '.nav-pills', '.modal-dialog', '.dropdown-item']) {
     assert.ok(has(rule), `missing ${rule}`);
   }
+});
+
+test('the overlays are native dialogs, not hand-rolled scrims', () => {
+  // The old markup carried its own backdrop div and z-index; showModal() puts
+  // both in the top layer instead, which is what brings Escape and the focus
+  // trap with it. A z-index creeping back means someone re-stacked them.
+  assert.ok(!has('.offcanvas-backdrop'), 'the offcanvas backdrop div is back');
+  assert.match(block('dialog.modal'), /background-color: transparent/);
+  assert.ok(has('dialog.modal::backdrop'), 'the modal has no ::backdrop scrim');
+  assert.ok(has('dialog.offcanvas[open]'), 'the offcanvas never opens');
+  for (const overlay of ['dialog.modal', 'dialog.offcanvas']) {
+    assert.ok(!/z-index/.test(block(overlay)), `${overlay} still fights for a z-index`);
+  }
+});
+
+test('animations back off under prefers-reduced-motion', () => {
+  assert.ok(has('prefers-reduced-motion'), 'no reduced-motion opt-out shipped');
 });
