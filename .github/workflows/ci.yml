@@ -25,9 +25,12 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - run: npm ci
-      - run: npm run build
+      # The playground aliases the library to ../src and pulls nothing from the
+      # root install, so it needs neither `npm ci` nor a library build here.
       - run: npm install
+        working-directory: example
+      # Renders the home page and all 37 component stories.
+      - run: npm run check
         working-directory: example
       - run: npm run build
         working-directory: example
