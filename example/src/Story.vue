@@ -1,5 +1,5 @@
 <script setup>
-import { computed, reactive, ref } from 'vue';
+import { computed, getCurrentInstance, reactive, ref } from 'vue';
 
 const props = defineProps({
   story: { type: Object, required: true },
@@ -17,6 +17,16 @@ const controls = Object.entries(props.story.props ?? {}).map(([key, raw]) => {
   return { key, options: spec.options, value, kind: spec.options ? 'select' : typeof value };
 });
 
+/* The component's own prop defaults, read off the globally registered
+   component. A prop is only safe to leave out of the code when it already
+   holds that value — dropping every falsy one instead makes a `true`-by-default
+   prop like the tooltip's `arrow` impossible to switch off. */
+const instance = getCurrentInstance();
+const componentDefaults = computed(
+  () => instance?.appContext.components[tag.value]?.props ?? {}
+);
+const defaultOf = (key) => componentDefaults.value[key]?.default;
+
 const state = reactive(Object.fromEntries(controls.map((c) => [c.key, c.value])));
 const model = ref(props.story.model);
 const hasModel = 'model' in props.story;
@@ -24,8 +34,10 @@ const hasModel = 'model' in props.story;
 const attrs = computed(() => {
   const bound = controls.map((c) => {
     const value = state[c.key];
-    if (value === false || value === '' || value === null || value === undefined) return '';
-    if (value === true) return ` ${kebab(c.key)}`;
+    if (value === null || value === undefined) return '';
+    if (value === defaultOf(c.key)) return '';
+    if (typeof value === 'boolean') return value ? ` ${kebab(c.key)}` : ` :${kebab(c.key)}="false"`;
+    if (value === '') return '';
     if (typeof value === 'number') return ` :${kebab(c.key)}="${value}"`;
     return ` ${kebab(c.key)}="${value}"`;
   });
