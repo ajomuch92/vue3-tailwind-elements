@@ -1,5 +1,37 @@
 # Changelog
 
+## 1.2.0
+
+### Added
+
+- `te-dropdown` — a menu taking plain strings or `{ label, disabled }` items,
+  with `align`, `size`, `closeOnSelect`, a `trigger` slot, `v-model` for the
+  open state and a `select` event. It renders on the server, so it works under
+  Nuxt and VitePress without a `<ClientOnly>` wrapper.
+- A [playground](https://vue3-tailwind-elements-playground.pages.dev/) with
+  live prop controls for every component and the code that renders each one.
+
+### Changed
+
+- `te-modal` and `te-offcanvas` are native `<dialog>` elements now instead of a
+  `<Teleport>`ed `div` with a hand-rolled scrim. Escape to close, the focus
+  trap, focus returning to the trigger, `::backdrop` and an inert page behind
+  come from the browser rather than from this library. The public API is
+  unchanged — `v-model:visible` on the modal, `v-model` on the offcanvas.
+
+### Fixed
+
+- `te-tooltip` only opened on `:hover`, so it did not exist for a keyboard or a
+  screen reader. The wrapper is focusable, `:focus-within` opens it, and the
+  tip is wired up with `role="tooltip"` and `aria-describedby`.
+
+## 1.1.1
+
+### Fixed
+
+- The `homepage` URL in `package.json` pointed at a site that no longer served
+  the documentation.
+
 ## 1.1.0
 
 ### Added

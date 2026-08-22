@@ -10,6 +10,9 @@ hero:
       text: Get started
       link: /guide/
     - theme: alt
+      text: Playground
+      link: https://vue3-tailwind-elements-playground.pages.dev/
+    - theme: alt
       text: Components
       link: /components/button
     - theme: alt
@@ -23,4 +26,8 @@ features:
     details: Types ship with the package and GlobalComponents is augmented, so te-button type="primary" is checked inside your templates.
   - title: Tailwind v4 native
     details: Built on the CSS-first theme. Variants read a shared palette of custom properties you can override with plain CSS.
+  - title: Try it in the playground
+    details: Every component with live prop controls and the exact code that renders it, so you can copy what you built.
+    link: https://vue3-tailwind-elements-playground.pages.dev/
+    linkText: Open the playground
 ---

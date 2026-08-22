@@ -3,11 +3,19 @@ A light library of components based on [Tailwind Elements](https://tailwind-elem
 Requires **Vue 3.5+** and **Tailwind CSS v4**.
 For Vuejs 2, refer to [this package](https://www.npmjs.com/package/vue-tailwind-elements).
 
+**[Playground](https://vue3-tailwind-elements-playground.pages.dev/)** — every
+component with live prop controls and the code that renders it ·
+**[Documentation](https://vue3-tailwind-elements.pages.dev/)**
+
 ### Components
 `te-accordion` · `te-alert` · `te-badge` · `te-breadcrumb` · `te-button` ·
 `te-button-group` · `te-card` · `te-checkbox` · `te-chip` · `te-date-picker` ·
-`te-file` · `te-icon` · `te-input` · `te-list-group` · `te-loading` ·
-`te-spinner`
+`te-dropdown` · `te-file` · `te-icon` · `te-input` · `te-list-group` ·
+`te-loading` · `te-modal` · `te-multiselect` · `te-notification` ·
+`te-offcanvas` · `te-pagination` · `te-progress` · `te-radio` · `te-range` ·
+`te-rating` · `te-scroll-to-top` · `te-select` · `te-spinner` · `te-stepper` ·
+`te-switch` · `te-table` · `te-tabs` · `te-textarea` · `te-time-picker` ·
+`te-toast` · `te-toast-light` · `te-tooltip`
 
 Plus the `v-click-outside` directive. All of them are registered globally by
 the plugin and can also be imported by name.
@@ -108,7 +116,10 @@ stylesheet (`.modal`, `.offcanvas`, `.navbar`, `--bs-*`, …) has been removed.
 See the [CHANGELOG](./CHANGELOG.md) for the full list of breaking changes and
 fixes.
 
-See an example [here](https://github.com/ajomuch92/vue3-tailwind-elements/tree/main/example) or documentation [here](https://vue-tailwind-elements.netlify.app/).
+Play with every component in the
+[playground](https://vue3-tailwind-elements-playground.pages.dev/) (its source
+lives [here](https://github.com/ajomuch92/vue3-tailwind-elements/tree/main/example)),
+or read the [documentation](https://vue3-tailwind-elements.pages.dev/).
 
 ## Nuxt:
 Put the plugin registration into a plugin file and use it in `nuxt.config.ts` like this:
