@@ -1,12 +1,12 @@
 {
   "name": "vue3-tailwind-elements",
   "private": false,
-  "version": "1.1.1",
+  "version": "1.2.0",
   "author": {
     "name": "Aarón Montes"
   },
   "license": "MIT",
-  "homepage": "https://vue3-tailwind-elements.pages.dev/",
+  "homepage": "https://vue3-tailwind-elements-playground.pages.dev/",
   "repository": {
     "type": "git",
     "url": "https://github.com/ajomuch92/vue3-tailwind-elements.git"
