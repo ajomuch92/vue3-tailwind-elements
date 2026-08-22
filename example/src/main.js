@@ -1,7 +1,6 @@
 import { createApp } from 'vue';
 import App from './App.vue';
 import Vue3TailwindElements from 'vue3-tailwind-elements';
-import 'vue3-tailwind-elements/style.css';
 import './styles/index.css';
 
 createApp(App)
