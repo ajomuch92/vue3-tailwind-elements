@@ -8,11 +8,29 @@
   with `align`, `size`, `closeOnSelect`, a `trigger` slot, `v-model` for the
   open state and a `select` event. It renders on the server, so it works under
   Nuxt and VitePress without a `<ClientOnly>` wrapper.
+- `te-calendar` — a month grid and a week grid with hour lanes, driven by
+  `v-model` for the visible date and `v-model:view` for the two views. Events
+  are `{ start, end?, title?, type?, allDay? }`; overlapping events split their
+  column and the split resets after a gap. `editable` turns on drag-and-drop,
+  which reports a `move-event` rather than mutating the array it was given.
+  Month names, weekday names and the clock come from `Intl`, so a `locale` prop
+  replaces the hand-translated `monthNames` / `days` lists `te-date-picker`
+  still needs. No resizing, recurrence, timezone conversion, or day/year view.
+- `te-table` grew the data-grid features it was missing: `sortable` columns
+  with `v-model:sort`, row selection through `selectable` + `v-model:selected`,
+  a `stickyHeader` and `stickyColumns` for frozen headings and pinned columns,
+  and `resizable` / `reorderable` headings backed by `v-model:column-widths`
+  and `v-model:column-order`. Every one of those models works uncontrolled, so
+  none of them is required.
 - A [playground](https://vue3-tailwind-elements-playground.pages.dev/) with
   live prop controls for every component and the code that renders each one.
 
 ### Changed
 
+- `te-table` renders only the current page. It used to keep every row mounted
+  and hide the off-page ones with `v-show`, so 5,000 rows paginated by 20 still
+  built 5,000 `<tr>`. A per-column slot's `index` still counts across the whole
+  set rather than restarting each page.
 - `te-modal` and `te-offcanvas` are native `<dialog>` elements now instead of a
   `<Teleport>`ed `div` with a hand-rolled scrim. Escape to close, the focus
   trap, focus returning to the trigger, `::backdrop` and an inert page behind
@@ -24,6 +42,14 @@
 - `te-tooltip` only opened on `:hover`, so it did not exist for a keyboard or a
   screen reader. The wrapper is focusable, `:focus-within` opens it, and the
   tip is wired up with `role="tooltip"` and `aria-describedby`.
+- `te-tooltip`'s arrow was painted `black` while the bubble was `bg-gray-800`,
+  so the pointer never matched the thing it pointed from. Both now read a
+  single `--te-tooltip-bg`, which also makes recolouring one declaration.
+- `te-tooltip` placed itself with fixed guesses about its own size — `-top-9`
+  above the trigger and `left: -110%` beside it — so a two-line tip overlapped
+  its trigger and a wide one drifted sideways. It anchors to the trigger's edge
+  now and holds the distance with a margin, exposed as a new `offset` prop
+  (8px by default).
 
 ## 1.1.1
 

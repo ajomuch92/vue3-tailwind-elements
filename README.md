@@ -9,8 +9,9 @@ component with live prop controls and the code that renders it ·
 
 ### Components
 `te-accordion` · `te-alert` · `te-badge` · `te-breadcrumb` · `te-button` ·
-`te-button-group` · `te-card` · `te-checkbox` · `te-chip` · `te-date-picker` ·
-`te-dropdown` · `te-file` · `te-icon` · `te-input` · `te-list-group` ·
+`te-button-group` · `te-calendar` · `te-card` · `te-checkbox` · `te-chip` ·
+`te-date-picker` · `te-dropdown` · `te-file` · `te-icon` · `te-input` ·
+`te-list-group` ·
 `te-loading` · `te-modal` · `te-multiselect` · `te-notification` ·
 `te-offcanvas` · `te-pagination` · `te-progress` · `te-radio` · `te-range` ·
 `te-rating` · `te-scroll-to-top` · `te-select` · `te-spinner` · `te-stepper` ·
