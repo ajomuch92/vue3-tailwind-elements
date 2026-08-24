@@ -1,5 +1,5 @@
 export default {
-  props: { position: { options: ['top', 'right', 'bottom', 'left'] }, arrow: true },
+  props: { position: { options: ['top', 'right', 'bottom', 'left'] }, arrow: true, offset: 8 },
   template: (attrs) => `<div class="p-16">
   <te-tooltip${attrs}>
     <te-button>Hover or focus me</te-button>
