@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vitepress dev",
+    "prebuild": "node check-components.mjs",
     "build": "vitepress build",
     "preview": "vitepress preview",
     "deploy": "npm run build && wrangler pages deploy .vitepress/dist --project-name=vue3-tailwind-elements"

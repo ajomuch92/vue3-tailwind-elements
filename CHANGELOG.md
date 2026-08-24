@@ -21,7 +21,11 @@
   a `stickyHeader` and `stickyColumns` for frozen headings and pinned columns,
   and `resizable` / `reorderable` headings backed by `v-model:column-widths`
   and `v-model:column-order`. Every one of those models works uncontrolled, so
-  none of them is required.
+  none of them is required. Alongside them: `rowKey` to identify a row by a
+  field instead of its index (so selection survives sorting and paging),
+  `maxHeight` to scroll the body under a sticky heading, `minColumnWidth` as
+  the floor a resize drag cannot cross, and `labelSelectAll` / `labelSelectRow`
+  / `labelResize` so the accessible names on those controls can be translated.
 - A [playground](https://vue3-tailwind-elements-playground.pages.dev/) with
   live prop controls for every component and the code that renders each one.
 
@@ -34,8 +38,23 @@
 - `te-modal` and `te-offcanvas` are native `<dialog>` elements now instead of a
   `<Teleport>`ed `div` with a hand-rolled scrim. Escape to close, the focus
   trap, focus returning to the trigger, `::backdrop` and an inert page behind
-  come from the browser rather than from this library. The public API is
-  unchanged — `v-model:visible` on the modal, `v-model` on the offcanvas.
+  come from the browser rather than from this library. The props are unchanged
+  — `v-model:visible` on the modal, `v-model` on the offcanvas — and
+  `te-offcanvas` gained the `close` event `te-modal` already had. Both fire it
+  on every route out: the button, the backdrop, Escape, or the model.
+- Animations everywhere in the library now stand down under
+  `prefers-reduced-motion: reduce`. The overlays gained slide and fade
+  transitions in this release, so shipping them without the opt-out would have
+  traded one accessibility problem for another.
+
+### Removed
+
+- `.offcanvas-backdrop` no longer exists: the scrim is `dialog.offcanvas::backdrop`
+  now. In the same move `.modal` and `.offcanvas` only match `dialog.modal` and
+  `dialog.offcanvas`, and neither carries a `z-index` any more — the top layer
+  settles stacking instead. **If you overrode any of those three selectors in
+  your own stylesheet, that override no longer applies.** Retarget it at
+  `dialog.modal`, `dialog.offcanvas`, or their `::backdrop`.
 
 ### Fixed
 

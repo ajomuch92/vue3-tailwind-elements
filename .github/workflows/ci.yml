@@ -29,7 +29,8 @@ jobs:
       # root install, so it needs neither `npm ci` nor a library build here.
       - run: npm install
         working-directory: example
-      # Renders the home page and all 37 component stories.
+      # Renders the home page and every component story; check.mjs enumerates them,
+      # so the comment never drifts from the router.
       - run: npm run check
         working-directory: example
       - run: npm run build
