@@ -88,6 +88,25 @@ import { TeButton, TeDatePicker } from 'vue3-tailwind-elements';
 import type { Variant, Size } from 'vue3-tailwind-elements';
 ```
 
+## Upgrading to 2.0
+
+Every prop, event and slot from 1.x still works. The major is for the
+stylesheet: `te-modal` and `te-offcanvas` are native `<dialog>` elements now, so
+they get <kbd>Esc</kbd>, a focus trap, focus restored to the trigger and an
+inert page behind straight from the browser — and the scrim moved with them.
+
+If you never overrode those classes, there is nothing to do. If you did:
+
+```diff
+- .modal { background-color: rgb(0 0 0 / 0.8); }
++ dialog.modal::backdrop { background-color: rgb(0 0 0 / 0.8); }
+
+- .offcanvas-backdrop { background-color: rgb(0 0 0 / 0.8); }
++ dialog.offcanvas::backdrop { background-color: rgb(0 0 0 / 0.8); }
+```
+
+Full notes in the [upgrade guide](https://vue3-tailwind-elements.pages.dev/guide/upgrading).
+
 ## Upgrading from 0.0.x
 
 1.0.0 requires Tailwind v4 and replaces the JavaScript plugin with a

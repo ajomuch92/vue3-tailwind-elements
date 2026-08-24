@@ -1,7 +1,43 @@
-# Upgrading from 0.0.x
+# Upgrading
 
-Version 1.0.0 requires Tailwind v4 and replaces the JavaScript plugin with a
-stylesheet. The full list lives in the
+## To 2.0.0
+
+Nothing about the components changed: every prop, event and slot from 1.x still
+works, and `te-modal` still takes `v-model:visible` while `te-offcanvas` still
+takes `v-model`. The major is for the stylesheet.
+
+`te-modal` and `te-offcanvas` are native `<dialog>` elements now, opened with
+`showModal()`. That is what brings <kbd>Esc</kbd>, the focus trap, focus
+returning to whatever opened them, and an inert page behind — all from the
+browser rather than from this library. It also moves where the scrim lives.
+
+**If you never overrode `.modal`, `.offcanvas` or `.offcanvas-backdrop`, there
+is nothing to do.** If you did:
+
+```diff
+- .modal { background-color: rgb(0 0 0 / 0.8); }
++ dialog.modal::backdrop { background-color: rgb(0 0 0 / 0.8); }
+
+- .offcanvas-backdrop { background-color: rgb(0 0 0 / 0.8); }
++ dialog.offcanvas::backdrop { background-color: rgb(0 0 0 / 0.8); }
+```
+
+Two details worth knowing:
+
+- `.modal` and `.offcanvas` now only match `dialog.modal` / `dialog.offcanvas`.
+  A bare `.modal { … }` rule no longer reaches the element.
+- Neither carries a `z-index` any more. Both render in the browser's top layer,
+  so they sit above everything and are never clipped by an ancestor's
+  `overflow` — a `z-index` you were using to win that fight can go.
+
+Everything else about theming is untouched: the `--te-*` variant slots,
+`.te-backdrop`, and Tailwind's `@theme`.
+
+## From 0.0.x
+
+Version 1.0.0 required Tailwind v4 and replaced the JavaScript plugin with a
+stylesheet. Coming from 0.0.x you need this section as well as the 2.0.0 one
+above. The full list lives in the
 [CHANGELOG](https://github.com/ajomuch92/vue3-tailwind-elements/blob/main/CHANGELOG.md).
 
 ## Tailwind config
