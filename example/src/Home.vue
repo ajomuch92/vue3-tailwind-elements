@@ -23,7 +23,7 @@ const styles = `/* style.css */
   <div class="space-y-10">
     <header class="space-y-3">
       <div class="flex flex-wrap items-center gap-3">
-        <h1 class="text-3xl font-bold">{{ pkg.name }}</h1>
+        <h1 class="break-words text-2xl font-bold sm:text-3xl">{{ pkg.name }}</h1>
         <te-badge type="primary" :text="`v${pkg.version}`" rounded />
       </div>
       <p class="max-w-2xl text-gray-600">

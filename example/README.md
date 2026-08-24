@@ -28,6 +28,10 @@ rule or SPA fallback.
 
 ## Adding a story
 
+The layout is responsive: below `md` the component list collapses into a drawer
+opened from the top bar, and the prop controls sit under the preview instead of
+beside it.
+
 One file per component in `src/stories/`. Drop a new `.js` in there and it shows
 up in the sidebar and on the home page — there is no list to update. The
 filename becomes the tag, so `button.js` renders `<te-button>`.

@@ -62,19 +62,19 @@ const preview = computed(() => ({
 </script>
 
 <template>
-  <div class="flex flex-col gap-6 xl:flex-row">
+  <div class="flex flex-col gap-6 lg:flex-row">
     <div class="min-w-0 flex-1 space-y-4">
-      <div class="rounded-lg border border-gray-200 bg-white p-8">
+      <div class="overflow-x-auto rounded-lg border border-gray-200 bg-white p-4 sm:p-8">
         <component :is="preview" />
       </div>
 
       <pre class="overflow-x-auto rounded-lg bg-gray-900 p-4 text-sm text-gray-100"><code>{{ code }}</code></pre>
     </div>
 
-    <aside class="w-full shrink-0 space-y-4 xl:w-72">
+    <aside class="w-full shrink-0 space-y-4 lg:w-72">
       <div v-if="controls.length" class="rounded-lg border border-gray-200 p-4">
         <h3 class="mb-3 text-xs font-bold uppercase tracking-wide text-gray-400">Props</h3>
-        <div class="space-y-3">
+        <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-1">
           <label v-for="control in controls" :key="control.key" class="block text-sm">
             <span class="mb-1 block font-medium text-gray-600">{{ control.key }}</span>
 
