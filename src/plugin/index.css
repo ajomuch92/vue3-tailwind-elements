@@ -22,7 +22,8 @@
 
 @layer components {
   .btn, .badge, .chip, .notification, .spinner, .alert, .progress,
-  .toast-wrapper, .toast, .toast-light, .toast-text, .page-link {
+  .toast-wrapper, .toast, .toast-light, .toast-text, .page-link,
+  .calendar-event {
     --te-400: var(--color-gray-400);
     --te-500: var(--color-gray-500);
     --te-600: var(--color-gray-600);
@@ -986,5 +987,232 @@
     animation-iteration-count: 1 !important;
     transition-duration: 1ms !important;
     scroll-behavior: auto !important;
+  }
+}
+
+
+/* ---------------------------------------------------------------------------
+ * Calendar
+ *
+ * The grid draws its lines with a single outer border plus one border per
+ * cell, so a 1px seam never doubles up between neighbours.
+ * ------------------------------------------------------------------------ */
+
+@layer components {
+  .calendar-grid {
+    border: 1px solid var(--color-gray-200);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    background-color: var(--color-white);
+  }
+
+  .calendar-heading {
+    padding: 0.5rem 0.25rem;
+    text-align: center;
+    font-size: var(--text-xs);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-gray-500);
+    background-color: var(--color-gray-50);
+
+    &.is-today { color: var(--color-blue-600); }
+  }
+
+  .calendar-cell {
+    min-height: 6rem;
+    padding: 0.25rem;
+    border-top: 1px solid var(--color-gray-200);
+    border-left: 1px solid var(--color-gray-200);
+    cursor: pointer;
+    transition: background-color 150ms;
+
+    /* The first column of every row would otherwise carry a left edge that
+       sits on top of the container's own border. */
+    &:nth-child(7n + 1) { border-left: 0; }
+    &:hover { background-color: var(--color-gray-50); }
+    &.is-outside { background-color: var(--color-gray-50); color: var(--color-gray-400); }
+  }
+
+  .calendar-daynum {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.75rem;
+    height: 1.75rem;
+    margin-bottom: 0.125rem;
+    border-radius: var(--radius-full);
+    font-size: var(--text-sm);
+  }
+
+  .calendar-cell.is-today .calendar-daynum {
+    background-color: var(--color-blue-500);
+    color: var(--color-white);
+    font-weight: 600;
+  }
+
+  .calendar-more {
+    padding-left: 0.25rem;
+    font-size: var(--text-xs);
+    color: var(--color-gray-500);
+  }
+
+  .calendar-gutter {
+    border-right: 1px solid var(--color-gray-200);
+    background-color: var(--color-gray-50);
+  }
+
+  .calendar-gutter-label {
+    padding: 0.25rem;
+    font-size: var(--text-xs);
+    color: var(--color-gray-500);
+    text-align: right;
+  }
+
+  /* Nudged up by half a line so the label reads as the boundary between two
+     hours rather than as a caption for the block below it. */
+  .calendar-hour-label {
+    position: relative;
+    padding-right: 0.5rem;
+    text-align: right;
+    font-size: var(--text-xs);
+    color: var(--color-gray-400);
+
+    & > * { position: relative; top: -0.5em; }
+  }
+
+  .calendar-allday {
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+    min-height: 1.75rem;
+    padding: 0.125rem;
+    border-left: 1px solid var(--color-gray-200);
+  }
+
+  .calendar-column {
+    position: relative;
+    border-left: 1px solid var(--color-gray-200);
+
+    &.is-today { background-color: color-mix(in oklab, var(--color-blue-500) 4%, transparent); }
+  }
+
+  .calendar-slot {
+    border-top: 1px solid var(--color-gray-100);
+
+    &:first-child { border-top: 0; }
+  }
+
+  .calendar-event {
+    display: block;
+    width: 100%;
+    padding: 0.125rem 0.375rem;
+    border: 0;
+    border-radius: var(--radius-sm);
+    background-color: var(--te-500);
+    color: var(--te-on);
+    font-size: var(--text-xs);
+    line-height: 1.25;
+    text-align: left;
+    cursor: pointer;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    transition: background-color 150ms;
+
+    &:hover { background-color: var(--te-700); }
+    &[draggable="true"] { cursor: grab; }
+  }
+
+  /* Absolutely placed from the inline top/height/left/width the component
+     computes, with a hairline gap so neighbouring columns stay readable. */
+  .calendar-event-timed {
+    position: absolute;
+    width: auto;
+    white-space: normal;
+    padding-right: 0.25rem;
+    outline: 1px solid var(--color-white);
+    min-height: 1rem;
+  }
+
+  .calendar-event-time {
+    font-weight: 600;
+    opacity: 0.85;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * Table — data-grid extras
+ *
+ * `position: sticky` does all the pinning; the component only supplies the
+ * `left` offsets, summed from the widths in front of each pinned column.
+ * ------------------------------------------------------------------------ */
+
+@layer components {
+  .table-sticky-head th {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    /* thead has no background of its own once the body scrolls under it. */
+    background-color: inherit;
+  }
+
+  .table-pinned {
+    position: sticky;
+    z-index: 10;
+    background-color: inherit;
+  }
+
+  /* A pinned header cell is sticky on both axes, so it has to outrank both. */
+  .table-sticky-head th.table-pinned { z-index: 30; }
+
+  tbody .table-pinned { background-color: var(--color-white); }
+
+  tr.bg-gray-50 .table-pinned { background-color: var(--color-gray-50); }
+
+  /* A pinned cell paints its own background, so it would sit out the row's
+     hover. Matched on the utility itself rather than re-declaring `hoverable`. */
+  tr[class*="hover:bg-gray-100"]:hover .table-pinned { background-color: var(--color-gray-100); }
+
+  .table-select-cell,
+  .table-num-cell {
+    width: 48px;
+    min-width: 48px;
+    text-align: center;
+  }
+
+  .table-check {
+    accent-color: rgb(59, 130, 246);
+    width: 1rem;
+    height: 1rem;
+    cursor: pointer;
+  }
+
+  .table-sort {
+    font-size: 0.625rem;
+    line-height: 1;
+    opacity: 0.35;
+    transition: opacity 150ms;
+
+    &.asc, &.desc { opacity: 1; }
+  }
+
+  /* Sits on the cell's trailing edge and widens its own hit area with padding
+     rather than with width, so neighbouring columns are never overlapped. */
+  .table-resizer {
+    position: absolute;
+    top: 0;
+    right: 0;
+    height: 100%;
+    width: 5px;
+    cursor: col-resize;
+    touch-action: none;
+    user-select: none;
+
+    &:hover, &:active { background-color: var(--color-blue-400); }
+  }
+
+  th.is-drop {
+    box-shadow: inset 2px 0 0 0 var(--color-blue-500);
   }
 }

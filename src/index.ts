@@ -6,6 +6,7 @@ import TeBadge from './components/teBadge.vue';
 import TeBreadcrumb from './components/teBreadcrumb.vue';
 import TeButton from './components/teButton.vue';
 import TeButtonGroup from './components/teButtonGroup.vue';
+import TeCalendar from './components/teCalendar.vue';
 import TeCard from './components/teCard.vue';
 import TeCheckbox from './components/teCheckbox.vue';
 import TeChip from './components/teChip.vue';
@@ -50,6 +51,7 @@ const components = {
   'te-breadcrumb': TeBreadcrumb,
   'te-button': TeButton,
   'te-button-group': TeButtonGroup,
+  'te-calendar': TeCalendar,
   'te-card': TeCard,
   'te-checkbox': TeCheckbox,
   'te-chip': TeChip,
@@ -95,7 +97,7 @@ export default install;
 
 export {
   TeAccordion, TeAlert, TeBadge, TeBreadcrumb, TeButton, TeButtonGroup,
-  TeCard, TeCheckbox, TeChip, TeDatePicker, TeDropdown, TeFile, TeIcon, TeInput,
+  TeCalendar, TeCard, TeCheckbox, TeChip, TeDatePicker, TeDropdown, TeFile, TeIcon, TeInput,
   TeListGroup, TeLoading, TeModal, TeMultiselect, TeNotification, TeOffcanvas,
   TePagination, TeProgress, TeRadio, TeRange, TeRating, TeScrollToTop,
   TeSelect, TeSpinner, TeStepper, TeSwitch, TeTable, TeTabs, TeTextarea,
@@ -113,6 +115,7 @@ declare module 'vue' {
     TeBreadcrumb: typeof TeBreadcrumb;
     TeButton: typeof TeButton;
     TeButtonGroup: typeof TeButtonGroup;
+    TeCalendar: typeof TeCalendar;
     TeCard: typeof TeCard;
     TeCheckbox: typeof TeCheckbox;
     TeChip: typeof TeChip;

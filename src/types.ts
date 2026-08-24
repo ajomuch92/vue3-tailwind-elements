@@ -43,3 +43,24 @@ export interface ListGroupItem {
   name?: string;
   disabled?: boolean;
 }
+
+export type CalendarView = 'month' | 'week';
+
+export interface CalendarEvent {
+  start: Date | string;
+  /** Defaults to 30 minutes after `start`. */
+  end?: Date | string;
+  title?: string;
+  /** One of the shared VARIANTS; drives the chip's colour. */
+  type?: Variant;
+  allDay?: boolean;
+  [key: string]: unknown;
+}
+
+export interface SortState {
+  field: string;
+  dir: 'asc' | 'desc';
+}
+
+/** A row key when `te-table` has a `rowKey`, otherwise the row object itself. */
+export type TableSelection = unknown;
