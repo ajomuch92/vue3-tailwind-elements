@@ -1,6 +1,29 @@
 # Changelog
 
-## 1.2.0
+## 2.0.0
+
+The components are the same to use — every prop, event and slot from 1.x still
+works. The major is for one thing only: the overlay classes moved, so a
+stylesheet that overrode them needs one edit. See **Breaking changes** below.
+
+### Breaking changes
+
+- `.offcanvas-backdrop` is gone. `te-offcanvas` is a native `<dialog>` now and
+  its scrim is `dialog.offcanvas::backdrop`.
+- `.modal` and `.offcanvas` only match `dialog.modal` and `dialog.offcanvas`,
+  and neither carries a `z-index` any more — the browser's top layer settles
+  stacking. A bare `.modal { … }` override no longer applies.
+
+  ```diff
+  - .modal { background-color: rgb(0 0 0 / 0.8); }
+  + dialog.modal::backdrop { background-color: rgb(0 0 0 / 0.8); }
+
+  - .offcanvas-backdrop { background-color: rgb(0 0 0 / 0.8); }
+  + dialog.offcanvas::backdrop { background-color: rgb(0 0 0 / 0.8); }
+  ```
+
+  Nothing else about theming changed: the `--te-*` variant slots, `.te-backdrop`
+  and Tailwind's `@theme` all behave as they did.
 
 ### Added
 
@@ -46,15 +69,6 @@
   `prefers-reduced-motion: reduce`. The overlays gained slide and fade
   transitions in this release, so shipping them without the opt-out would have
   traded one accessibility problem for another.
-
-### Removed
-
-- `.offcanvas-backdrop` no longer exists: the scrim is `dialog.offcanvas::backdrop`
-  now. In the same move `.modal` and `.offcanvas` only match `dialog.modal` and
-  `dialog.offcanvas`, and neither carries a `z-index` any more — the top layer
-  settles stacking instead. **If you overrode any of those three selectors in
-  your own stylesheet, that override no longer applies.** Retarget it at
-  `dialog.modal`, `dialog.offcanvas`, or their `::backdrop`.
 
 ### Fixed
 
