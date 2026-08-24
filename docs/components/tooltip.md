@@ -25,6 +25,37 @@ will clip it. Inside a scrolling container, reach for
 <te-tooltip position="right"><te-button>Right</te-button><template #content>To the right</template></te-tooltip>
 ```
 
+## Offset
+
+`offset` is the gap between the trigger and the bubble, in pixels.
+
+<Demo>
+  <te-tooltip :offset="2"><te-button>Tight</te-button><template #content>2px</template></te-tooltip>
+  <te-tooltip><te-button>Default</te-button><template #content>8px</template></te-tooltip>
+  <te-tooltip :offset="20"><te-button>Loose</te-button><template #content>20px</template></te-tooltip>
+</Demo>
+
+```vue
+<te-tooltip :offset="20"><te-button>Loose</te-button><template #content>20px</template></te-tooltip>
+```
+
+The bubble anchors to the trigger's edge and holds the gap with a margin, so the
+distance is the same whether the tip is one line or five.
+
+## Colour
+
+The bubble and the arrow read one custom property, so recolouring is two
+declarations of plain CSS and the pointer follows automatically:
+
+```css
+.tooltip-content {
+  --te-tooltip-bg: var(--color-blue-600);
+  --te-tooltip-color: white;
+}
+```
+
+`--te-tooltip-arrow` sets the pointer's size (`6px` by default).
+
 ## Without the arrow
 
 <Demo>
@@ -41,6 +72,7 @@ will clip it. Inside a scrolling container, reach for
 |---|---|---|---|
 | `position` | `'top'` \| `'right'` \| `'bottom'` \| `'left'` | `'top'` | Side the bubble appears on. |
 | `arrow` | `boolean` | `true` | Draws the little pointer. |
+| `offset` | `number` | `8` | Gap in pixels between the trigger and the bubble. |
 
 ## Slots
 
