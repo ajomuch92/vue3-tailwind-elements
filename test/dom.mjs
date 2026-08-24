@@ -40,6 +40,9 @@ function mount(tag, initialProps = {}, slots) {
       'onUpdate:modelValue': model('modelValue'),
       'onUpdate:activeItem': model('activeItem'),
       'onUpdate:visible': model('visible'),
+      'onUpdate:sort': model('sort'),
+      'onUpdate:selected': model('selected'),
+      'onUpdate:columnOrder': model('columnOrder'),
       onClick: rec('click'),
       onOpen: rec('open'),
       onSelect: rec('select'),
@@ -601,5 +604,90 @@ test('te-dropdown survives a browser with no Popover API', async () => {
   w.state.modelValue = true;
   await nextTick();
   assert.equal(w.$('.dropdown-menu').isConnected, true);
+  w.unmount();
+});
+
+const GRID_HEADERS = [{ label: 'Name', field: 'name' }, { label: 'Qty', field: 'qty' }];
+const GRID_ITEMS = [{ name: 'b', qty: 2 }, { name: 'a', qty: 1 }, { name: 'c', qty: 3 }];
+
+test('te-table cycles a sortable header asc -> desc -> unsorted', async () => {
+  const w = mount('te-table', { headers: GRID_HEADERS, items: GRID_ITEMS, sortable: true });
+  const nameHeader = w.$$('th span')[0];
+  const names = () => w.$$('tbody tr td:first-child').map((td) => td.textContent.trim());
+
+  assert.deepEqual(names(), ['b', 'a', 'c'], 'started out sorted');
+
+  await click(nameHeader);
+  assert.deepEqual(w.state.sort, { field: 'name', dir: 'asc' });
+  assert.deepEqual(names(), ['a', 'b', 'c']);
+
+  await click(nameHeader);
+  assert.deepEqual(w.state.sort, { field: 'name', dir: 'desc' });
+  assert.deepEqual(names(), ['c', 'b', 'a']);
+
+  /* The third click must clear it, otherwise a column can never go back. */
+  await click(nameHeader);
+  assert.equal(w.state.sort, null);
+  assert.deepEqual(names(), ['b', 'a', 'c']);
+  w.unmount();
+});
+
+test('te-table does not sort a column that is not sortable', async () => {
+  const w = mount('te-table', {
+    headers: [{ label: 'Name', field: 'name' }, { label: 'Qty', field: 'qty', sortable: true }],
+    items: GRID_ITEMS,
+  });
+  await click(w.$$('th span')[0]);
+  assert.equal(w.state.sort ?? null, null, 'a plain column reacted to a click');
+
+  await click(w.$$('th span')[1]);
+  assert.deepEqual(w.state.sort, { field: 'qty', dir: 'asc' }, 'per-header sortable was ignored');
+  w.unmount();
+});
+
+test('te-table select-all only touches the visible page', async () => {
+  const items = Array.from({ length: 6 }, (_, i) => ({ name: `r${i}`, qty: i }));
+  const w = mount('te-table', {
+    headers: GRID_HEADERS,
+    items,
+    selectable: true,
+    rowKey: 'name',
+    itemPerPage: 3,
+    selected: [],
+  });
+
+  const headerBox = w.$('thead input[type="checkbox"]');
+  headerBox.checked = true;
+  headerBox.dispatchEvent(new Event('change'));
+  await nextTick();
+  assert.deepEqual(w.state.selected, ['r0', 'r1', 'r2'], 'select-all reached rows on other pages');
+
+  /* Off-page selections must survive a second page's select-all. */
+  const secondPage = w.$$('.page-link').find((el) => el.textContent.trim() === '2');
+  await click(secondPage);
+  const box2 = w.$('thead input[type="checkbox"]');
+  assert.equal(box2.checked, false, 'page 2 inherited page 1 checked state');
+
+  box2.checked = true;
+  box2.dispatchEvent(new Event('change'));
+  await nextTick();
+  assert.deepEqual(w.state.selected, ['r0', 'r1', 'r2', 'r3', 'r4', 'r5']);
+  w.unmount();
+});
+
+test('te-table toggles a single row without disturbing the rest', async () => {
+  const w = mount('te-table', {
+    headers: GRID_HEADERS, items: GRID_ITEMS, selectable: true, rowKey: 'name', selected: ['a'],
+  });
+  const boxes = w.$$('tbody input[type="checkbox"]');
+  boxes[0].checked = true;
+  boxes[0].dispatchEvent(new Event('change'));
+  await nextTick();
+  assert.deepEqual(w.state.selected, ['a', 'b']);
+
+  boxes[0].checked = false;
+  boxes[0].dispatchEvent(new Event('change'));
+  await nextTick();
+  assert.deepEqual(w.state.selected, ['a']);
   w.unmount();
 });

@@ -138,3 +138,18 @@ test('the overlays are native dialogs, not hand-rolled scrims', () => {
 test('animations back off under prefers-reduced-motion', () => {
   assert.ok(has('prefers-reduced-motion'), 'no reduced-motion opt-out shipped');
 });
+
+/* te-calendar colours its event chips from the shared --te-* palette, which
+   only works while `.calendar-event` stays in the variant selector list. */
+test('calendar event chips inherit the variant palette', () => {
+  const block = css.slice(css.indexOf('.calendar-event {'));
+  assert.ok(block, '.calendar-event never compiled');
+  assert.match(block.slice(0, 3000), /&\.danger\s*\{[^}]*--te-500: var\(--color-red-500\)/);
+});
+
+/* Pinned cells opt out of the row background to stay opaque while scrolling,
+   which also opts them out of the hover state unless this rule survives. */
+test('pinned table cells follow the row hover', () => {
+  assert.match(css, /tr\[class\*="hover:bg-gray-100"\]:hover \.table-pinned/);
+  assert.match(css, /\.table-pinned\s*\{[^}]*position: sticky/);
+});

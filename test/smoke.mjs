@@ -22,6 +22,10 @@ const cases = {
   'te-breadcrumb': { options: [{ label: 'Home', href: '/' }, { label: 'Now' }] },
   'te-button': { type: 'primary', loading: true },
   'te-button-group': { quantity: 3, disabled: [false, true, false] },
+  'te-calendar': {
+    modelValue: new Date(2024, 0, 15),
+    events: [{ start: new Date(2024, 0, 15, 9), end: new Date(2024, 0, 15, 10), title: 'Standup' }],
+  },
   'te-card': { title: 'Card', width: 400, hasHeader: true, hasFooter: true },
   'te-checkbox': { modelValue: true, label: 'ok' },
   'te-chip': { closable: true, imgUrl: 'x.png', size: 'small' },
@@ -151,4 +155,189 @@ test('te-icon resolves a custom family', async () => {
 test('te-date-picker shows the bound date', async () => {
   const html = await render('te-date-picker', { modelValue: new Date(2024, 0, 15) });
   assert.match(html, new RegExp(new Date(2024, 0, 15).toLocaleDateString().replace(/\//g, '\\/')));
+});
+
+
+test('te-calendar renders the focused month and its events', async () => {
+  const html = await render('te-calendar', {
+    modelValue: new Date(2024, 0, 15),
+    events: [{ start: new Date(2024, 0, 15, 9), title: 'Standup' }],
+  });
+  assert.match(html, /January 2024/);
+  assert.match(html, /Standup/);
+  /* January 2024 starts on a Monday and ends on a Wednesday, so a Sunday-first
+     grid spans 5 weeks: 7 headings + 35 cells. */
+  assert.equal(html.match(/calendar-cell/g).length, 35);
+});
+
+test('te-calendar week view clips events to the visible hours', async () => {
+  const html = await render('te-calendar', {
+    view: 'week',
+    modelValue: new Date(2024, 0, 15),
+    dayStart: 8,
+    dayEnd: 12,
+    events: [
+      { start: new Date(2024, 0, 15, 9), end: new Date(2024, 0, 15, 10), title: 'Inside' },
+      { start: new Date(2024, 0, 15, 20), end: new Date(2024, 0, 15, 21), title: 'Outside' },
+    ],
+  });
+  assert.match(html, /Inside/);
+  assert.doesNotMatch(html, /Outside/, 'an event past dayEnd was still drawn');
+});
+
+/* The overlap layout is the one piece of real arithmetic in te-calendar:
+   events that share a time range split the column, and a gap resets the split
+   so a later event is not squeezed by an earlier cluster. */
+test('te-calendar splits overlapping events and resets after a gap', async () => {
+  const at = (h, m = 0) => new Date(2024, 0, 15, h, m);
+  const html = await render('te-calendar', {
+    view: 'week',
+    modelValue: at(9),
+    dayStart: 8,
+    dayEnd: 20,
+    events: [
+      { start: at(9), end: at(11), title: 'A' },
+      { start: at(10), end: at(12), title: 'B' },
+      { start: at(10, 30), end: at(11, 30), title: 'C' },
+      { start: at(15), end: at(16), title: 'Alone' },
+    ],
+  });
+
+  const widths = [...html.matchAll(/width:([\d.]+)%/g)].map((m) => Number(m[1]));
+  assert.equal(widths.length, 4, 'expected one positioned block per event');
+
+  const thirds = widths.filter((w) => Math.abs(w - 100 / 3) < 0.01);
+  assert.equal(thirds.length, 3, 'A, B and C form one cluster of three columns');
+  assert.ok(widths.includes(100), 'the event after the gap should span the full column');
+
+  /* Three columns means three distinct offsets, not three stacked on 0. */
+  const lefts = new Set([...html.matchAll(/left:([\d.]+)%/g)].map((m) => m[1]));
+  assert.equal(lefts.size, 3, `expected 3 distinct offsets, got ${[...lefts]}`);
+});
+
+test('te-calendar keeps a lone event at full width', async () => {
+  const html = await render('te-calendar', {
+    view: 'week',
+    modelValue: new Date(2024, 0, 15, 9),
+    events: [{ start: new Date(2024, 0, 15, 9), end: new Date(2024, 0, 15, 10), title: 'Solo' }],
+  });
+  assert.match(html, /width:100%/);
+});
+
+const GRID = {
+  headers: [{ label: 'Name', field: 'name' }, { label: 'Qty', field: 'qty' }],
+  items: [
+    { name: 'item 10', qty: 2 },
+    { name: 'item 2', qty: 30 },
+    { name: 'item 1', qty: 100 },
+  ],
+};
+
+const rowsOf = (html) => [...html.matchAll(/>item \d+</g)].map((m) => m[0].slice(1, -1));
+
+test('te-table sorts by a column and puts numbers in numeric order', async () => {
+  assert.deepEqual(
+    rowsOf(await render('te-table', { ...GRID, sort: { field: 'name', dir: 'asc' } })),
+    ['item 1', 'item 2', 'item 10'],
+    'a plain string sort would put "item 10" before "item 2"',
+  );
+  assert.deepEqual(
+    rowsOf(await render('te-table', { ...GRID, sort: { field: 'name', dir: 'desc' } })),
+    ['item 10', 'item 2', 'item 1'],
+  );
+  assert.deepEqual(
+    rowsOf(await render('te-table', { ...GRID, sort: { field: 'qty', dir: 'asc' } })),
+    ['item 10', 'item 2', 'item 1'],
+    'numbers must compare numerically, not as strings',
+  );
+});
+
+test('te-table leaves the order alone when the server pages', async () => {
+  const html = await render('te-table', {
+    ...GRID,
+    backendPagination: true,
+    totalItems: 90,
+    itemPerPage: 3,
+    sort: { field: 'name', dir: 'asc' },
+  });
+  assert.deepEqual(rowsOf(html), ['item 10', 'item 2', 'item 1'], 'sorted one page of a server-paged set');
+});
+
+/* Was `v-show`: every row stayed mounted and only the page was visible. */
+test('te-table only renders the current page', async () => {
+  const items = Array.from({ length: 25 }, (_, i) => ({ name: `item ${i + 1}`, qty: i }));
+  const html = await render('te-table', { headers: GRID.headers, items, itemPerPage: 5 });
+  assert.equal(rowsOf(html).length, 5, 'off-page rows are still in the DOM');
+});
+
+test('te-table applies columnOrder and keeps unlisted columns', async () => {
+  const html = await render('te-table', { ...GRID, columnOrder: ['qty'] });
+  assert.ok(html.indexOf('Qty') < html.indexOf('Name'), 'columnOrder was ignored');
+  assert.match(html, /Name/, 'a column missing from columnOrder was dropped');
+});
+
+test('te-table renders a checkbox column and marks selected rows', async () => {
+  const html = await render('te-table', { ...GRID, selectable: true, rowKey: 'name', selected: ['item 2'] });
+  assert.equal([...html.matchAll(/type="checkbox"/g)].length, 4, 'one header box plus one per row');
+  assert.equal([...html.matchAll(/checked/g)].length, 1, 'exactly the selected row should be checked');
+});
+
+test('te-table pins columns with cumulative offsets', async () => {
+  const html = await render('te-table', {
+    ...GRID,
+    selectable: true,
+    showRowNum: true,
+    stickyColumns: 1,
+    headers: [{ label: 'Name', field: 'name', width: '200px' }, { label: 'Qty', field: 'qty' }],
+  });
+  /* checkbox at 0, row number after it, then the first data column after both. */
+  assert.match(html, /left:0px/);
+  assert.match(html, /left:48px/);
+  assert.match(html, /left:96px/);
+});
+
+/* The bubble's colour used to live in a `bg-gray-800` utility while the arrow
+   hard-coded `black`, and the offsets were fixed guesses (`-top-9`,
+   `left: -110%`) about the bubble's own size. Both are read off the built
+   stylesheet because that is where the bug was, not in the markup. */
+test('te-tooltip arrow and bubble share one colour', async () => {
+  const { readFileSync } = await import('node:fs');
+  const css = readFileSync(new URL('../dist/vue3-tailwind-elements.css', import.meta.url), 'utf8');
+
+  assert.doesNotMatch(css, /\.tooltip-content[^{]*\{[^}]*border-color:\s*(black|#000)/,
+    'the arrow is painted with a literal colour again');
+
+  for (const side of ['top', 'bottom', 'left', 'right']) {
+    const rule = css.match(new RegExp(`\\.tooltip-content\\.${side}\\.arrow\\[[^\\]]+\\]:after\\{[^}]*\\}`))?.[0];
+    assert.ok(rule, `no arrow rule for ${side}`);
+    assert.match(rule, /var\(--te-tooltip-bg\)/, `the ${side} arrow does not read the bubble colour`);
+  }
+
+  assert.match(css, /\.tooltip-content\[[^\]]+\]\{[^}]*background-color:var\(--te-tooltip-bg\)/,
+    'the bubble no longer reads the shared colour');
+});
+
+test('te-tooltip anchors to the trigger instead of guessing an offset', async () => {
+  const { readFileSync } = await import('node:fs');
+  const css = readFileSync(new URL('../dist/vue3-tailwind-elements.css', import.meta.url), 'utf8');
+  const ruleFor = (side) => css.match(new RegExp(`\\.tooltip-content\\.${side}\\[[^\\]]+\\]\\{[^}]*\\}`))?.[0] ?? '';
+
+  /* Edge anchoring: each side pins to the opposite edge and holds the gap with
+     a margin, so a two-line tip cannot overlap the trigger. */
+  assert.match(ruleFor('top'), /bottom:100%/);
+  assert.match(ruleFor('bottom'), /top:100%/);
+  assert.match(ruleFor('left'), /right:100%/);
+  assert.match(ruleFor('right'), /left:100%/);
+
+  for (const side of ['top', 'bottom', 'left', 'right']) {
+    assert.match(ruleFor(side), /margin-\w+:var\(--te-tooltip-offset\)/, `${side} lost its offset`);
+  }
+  assert.doesNotMatch(css, /\.tooltip-content[^{]*\{[^}]*left:-110%/, 'the width-relative offset is back');
+});
+
+test('te-tooltip carries its offset in server-rendered markup', async () => {
+  assert.match(await render('te-tooltip', { position: 'left' }, { content: () => 'hi' }),
+    /--te-tooltip-offset:8px/);
+  assert.match(await render('te-tooltip', { position: 'left', offset: 20 }, { content: () => 'hi' }),
+    /--te-tooltip-offset:20px/);
 });
