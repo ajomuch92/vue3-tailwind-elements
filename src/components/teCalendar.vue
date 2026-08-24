@@ -17,7 +17,7 @@
             type="button"
             class="btn small"
             :class="view === option ? 'primary' : 'light'"
-            @click="setView(option)"
+            @click="setView(option as CalendarView)"
           >{{ option === 'month' ? labelMonth : labelWeek }}</button>
         </div>
       </div>
