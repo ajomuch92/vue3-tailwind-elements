@@ -1,9 +1,9 @@
 {
   "name": "vue3-tailwind-elements",
   "private": false,
-  "version": "2.1.0",
+  "version": "2.1.1",
   "author": {
-    "name": "Aar\u00f3n Montes"
+    "name": "ajomuch92"
   },
   "license": "MIT",
   "homepage": "https://vue3-tailwind-elements-playground.pages.dev/",

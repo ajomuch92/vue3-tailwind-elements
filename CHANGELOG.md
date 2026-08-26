@@ -1,5 +1,14 @@
 # Changelog
 
+## 2.1.1
+
+### Changed
+
+- `te-calendar`'s Today button is disabled while the visible month or week
+  already contains today, so it reads as the control it is instead of a label
+  that never changes. Custom toolbars get the same flag as `showsToday` in the
+  `toolbar` slot props.
+
 ## 2.1.0
 
 ### Added
