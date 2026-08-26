@@ -42,6 +42,7 @@ relies on the `v-click-outside` directive the plugin registers.
 | `notAllowedDates` | `Date[]` | `[]` | Individual dates to block. |
 | `monthNames` | `string[]` | English months | Twelve month names. |
 | `days` | `string[]` | `['Sun', …]` | Seven weekday labels, starting on Sunday. |
+| `appendToBody` | `boolean` | `false` | Renders the calendar in `<body>` so it is not clipped by a scrolling or `overflow: hidden` container. |
 
 ## Events
 

@@ -67,6 +67,7 @@ multiple selection. It closes on an outside click, so the plugin's
 | `minWidth` | `string` \| `number` | `'250px'` | Minimum width of the field. |
 | `listHeight` | `string` \| `number` | `'250px'` | Height of the scrolling list. |
 | `disabled` | `boolean` | `false` | Disables the field. |
+| `appendToBody` | `boolean` | `false` | Renders the list in `<body>` so it is not clipped by a scrolling or `overflow: hidden` container. |
 
 ## Events
 
