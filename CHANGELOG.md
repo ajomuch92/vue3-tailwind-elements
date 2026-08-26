@@ -1,5 +1,20 @@
 # Changelog
 
+## 2.1.0
+
+### Added
+
+- `append-to-body` on `te-multiselect` and `te-date-picker`. The dropdown and
+  the calendar render in `<body>` instead of next to their trigger, so a
+  scrolling container or an ancestor with `overflow: hidden` no longer clips
+  them. They stay anchored to the field while the page or any container
+  scrolls. Off by default — nothing changes unless you ask for it.
+
+  ```html
+  <te-multiselect append-to-body :options="options" v-model="picked" />
+  <te-date-picker append-to-body v-model="date" />
+  ```
+
 ## 2.0.0
 
 The components are the same to use — every prop, event and slot from 1.x still
