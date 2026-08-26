@@ -31,6 +31,25 @@ relies on the `v-click-outside` directive the plugin registers.
 />
 ```
 
+## Inside a scrolling container
+
+An ancestor with `overflow: hidden` or its own scrollbar clips the open
+calendar. `append-to-body` renders it in `<body>` instead, anchored to the
+field while the page or the container scrolls.
+
+<Demo block>
+  <div style="height: 8rem; overflow: auto; border: 1px solid var(--vp-c-divider); border-radius: 0.5rem; padding: 1rem;">
+    <te-date-picker append-to-body />
+    <div style="height: 10rem"></div>
+  </div>
+</Demo>
+
+```vue
+<div class="h-32 overflow-auto">
+  <te-date-picker append-to-body v-model="date" />
+</div>
+```
+
 ## Props
 
 | Prop | Type | Default | Description |

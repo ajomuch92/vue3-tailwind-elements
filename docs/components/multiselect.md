@@ -5,6 +5,7 @@ import { ref } from 'vue';
 
 const picked = ref([1]);
 const one = ref(1);
+const clipped = ref([]);
 </script>
 
 `te-multiselect` is a dropdown with search, select-all and either single or
@@ -47,6 +48,30 @@ multiple selection. It closes on an outside click, so the plugin's
   placeholder="Pick one"
   :options="[{ value: 1, text: 'One' }, { value: 2, text: 'Two' }]"
 />
+```
+
+## Inside a scrolling container
+
+An ancestor with `overflow: hidden` or its own scrollbar clips the open list.
+`append-to-body` renders it in `<body>` instead, anchored to the field while
+the page or the container scrolls.
+
+<Demo block>
+  <div style="height: 8rem; overflow: auto; border: 1px solid var(--vp-c-divider); border-radius: 0.5rem; padding: 1rem;">
+    <te-multiselect
+      v-model="clipped"
+      append-to-body
+      placeholder="Pick some"
+      :options="[{ value: 1, text: 'One' }, { value: 2, text: 'Two' }, { value: 3, text: 'Three' }]"
+    />
+    <div style="height: 10rem"></div>
+  </div>
+</Demo>
+
+```vue
+<div class="h-32 overflow-auto">
+  <te-multiselect v-model="picked" append-to-body :options="options" />
+</div>
 ```
 
 ## Props
