@@ -77,6 +77,17 @@ That is the whole setup. There is no `tailwind.config.js` and no `content`
 array to maintain — the stylesheet carries its own `@source`, so Tailwind
 finds the classes this library uses on its own.
 
+### Dropdowns in scrolling containers
+
+Inside a table, a card with `overflow: hidden`, or any scrolling panel, an
+open dropdown gets clipped by its container. `append-to-body` moves it to
+`<body>` and keeps it anchored to the field as the page scrolls:
+
+```html
+<te-multiselect append-to-body :options="options" v-model="picked" />
+<te-date-picker append-to-body v-model="date" />
+```
+
 ## TypeScript
 
 Types ship with the package. Global components are typed too, so
