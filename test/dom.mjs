@@ -734,3 +734,22 @@ test('te-date-picker teleports its panel to <body>', async () => {
   assert.ok(!isVisible(panel), 'outside click did not close the panel');
   w.unmount();
 });
+
+test('disabled te-multiselect and te-date-picker fade out and stay inert', async () => {
+  const ms = mount('te-multiselect', {
+    disabled: true, clearable: true, modelValue: [1],
+    options: [{ text: 'One', value: 1 }],
+  });
+  assert.ok(ms.$('.multiselect-wrapper').className.includes('opacity-50'), 'multiselect not faded');
+  // bg-white and bg-gray-200 would fight over CSS order, so only one is ever bound
+  assert.ok(ms.$('input').className.includes('bg-gray-200'), 'multiselect field not greyed');
+  assert.ok(!ms.$('input').className.includes('bg-white'), 'disabled field still asks for bg-white');
+  await click(ms.$('button.clear'));
+  assert.deepEqual(ms.state.modelValue, [1], 'clear button fired while disabled');
+  ms.unmount();
+
+  const dp = mount('te-date-picker', { disabled: true });
+  assert.ok(dp.$('.date-picker').className.includes('opacity-50'), 'date picker not faded');
+  assert.ok(dp.$('input').className.includes('bg-gray-200'), 'date picker field not greyed');
+  dp.unmount();
+});
