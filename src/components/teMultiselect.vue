@@ -1,17 +1,17 @@
 <template>
-  <div ref="wrapper" class="multiselect-wrapper relative cursor-pointer inline-block" v-click-outside="outsideOptions" :style="varCss">
+  <div ref="wrapper" class="multiselect-wrapper relative cursor-pointer inline-block" :class="{'opacity-50': disabled}" v-click-outside="outsideOptions" :style="varCss">
     <input
       type="text"
       readonly
       :placeholder="placeholder"
       :value="textValue"
       :disabled="disabled"
-      class="pl-1 bg-white bg-clip-padding border border-solid border-gray-300 h-10 cursor-pointer transition ease-in-out duration-200 outline-none"
-      :class="{'rounded-md': !open, 'rounded-tl-md rounded-tr-md': open, 'bg-gray-100 cursor-not-allowed': disabled, 'pr-10': clearable&&textValue, 'pr-6': !clearable}"
+      class="pl-1 bg-clip-padding border border-solid border-gray-300 h-10 cursor-pointer transition ease-in-out duration-200 outline-none"
+      :class="{'rounded-md': !open, 'rounded-tl-md rounded-tr-md': open, 'bg-white': !disabled, 'bg-gray-200 cursor-not-allowed': disabled, 'pr-10': clearable&&textValue, 'pr-6': !clearable}"
       @click="open=!open"
     />
     <span class="icon absolute right-2 top-1/2 transform -translate-y-1/2 flex items-center justify-center">
-      <button v-if="clearable&&textValue" class="clear h-4 w-4" @click="clear">
+      <button v-if="clearable&&textValue" class="clear h-4 w-4" :class="{'cursor-not-allowed': disabled}" :disabled="disabled" @click="clear">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
           <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z" />
         </svg>

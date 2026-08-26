@@ -1,5 +1,5 @@
 <template>
-  <div class="antialiased sans-serif date-picker">
+  <div class="antialiased sans-serif date-picker" :class="{'opacity-50': disabled}">
     <div ref="wrapper" class="relative">
       <slot name="trigger">
         <input
@@ -21,6 +21,7 @@
             border-2
             z-0
           "
+          :class="{'bg-gray-200 cursor-not-allowed': disabled}"
           :placeholder="placeholder"
           :disabled="disabled"
         />
