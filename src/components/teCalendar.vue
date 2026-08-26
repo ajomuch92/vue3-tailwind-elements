@@ -1,10 +1,10 @@
 <template>
   <div class="calendar flex flex-col gap-3">
-    <slot name="toolbar" :label="label" :view="view" :prev="prev" :next="next" :today="today" :set-view="setView">
+    <slot name="toolbar" :label="label" :view="view" :prev="prev" :next="next" :today="today" :shows-today="showsToday" :set-view="setView">
       <div class="flex flex-wrap items-center justify-between gap-2">
         <div class="flex items-center gap-1">
           <button type="button" class="btn light small" :aria-label="labelPrev" @click="prev">&lsaquo;</button>
-          <button type="button" class="btn light small" @click="today">{{ labelToday }}</button>
+          <button type="button" class="btn light small" :disabled="showsToday" @click="today">{{ labelToday }}</button>
           <button type="button" class="btn light small" :aria-label="labelNext" @click="next">&rsaquo;</button>
         </div>
 
@@ -217,6 +217,18 @@ const hourFormat = computed(() =>
 
 const formatTime = (date: Date) => timeFormat.value.format(date);
 const formatHour = (hour: number) => hourFormat.value.format(new Date(2000, 0, 1, hour));
+
+/* The button jumps back to the current date, so it has nothing to do while the
+   visible range already holds it — greyed out, it stops reading as a label. */
+const showsToday = computed(() => {
+  const now = new Date();
+  if (view.value === 'month') {
+    return focus.value.getMonth() === now.getMonth() && focus.value.getFullYear() === now.getFullYear();
+  }
+  const first = startOfWeek(focus.value);
+  const day = startOfDay(now);
+  return day >= first && day <= addDays(first, 6);
+});
 
 const label = computed(() => {
   if (view.value === 'month') {

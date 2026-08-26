@@ -753,3 +753,21 @@ test('disabled te-multiselect and te-date-picker fade out and stay inert', async
   assert.ok(dp.$('input').className.includes('bg-gray-200'), 'date picker field not greyed');
   dp.unmount();
 });
+
+test('te-calendar Today jumps back and is inert while today is on screen', async () => {
+  const w = mount('te-calendar');
+  const [prev, today] = w.$$('button');
+  const label = () => w.$('h2').textContent;
+
+  assert.ok(today.disabled, 'Today is clickable while the current month is already shown');
+  const start = label();
+
+  await click(prev);
+  assert.notEqual(label(), start, 'prev did not move the calendar');
+  assert.ok(!today.disabled, 'Today stayed disabled after navigating away');
+
+  await click(today);
+  assert.equal(label(), start, 'Today did not jump back');
+  assert.ok(today.disabled, 'Today did not go inert again');
+  w.unmount();
+});
