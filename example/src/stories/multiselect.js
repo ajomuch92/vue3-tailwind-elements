@@ -10,6 +10,7 @@ export default {
     showSelectAll: true,
     clearable: true,
     disabled: false,
+    appendToBody: false,
   },
   model: [],
   data: { options: Array.from({ length: 8 }, (_, i) => ({ text: `Option ${i + 1}`, value: i + 1 })) },
