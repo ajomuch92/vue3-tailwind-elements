@@ -15,6 +15,19 @@
   <te-date-picker append-to-body v-model="date" />
   ```
 
+### Changed
+
+- A disabled `te-multiselect` or `te-date-picker` now fades to `opacity-50` and
+  paints its field `bg-gray-200`, so the state reads at a glance. The date
+  picker also shows `cursor-not-allowed`, which only the multiselect did
+  before. The multiselect's `bg-white` is bound rather than static, so the two
+  backgrounds no longer depend on which one Tailwind emits last.
+
+### Fixed
+
+- `te-multiselect`'s clear button still emptied the selection while the field
+  was disabled. It is disabled with the field now.
+
 ## 2.0.0
 
 The components are the same to use — every prop, event and slot from 1.x still
