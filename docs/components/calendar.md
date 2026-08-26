@@ -137,7 +137,7 @@ today and manages its own position.
 | --- | --- | --- |
 | `event` | `{ event, view }` | Replaces an event chip. |
 | `day-header` | `{ date, view }` | Replaces a weekday heading. |
-| `toolbar` | `{ label, view, prev, next, today, setView }` | Replaces the whole toolbar. |
+| `toolbar` | `{ label, view, prev, next, today, showsToday, setView }` | Replaces the whole toolbar. `showsToday` is `true` while the visible range already contains today — the built-in toolbar uses it to disable its Today button. |
 
 <Demo block>
   <te-calendar :events="events" @select-event="picked = $event.title">
