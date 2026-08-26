@@ -1,5 +1,5 @@
 <template>
-  <div class="multiselect-wrapper relative cursor-pointer inline-block" v-click-outside="() => open = false" :style="varCss">
+  <div ref="wrapper" class="multiselect-wrapper relative cursor-pointer inline-block" v-click-outside="outsideOptions" :style="varCss">
     <input
       type="text"
       readonly
@@ -28,37 +28,43 @@
             clip-rule="evenodd" />
         </svg>
     </span>
-    <transition name="zoom">
-      <div v-show="open" class="absolute z-50 border border-gray-300 shadow-sm w-full bg-white ">
-        <div v-if="searchable" class="search p-2">
-          <input v-model="search" type="search" class="border border-gray-100 w-full h-8 outline-none px-2" :placeholder="placeholderSearch" />
+    <Teleport to="body" :disabled="!appendToBody">
+      <transition name="zoom">
+        <div
+          v-show="open"
+          ref="dropdown"
+          class="absolute z-50 border border-gray-300 shadow-sm w-full bg-white"
+          :style="appendToBody ? { ...varCss, ...anchorStyle } : undefined">
+          <div v-if="searchable" class="search p-2">
+            <input v-model="search" type="search" class="border border-gray-100 w-full h-8 outline-none px-2" :placeholder="placeholderSearch" />
+          </div>
+          <div class="list-container flex flex-col px-2">
+            <template v-if="singleSelect">
+              <div v-for="(option, key) in filteredOptions"
+                :key="key"
+                class="hover:bg-gray-100 rounded-md px-1 py-2 cursor-pointer"
+                :class="{'bg-blue-500 text-white hover:bg-blue-600': optionValue(option) === model}"
+                @click="selectSingleValue(optionValue(option))"
+              >
+                <slot name="item" v-bind="{option, key}">
+                  {{ option[displayField] }}
+                </slot>
+              </div>
+            </template>
+            <template v-else>
+              <te-checkbox v-if="showSelectAll&&search.length===0" v-model="selectAll" class="py-2 px-1 cursor-pointer rounded-md hover:bg-gray-100">
+                Select all
+              </te-checkbox>
+              <te-checkbox v-for="(option, key) in filteredOptions" :key="key" v-model="checkedValues" :native-value="optionValue(option)" class="py-2 px-1 cursor-pointer rounded-md hover:bg-gray-100">
+                <slot name="item" v-bind="{option, key}">
+                  {{ option[displayField] }}
+                </slot>
+              </te-checkbox>
+            </template>
+          </div>
         </div>
-        <div class="list-container flex flex-col px-2">
-          <template v-if="singleSelect">
-            <div v-for="(option, key) in filteredOptions"
-              :key="key"
-              class="hover:bg-gray-100 rounded-md px-1 py-2 cursor-pointer"
-              :class="{'bg-blue-500 text-white hover:bg-blue-600': optionValue(option) === model}"
-              @click="selectSingleValue(optionValue(option))"
-            >
-              <slot name="item" v-bind="{option, key}">
-                {{ option[displayField] }}
-              </slot>
-            </div>
-          </template>
-          <template v-else>
-            <te-checkbox v-if="showSelectAll&&search.length===0" v-model="selectAll" class="py-2 px-1 cursor-pointer rounded-md hover:bg-gray-100">
-              Select all
-            </te-checkbox>
-            <te-checkbox v-for="(option, key) in filteredOptions" :key="key" v-model="checkedValues" :native-value="optionValue(option)" class="py-2 px-1 cursor-pointer rounded-md hover:bg-gray-100">
-              <slot name="item" v-bind="{option, key}">
-                {{ option[displayField] }}
-              </slot>
-            </te-checkbox>
-          </template>
-        </div>
-      </div>
-    </transition>
+      </transition>
+    </Teleport>
   </div>
 </template>
 
@@ -68,6 +74,7 @@ import type { PropType } from 'vue';
 /* Was './directives/v-outside' — relative to src/components/, a path that
    does not exist. The directive lives in src/directives. */
 import { clickOutside as vClickOutside } from '../directives';
+import { useBodyAnchor } from '../composables/useBodyAnchor';
 import teCheckbox from './teCheckbox.vue';
 
 defineOptions({ name: 'TeMultiselect' });
@@ -91,10 +98,22 @@ const props = defineProps({
   clearable: { type: Boolean, default: true },
   minWidth: { type: [String, Number], default: '250px' },
   listHeight: { type: [String, Number], default: '250px' },
+  appendToBody: { type: Boolean, default: false },
 });
 
 const open = ref(false);
 const search = ref('');
+const wrapper = ref<HTMLElement | null>(null);
+const dropdown = ref<HTMLElement | null>(null);
+
+const { anchorStyle } = useBodyAnchor(wrapper, open, () => props.appendToBody);
+
+/* Teleported, the list is no longer inside the wrapper, so a click on it would
+   read as an outside click. Swallow those explicitly. */
+const outsideOptions = {
+  handler: () => { open.value = false; },
+  middleware: (event: MouseEvent) => !dropdown.value?.contains(event.target as Node),
+};
 
 const selection = computed<OptionValue[]>(() =>
   Array.isArray(model.value) ? model.value : model.value === undefined ? [] : [model.value]

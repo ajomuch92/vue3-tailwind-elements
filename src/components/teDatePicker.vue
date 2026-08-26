@@ -1,6 +1,6 @@
 <template>
   <div class="antialiased sans-serif date-picker">
-    <div class="relative">
+    <div ref="wrapper" class="relative">
       <slot name="trigger">
         <input
           type="text"
@@ -44,22 +44,23 @@
         </slot>
       </div>
 
-      <div
-        class="
-          bg-white
-          mt-12
-          rounded-lg
-          shadow
-          p-4
-          absolute
-          top-0
-          left-0
-          z-50
-        "
-        style="width: 17rem"
-        v-show="showDatepicker"
-        v-click-outside="hideCalendar"
-      >
+      <Teleport to="body" :disabled="!appendToBody">
+        <div
+          class="
+            bg-white
+            mt-12
+            rounded-lg
+            shadow
+            p-4
+            absolute
+            top-0
+            left-0
+            z-50
+          "
+          :style="appendToBody ? { ...anchorStyle, width: '17rem' } : { width: '17rem' }"
+          v-show="showDatepicker"
+          v-click-outside="hideCalendar"
+        >
         <div class="flex justify-between items-center mb-2">
           <div>
             <select
@@ -190,8 +191,9 @@
               </div>
             </div>
           </template>
+          </div>
         </div>
-      </div>
+      </Teleport>
     </div>
   </div>
 </template>
@@ -200,6 +202,7 @@
 import { computed, ref, watch } from 'vue';
 import type { PropType } from 'vue';
 import { clickOutside as vClickOutside } from '../directives';
+import { useBodyAnchor } from '../composables/useBodyAnchor';
 
 defineOptions({ name: 'TeDatePicker' });
 
@@ -221,6 +224,7 @@ const props = defineProps({
   placeholder: { type: String, default: 'Select a date' },
   maxDate: { type: Date, default: null },
   minDate: { type: Date, default: null },
+  appendToBody: { type: Boolean, default: false },
   notAllowedDates: {
     type: Array as PropType<Date[]>,
     default: () => [],
@@ -230,6 +234,8 @@ const props = defineProps({
 });
 
 const showDatepicker = ref(false);
+const wrapper = ref<HTMLElement | null>(null);
+const { anchorStyle } = useBodyAnchor(wrapper, showDatepicker, () => props.appendToBody);
 const month = ref(0);
 const year = ref(0);
 const noOfDays = ref<number[]>([]);
