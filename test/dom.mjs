@@ -691,3 +691,46 @@ test('te-table toggles a single row without disturbing the rest', async () => {
   assert.deepEqual(w.state.selected, ['a']);
   w.unmount();
 });
+
+/* --------------------------------------------------------- append-to-body */
+
+test('te-multiselect teleports its list to <body> and keeps clicks inside it', async () => {
+  const w = mount('te-multiselect', {
+    appendToBody: true,
+    options: [{ text: 'One', value: 1 }, { text: 'Two', value: 2 }],
+    modelValue: [],
+  });
+  assert.equal(w.$('.list-container'), null, 'list still rendered inside the wrapper');
+
+  const panel = [...document.body.children].find((el) => el.querySelector?.('.list-container'));
+  assert.ok(panel, 'list was not teleported to <body>');
+
+  await click(w.$('input'));
+  assert.ok(isVisible(panel), 'list did not open');
+  assert.equal(panel.style.position, 'fixed', 'teleported list is not anchored');
+
+  // A click inside the teleported list is outside the wrapper — it must not close it.
+  await click(panel.querySelector('.list-container'));
+  assert.ok(isVisible(panel), 'clicking the teleported list closed it');
+
+  await click(document.body);
+  // the zoom transition defers display:none past nextTick
+  await new Promise((resolve) => setTimeout(resolve, 50));
+  assert.ok(!isVisible(panel), 'outside click did not close the list');
+  w.unmount();
+});
+
+test('te-date-picker teleports its panel to <body>', async () => {
+  const w = mount('te-date-picker', { appendToBody: true });
+  assert.equal(w.$('select[name="month"]'), null, 'panel still rendered inside the wrapper');
+
+  const panel = [...document.body.children].find((el) => el.querySelector?.('select[name="month"]'));
+  assert.ok(panel, 'panel was not teleported to <body>');
+
+  await click(w.$('input'));
+  assert.ok(isVisible(panel), 'panel did not open');
+  assert.equal(panel.style.position, 'fixed', 'teleported panel is not anchored');
+  await click(document.body);
+  assert.ok(!isVisible(panel), 'outside click did not close the panel');
+  w.unmount();
+});
