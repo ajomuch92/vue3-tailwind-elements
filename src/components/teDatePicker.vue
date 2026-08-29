@@ -3,11 +3,17 @@
     <div ref="wrapper" class="relative">
       <slot name="trigger">
         <input
+          :id="fieldId"
+          ref="trigger"
           type="text"
           readonly
+          aria-haspopup="dialog"
+          :aria-describedby="fieldDescribedBy"
+          :aria-invalid="fieldInvalid || undefined"
+          :aria-expanded="showDatepicker"
           :value="datepickerValue"
           @click="showDatepicker = !showDatepicker"
-          @keydown.esc="showDatepicker = false"
+          @keydown="onTriggerKeydown"
           class="
             w-full
             pl-4
@@ -21,7 +27,7 @@
             border-2
             z-0
           "
-          :class="{'bg-gray-200 cursor-not-allowed': disabled}"
+          :class="{'bg-gray-200 cursor-not-allowed': disabled, 'border-red-500': fieldInvalid}"
           :placeholder="placeholder"
           :disabled="disabled"
         />
@@ -61,6 +67,9 @@
           :style="appendToBody ? { ...anchorStyle, width: '17rem' } : { width: '17rem' }"
           v-show="showDatepicker"
           v-click-outside="hideCalendar"
+          role="dialog"
+          :aria-label="`${monthNames[month]} ${year}`"
+          @keydown.esc.prevent="closeAndRestore"
         >
         <div class="flex justify-between items-center mb-2">
           <div>
@@ -153,7 +162,7 @@
           </template>
         </div>
 
-        <div class="flex flex-wrap -mx-1">
+        <div ref="grid" class="flex flex-wrap -mx-1" @keydown="onGridKeydown">
           <template v-for="key in blankdays.length" :key="`bd-${key}`">
             <div
               style="width: 14.28%"
@@ -172,6 +181,12 @@
           >
             <div style="width: 14.28%" class="px-1 mb-1">
               <div
+                :data-day="date"
+                role="button"
+                :tabindex="date === focusedDay ? 0 : -1"
+                :aria-label="dayLabel(date)"
+                :aria-pressed="isToday(date)"
+                :aria-disabled="isNotAllowedDate(date) || isOutOfRange(date) ? true : undefined"
                 @click="getDateValue(date)"
                 class="
                   cursor-pointer
@@ -200,10 +215,11 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue';
+import { computed, nextTick, ref, watch } from 'vue';
 import type { PropType } from 'vue';
 import { clickOutside as vClickOutside } from '../directives';
 import { useBodyAnchor } from '../composables/useBodyAnchor';
+import { useField } from '../composables/useField';
 
 defineOptions({ name: 'TeDatePicker' });
 
@@ -234,8 +250,15 @@ const props = defineProps({
   },
 });
 
+const { fieldId, fieldDescribedBy, fieldInvalid } = useField();
+
 const showDatepicker = ref(false);
 const wrapper = ref<HTMLElement | null>(null);
+const trigger = ref<HTMLInputElement | null>(null);
+const grid = ref<HTMLElement | null>(null);
+/* The day the arrows stand on. One cell is in the tab order and the rest are
+   reached with the keyboard, so the grid is a single stop, not thirty-one. */
+const focusedDay = ref(1);
 const { anchorStyle } = useBodyAnchor(wrapper, showDatepicker, () => props.appendToBody);
 const month = ref(0);
 const year = ref(0);
@@ -271,7 +294,65 @@ function isOutOfRange(date: number | Date) {
 
 function getDateValue(date: number) {
   model.value = new Date(year.value, month.value, date);
+  closeAndRestore();
+}
+
+function closeAndRestore() {
   showDatepicker.value = false;
+  /* Only reachable when the default trigger is in use; a custom one owns its
+     own focus. */
+  trigger.value?.focus();
+}
+
+const dayLabel = (date: number) => `${props.monthNames[month.value]} ${date}, ${year.value}`;
+
+const focusDay = () =>
+  grid.value?.querySelector<HTMLElement>(`[data-day="${focusedDay.value}"]`)?.focus();
+
+/** Moves the grid to `target`, crossing into another month when it has to. */
+function goTo(target: Date) {
+  month.value = target.getMonth();
+  year.value = target.getFullYear();
+  focusedDay.value = target.getDate();
+  nextTick(focusDay);
+}
+
+const moveDays = (delta: number) => goTo(new Date(year.value, month.value, focusedDay.value + delta));
+
+function moveMonths(delta: number) {
+  /* Clamped, so leaving the 31st never lands two months ahead. */
+  const daysInTarget = new Date(year.value, month.value + delta + 1, 0).getDate();
+  goTo(new Date(year.value, month.value + delta, Math.min(focusedDay.value, daysInTarget)));
+}
+
+function onTriggerKeydown(event: KeyboardEvent) {
+  if (event.key === 'Escape') { showDatepicker.value = false; return; }
+  if (props.disabled || !['Enter', ' ', 'ArrowDown'].includes(event.key)) return;
+  event.preventDefault();
+  showDatepicker.value = true;
+}
+
+function onGridKeydown(event: KeyboardEvent) {
+  const weekday = new Date(year.value, month.value, focusedDay.value).getDay();
+
+  switch (event.key) {
+    case 'ArrowLeft': moveDays(-1); break;
+    case 'ArrowRight': moveDays(1); break;
+    case 'ArrowUp': moveDays(-7); break;
+    case 'ArrowDown': moveDays(7); break;
+    case 'Home': moveDays(-weekday); break;
+    case 'End': moveDays(6 - weekday); break;
+    case 'PageUp': moveMonths(-1); break;
+    case 'PageDown': moveMonths(1); break;
+    case 'Enter':
+    case ' ':
+      if (!isNotAllowedDate(focusedDay.value) && !isOutOfRange(focusedDay.value)) {
+        getDateValue(focusedDay.value);
+      }
+      break;
+    default: return;
+  }
+  event.preventDefault();
 }
 
 function addMonth() {
@@ -330,6 +411,16 @@ const isNextAllowed = computed(() => {
 
 watch(model, initDate);
 watch([month, year], getNoOfDays);
+
+/* Opening hands the keyboard the grid, starting on the selected day when it is
+   the one on screen. */
+watch(showDatepicker, (open) => {
+  if (!open) return;
+  const start = model.value ?? new Date();
+  const onScreen = start.getMonth() === month.value && start.getFullYear() === year.value;
+  focusedDay.value = onScreen ? start.getDate() : 1;
+  nextTick(focusDay);
+});
 
 initDate();
 getNoOfDays();

@@ -9,6 +9,8 @@
       :disabled="disabled"
       :aria-expanded="model"
       :popovertarget="panelId"
+      @click="onTriggerClick"
+      @keydown="onTriggerKeydown"
     >
       <slot name="trigger">{{ label }}</slot>
     </button>
@@ -21,6 +23,7 @@
       :aria-labelledby="triggerId"
       @toggle="onToggle"
       @click="onPanelClick"
+      @keydown="onPanelKeydown"
     >
       <slot>
         <button
@@ -42,6 +45,7 @@
 import { computed, onBeforeUnmount, ref, useId, watch } from 'vue';
 import type { PropType } from 'vue';
 import { SIZES, VARIANTS, oneOf } from '../types';
+import { stepIndex } from '../composables/keyboard';
 import type { DropdownItem } from '../types';
 
 defineOptions({ name: 'TeDropdown' });
@@ -119,7 +123,63 @@ function onToggle(event: Event) {
   nativelyOpen = (event as Event & { newState: string }).newState === 'open';
   model.value = nativelyOpen;
   watchViewport(nativelyOpen);
-  if (nativelyOpen) place();
+  if (nativelyOpen) {
+    place();
+    if (focusOnOpen) focusItem(focusOnOpen === 1 ? 0 : items().length - 1);
+  }
+  focusOnOpen = 0;
+}
+
+/* Every item a menu can move to, slot content included — the default items are
+   buttons, but the panel takes whatever the caller renders. */
+function items() {
+  const selector = 'button:not(:disabled), a[href], [tabindex]:not([tabindex="-1"])';
+  return [...(panelRef.value?.querySelectorAll<HTMLElement>(selector) ?? [])];
+}
+
+const focusItem = (index: number) => items()[index]?.focus();
+
+/* Which end to land on when the menu opens from the keyboard. A mouse click
+   leaves focus where it is: pulling it into the menu would be a surprise. */
+let focusOnOpen: 0 | 1 | -1 = 0;
+
+function onTriggerClick(event: MouseEvent) {
+  /* `popovertarget` opens the panel by itself, and Enter or Space on a button
+     arrives here as a click with no pointer behind it — detail 0. */
+  if (event.detail === 0) focusOnOpen = 1;
+}
+
+function onTriggerKeydown(event: KeyboardEvent) {
+  if (event.key !== 'ArrowDown' && event.key !== 'ArrowUp') return;
+  event.preventDefault();
+  const step = event.key === 'ArrowDown' ? 1 : -1;
+  if (model.value) focusItem(step === 1 ? 0 : items().length - 1);
+  else {
+    focusOnOpen = step;
+    model.value = true;
+  }
+}
+
+function onPanelKeydown(event: KeyboardEvent) {
+  const list = items();
+  if (list.length === 0) return;
+  const current = list.indexOf(document.activeElement as HTMLElement);
+
+  let target: number | undefined;
+  if (event.key === 'ArrowDown') target = current === -1 ? 0 : stepIndex(current, 1, list.length);
+  else if (event.key === 'ArrowUp') target = current === -1 ? list.length - 1 : stepIndex(current, -1, list.length);
+  else if (event.key === 'Home') target = 0;
+  else if (event.key === 'End') target = list.length - 1;
+  else if (event.key === 'Tab') {
+    /* Tabbing away closes the menu, the way a menu button is expected to
+       behave — a popover on its own would stay open behind the focus. */
+    panelRef.value?.hidePopover();
+    return;
+  }
+  if (target === undefined) return;
+
+  event.preventDefault();
+  list[target]?.focus();
 }
 
 function onPanelClick(event: MouseEvent) {

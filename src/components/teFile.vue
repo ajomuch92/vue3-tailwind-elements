@@ -1,7 +1,9 @@
 <template>
-  <input class="form-control file-control"
+  <input :id="fieldId" class="form-control file-control"
     :class="[size]"
     type="file"
+    :aria-describedby="fieldDescribedBy"
+    :aria-invalid="fieldInvalid || undefined"
     :disabled="disabled"
     :accept="accept"
     :multiple="multiple"
@@ -11,8 +13,11 @@
 
 <script setup lang="ts">
 import { oneOf, SIZES } from '../types';
+import { useField } from '../composables/useField';
 
 defineOptions({ name: 'TeFile' });
+
+const { fieldId, fieldDescribedBy, fieldInvalid } = useField();
 
 const model = defineModel<string | string[]>({ default: '' });
 

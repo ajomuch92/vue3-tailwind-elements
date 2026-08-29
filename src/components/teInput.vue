@@ -16,7 +16,8 @@
         :placeholder="placeholder"
         :disabled="disabled"
         :readonly="readonly"
-        :aria-invalid="invalid"
+        :aria-invalid="isInvalid"
+        :aria-describedby="fieldDescribedBy"
         class="
           form-control
           block
@@ -76,7 +77,7 @@
       />
       <label v-if="floating" :for="inputId" class="text-gray-700">{{placeholder}}</label>
     </div>
-    <div v-if="helperText" class="text-sm mt-1" :class="{'text-red-500':invalid, 'text-gray-700': !invalid}">{{helperText}}</div>
+    <div v-if="helperText" class="text-sm mt-1" :class="{'text-red-500':isInvalid, 'text-gray-700': !isInvalid}">{{helperText}}</div>
   </div>
 </template>
 
@@ -84,6 +85,7 @@
 import { computed, ref, useId } from 'vue';
 import teIcon from './teIcon.vue';
 import { oneOf, SIZES } from '../types';
+import { useField } from '../composables/useField';
 
 defineOptions({ name: 'TeInput' });
 
@@ -150,7 +152,12 @@ function onRightIconClick(event: MouseEvent) {
 }
 
 const uid = useId();
-const inputId = computed(() => props.id ?? uid);
+/* A te-field around the input owns the id its <label for> points at, and the
+   description and invalid state that go with it. Standalone, all three are
+   simply absent. */
+const { fieldId, fieldDescribedBy, fieldInvalid } = useField();
+const inputId = computed(() => props.id ?? fieldId.value ?? uid);
+const isInvalid = computed(() => props.invalid || fieldInvalid.value);
 
 const sizeClass = computed(() => {
   const font = { small: 'text-sm', medium: 'text-base', large: 'text-xl' }[props.size];
@@ -174,8 +181,8 @@ const iconSizeClass = computed(() => ({
 const disabledClass = computed(() => ({ 'text-gray-700 bg-gray-100': props.disabled }));
 
 const invalidClass = computed(() => ({
-  'border-red-500 focus:border-red-600 invalid': props.invalid,
-  'focus:text-gray-700 focus:border-blue-600': !props.invalid,
+  'border-red-500 focus:border-red-600 invalid': isInvalid.value,
+  'focus:text-gray-700 focus:border-blue-600': !isInvalid.value,
 }));
 
 const paddingForIcons = computed(() => ({
