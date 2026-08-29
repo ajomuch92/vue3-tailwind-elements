@@ -56,7 +56,7 @@ const code = computed(() =>
 /* Same string, compiled. `story.data` and `model` are exposed as refs, so the
    preview writes back to the panel below instead of owning its own copy. */
 const preview = computed(() => ({
-  setup: () => ({ model, setTimeout, ...(props.story.data ?? {}) }),
+  setup: () => ({ model, setTimeout, values: state, ...(props.story.data ?? {}) }),
   template: `<div>${code.value}</div>`,
 }));
 </script>
