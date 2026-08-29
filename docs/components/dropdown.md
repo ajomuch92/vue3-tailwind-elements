@@ -82,6 +82,21 @@ a `button` or `a` inside it is clicked, unless you set `:close-on-select="false"
 <te-dropdown v-model="open" label="Menu" :items="['One', 'Two']" />
 ```
 
+## Keyboard
+
+<kbd>Enter</kbd>, <kbd>Space</kbd> or <kbd>↓</kbd> on the trigger opens the menu
+and lands on the first item; <kbd>↑</kbd> opens it on the last. A click with the
+mouse leaves the focus alone. Disabled items are skipped, and the arrows work on
+whatever the default slot renders, not only on `items`.
+
+| Key | Does |
+|---|---|
+| <kbd>↑</kbd> <kbd>↓</kbd> | Previous / next item. |
+| <kbd>Home</kbd> <kbd>End</kbd> | First / last item. |
+| <kbd>Enter</kbd> <kbd>Space</kbd> | Activate the focused item. |
+| <kbd>Esc</kbd> | Close and go back to the trigger — the popover's own behaviour. |
+| <kbd>Tab</kbd> | Close and move on. |
+
 ## Props
 
 | Prop | Type | Default | Description |

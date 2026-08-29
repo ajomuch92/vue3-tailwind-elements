@@ -50,6 +50,19 @@ interface ListGroupItem {
 }
 ```
 
+## Keyboard
+
+Only when `clickable` — a static list is not interactive and stays out of the
+tab order. The list is one tab stop; the arrows move inside it, and disabled
+rows are skipped. Moving the focus does not change the selection, so the active
+item only changes when you ask for it.
+
+| Key | Does |
+|---|---|
+| <kbd>↑</kbd> <kbd>↓</kbd> | Previous / next row. |
+| <kbd>Home</kbd> <kbd>End</kbd> | First / last row. |
+| <kbd>Enter</kbd> <kbd>Space</kbd> | Select the focused row. |
+
 ## Props
 
 | Prop | Type | Default | Description |

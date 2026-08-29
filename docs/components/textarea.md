@@ -3,6 +3,8 @@
 `te-textarea` is a multi-line field that forwards the same native events as
 [`te-input`](/components/input).
 
+Inside a [`te-field`](/components/field) it takes the id its label points at, its description and its invalid state from the wrapper.
+
 ## Basic
 
 <Demo block>
