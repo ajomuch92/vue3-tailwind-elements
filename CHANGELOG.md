@@ -1,5 +1,128 @@
 # Changelog
 
+## 3.0.0
+
+Every prop, event and slot from 2.x still works. The major is for one thing:
+the components follow the operating system's dark mode now, so a site that
+upgrades goes dark on a machine set to dark without asking. `<html class="light">`
+keeps it exactly as it was.
+
+### Breaking changes
+
+- **Dark mode is on.** Surfaces, text and borders come from theme tokens that
+  follow `prefers-color-scheme`, and a `dark` or `light` class — or
+  `data-theme` — overrules the system in both directions. The light values are
+  the greys the components already used, so nothing moves while the page is
+  light. See [Theming → Dark mode](/guide/theming#dark-mode).
+
+  ```html
+  <html class="light">  <!-- 2.x behaviour, always light -->
+  <html class="dark">   <!-- always dark -->
+  <html>                <!-- follows the OS -->
+  ```
+
+- The colour utilities inside the component templates are theme classes now:
+  `bg-white` → `te-surface`, `bg-gray-50` → `te-sunken`,
+  `hover:bg-gray-100` → `te-hover`, `text-gray-700` → `te-text-body`, and so
+  on for every grey. A stylesheet that reached into a component to override one
+  of those class names needs the new one. Table rows are the most likely to
+  bite: they carry `te-sunken` and `te-hover` where they carried `bg-gray-50`
+  and `hover:bg-gray-100`.
+
+- `te-rating` renders the stars inside a `role="slider"` element and its clear
+  icon as a `<button>`, so both can be reached with the keyboard. A selector
+  written against its inner markup may need a look.
+
+### Added
+
+- **Keyboard navigation** where there was none. Every one of these was
+  mouse-only before, and `te-tabs` in particular already announced itself as a
+  tablist without answering a single arrow key:
+
+  | Component | Keys |
+  |---|---|
+  | `te-tabs` | ←/→ (↑/↓ when vertical), Home, End — disabled tabs are skipped |
+  | `te-list-group` | ↑/↓, Home, End to move; Enter or Space to select |
+  | `te-rating` | ←/→/↑/↓ by half a star, Home, End |
+  | `te-dropdown` | Enter, Space or ↓ to open; ↑/↓, Home, End; Tab closes |
+  | `te-multiselect` | Enter, Space or ↓ to open; ↑/↓, Home, End; Enter picks; Esc closes |
+  | `te-date-picker` | ←/→ by a day, ↑/↓ by a week, PageUp/PageDown by a month, Home/End, Enter picks, Esc closes |
+
+  The date grid crosses into the next or previous month on its own, and each
+  list is a single stop in the tab order rather than one stop per item.
+
+- **`te-field`**, a wrapper that gives any control a label, a hint and an error
+  message, and wires the ids and the ARIA between them: the label focuses the
+  control, the control reports its own description through `aria-describedby`,
+  and it turns `aria-invalid` and red when the field is. It works out of the
+  box around `te-input`, `te-textarea`, `te-select`, `te-file`,
+  `te-multiselect` and `te-date-picker`, and hands the same three values to
+  anything else through its slot props.
+
+  ```html
+  <te-field label="Country" error="Pick one" required>
+    <te-select :options="countries" v-model="country" />
+  </te-field>
+  ```
+
+  Passing `error` is enough — a message is a state of its own, so a form does
+  not have to keep a boolean in step with its own text.
+
+- **`te-avatar`**, which shows a picture and falls back to the initials taken
+  from `name` — and then to an icon — so a missing or broken image never leaves
+  a hole. A URL that fails to load falls through at that point, which is the
+  usual fate of a hot-linked profile picture.
+
+  ```html
+  <te-avatar src="/ada.jpg" name="Ada Lovelace" />
+  <te-avatar name="Grace Hopper" type="success" size="large" square />
+  ```
+
+- **`te-skeleton`**, a placeholder in the shape of the content that has not
+  arrived: `text` (with `lines`, the last one short the way a paragraph ends),
+  `rect` and `circle`. It is hidden from assistive tech unless you give it a
+  `label`, and its pulse stops on its own under `prefers-reduced-motion`.
+
+  ```html
+  <te-skeleton :lines="3" />
+  <te-skeleton shape="circle" />
+  ```
+
+- **`showConfirm()`**, the imperative twin of `te-modal` in the shape
+  `showToast` already established. It returns a promise, so a yes-or-no
+  question reads like `window.confirm()` without freezing the page — and it is
+  your own markup, so it can be styled and translated:
+
+  ```js
+  import { showConfirm } from 'vue3-tailwind-elements';
+
+  if (await showConfirm({ title: 'Delete project', confirmLabel: 'Delete', type: 'danger' })) {
+    await api.deleteProject();
+  }
+  ```
+
+  Only the confirm button resolves `true`. Cancel, the close button, the
+  backdrop and Escape all resolve `false`, so a dismissed dialog is a "no"
+  rather than a promise left hanging — and with no DOM at all it resolves
+  `false` instead of throwing.
+
+- Theme tokens and the classes that read them (`te-surface`, `te-raised`,
+  `te-sunken`, `te-text`, `te-border`…), usable in your own markup so a page
+  matches the components in both themes.
+
+- `label` and `clearLabel` on `te-rating`, which name the slider and its clear
+  button for a screen reader.
+
+### Fixed
+
+- `te-tabs` numbered its ids from zero globally — `tab-0`, `tab-content-0` — so
+  a second set of tabs on the same page pointed every `aria-controls` at the
+  first set. They are scoped to the instance now, and each panel names its own
+  tab.
+- A disabled row in `te-list-group` could still be selected once it was
+  reachable; selection now checks the row rather than relying on
+  `pointer-events`.
+
 ## 2.2.0
 
 ### Added
