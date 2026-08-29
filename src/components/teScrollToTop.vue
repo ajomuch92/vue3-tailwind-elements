@@ -2,7 +2,7 @@
   <button
     v-show="show"
     type="button"
-    class="z-50 p-3 font-medium text-xs leading-tight uppercase rounded-full shadow-md hover:shadow-lg focus:shadow-lg focus:outline-none focus:ring-0 active:shadow-lg transition duration-150 ease-in-out bottom-5 right-5 fixed"
+    class="z-50 cursor-pointer p-3 font-medium text-xs leading-tight uppercase rounded-full shadow-md hover:shadow-lg focus:shadow-lg focus:outline-none focus:ring-0 active:shadow-lg transition duration-150 ease-in-out bottom-5 right-5 fixed"
     @click="backToTop"
   >
     <slot name="icon">

@@ -1,5 +1,5 @@
 <template>
-  <span class="badge" :class="[type, size, { solid, outlined, rounded }]">
+  <span class="badge" :class="[type, size, { solid, outlined, 'is-rounded': rounded }]">
     <slot name="default">
       {{text}}
     </slot>
