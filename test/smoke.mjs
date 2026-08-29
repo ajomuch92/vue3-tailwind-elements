@@ -18,6 +18,7 @@ const render = (tag, props = {}, slots = undefined) => {
 const cases = {
   'te-accordion': { items: ['a', 'b'], defaultOpen: [0] },
   'te-alert': { text: 'hi', type: 'danger' },
+  'te-avatar': { name: 'Ada Lovelace', type: 'primary', size: 'large' },
   'te-badge': { text: 'new', type: 'pink', size: 'large' },
   'te-breadcrumb': { options: [{ label: 'Home', href: '/' }, { label: 'Now' }] },
   'te-button': { type: 'primary', loading: true },
@@ -47,6 +48,7 @@ const cases = {
   'te-rating': { modelValue: 3, quantity: 5 },
   'te-scroll-to-top': {},
   'te-select': { options: [{ id: 1, label: 'One' }], modelValue: 1, placeholder: 'Pick' },
+  'te-skeleton': { shape: 'text', lines: 3, label: 'Loading' },
   'te-stepper': { steps: [{ label: 'One' }, { label: 'Two' }], modelValue: 0 },
   'te-switch': { label: 'On', modelValue: true },
   'te-table': {

@@ -149,7 +149,7 @@ test('calendar event chips inherit the variant palette', () => {
 /* Pinned cells opt out of the row background to stay opaque while scrolling,
    which also opts them out of the hover state unless this rule survives. */
 test('pinned table cells follow the row hover', () => {
-  assert.match(css, /tr\[class\*="hover:bg-gray-100"\]:hover \.table-pinned/);
+  assert.match(css, /tr\.te-hover:hover \.table-pinned/);
   assert.match(css, /\.table-pinned\s*\{[^}]*position: sticky/);
 });
 
@@ -163,4 +163,58 @@ test('no state class is shadowed by a Tailwind utility', async () => {
   const utilities = compiler.build(names);
   const shadowed = names.filter((name) => utilities.includes(`.${name} {`));
   assert.deepEqual(shadowed, [], `state classes a Tailwind utility outranks: ${shadowed}`);
+});
+
+/* ---------------------------------------------------------------------- theme */
+
+/** The `--te-x: var(--color-y)` pairs inside the first rule matching `selector`. */
+function tokens(selector) {
+  const body = block(selector);
+  return Object.fromEntries(
+    [...body.matchAll(/(--te-[a-z-]+):\s*var\((--color-[a-z0-9-]+)\)/g)].map((m) => [m[1], m[2]])
+  );
+}
+
+test('the light theme is the greys the components already had', () => {
+  const light = tokens(':root, .light, [data-theme="light"]');
+  assert.deepEqual(light, {
+    '--te-surface': '--color-white',
+    '--te-surface-raised': '--color-white',
+    '--te-surface-sunken': '--color-gray-50',
+    '--te-surface-hover': '--color-gray-100',
+    '--te-surface-active': '--color-gray-200',
+    '--te-surface-strong': '--color-gray-300',
+    '--te-text': '--color-gray-900',
+    '--te-text-soft': '--color-gray-800',
+    '--te-text-body': '--color-gray-700',
+    '--te-text-mild': '--color-gray-600',
+    '--te-text-muted': '--color-gray-500',
+    '--te-text-faint': '--color-gray-400',
+    '--te-border-soft': '--color-gray-100',
+    '--te-border': '--color-gray-200',
+    '--te-border-strong': '--color-gray-300',
+  }, 'a light token moved: every one of them is the colour the components used before the theme existed');
+});
+
+test('the class and the media query describe the same dark theme', () => {
+  const byClass = tokens('.dark, [data-theme="dark"]');
+  const bySystem = tokens(':root:not(.light):not([data-theme="light"])');
+  assert.deepEqual(byClass, bySystem, 'the dark class and prefers-color-scheme have drifted apart');
+  assert.equal(Object.keys(byClass).length, 15, 'a token is missing from the dark theme');
+  assert.notEqual(byClass['--te-surface'], '--color-white', 'the dark surface is still white');
+});
+
+test('an explicit theme outranks the system preference', () => {
+  assert.ok(has(':root:not(.light):not([data-theme="light"])'), 'a light class cannot override a dark system');
+  // The class block comes last, so it wins over :root at equal specificity.
+  assert.ok(css.indexOf('.dark, [data-theme="dark"]') > css.indexOf(':root, .light'), 'the dark class lands before :root');
+  assert.ok(has('color-scheme: dark'), 'the browser is never told the page went dark');
+});
+
+test('no component paints a surface behind the tokens', () => {
+  /* The variant palette is a colour scale, not a surface, so it keeps its
+     greys; everything after it has to go through a token. */
+  const afterPalette = css.slice(css.indexOf('.btn {'));
+  const raw = [...afterPalette.matchAll(/(background-color|border-color|^\s*color):[^;]*var\(--color-gray-\d+\)/gm)];
+  assert.deepEqual(raw.map((m) => m[0]), [], 'a rule still hard-codes a grey instead of a token');
 });

@@ -12,7 +12,7 @@ GlobalRegistrator.register();
 
 // Imported after the DOM globals exist, so Vue picks up its browser build.
 const { createApp, h, reactive, resolveComponent, nextTick } = await import('vue');
-const { default: install } = await import('../dist/vue3-tailwind-elements.js');
+const { default: install, showConfirm } = await import('../dist/vue3-tailwind-elements.js');
 
 // happy-dom keeps timers and the window alive; without this the runner sits
 // on an open event loop and aborts the file with SIGABRT after its timeout.
@@ -776,16 +776,17 @@ test('disabled te-multiselect and te-date-picker fade out and stay inert', async
     options: [{ text: 'One', value: 1 }],
   });
   assert.ok(ms.$('.multiselect-wrapper').className.includes('opacity-50'), 'multiselect not faded');
-  // bg-white and bg-gray-200 would fight over CSS order, so only one is ever bound
-  assert.ok(ms.$('input').className.includes('bg-gray-200'), 'multiselect field not greyed');
-  assert.ok(!ms.$('input').className.includes('bg-white'), 'disabled field still asks for bg-white');
+  // The surface and the greyed-out state would fight over CSS order, so only
+  // one of them is ever bound.
+  assert.ok(ms.$('input').className.includes('te-active'), 'multiselect field not greyed');
+  assert.ok(!ms.$('input').className.includes('te-surface'), 'disabled field still asks for the plain surface');
   await click(ms.$('button.clear'));
   assert.deepEqual(ms.state.modelValue, [1], 'clear button fired while disabled');
   ms.unmount();
 
   const dp = mount('te-date-picker', { disabled: true });
   assert.ok(dp.$('.date-picker').className.includes('opacity-50'), 'date picker not faded');
-  assert.ok(dp.$('input').className.includes('bg-gray-200'), 'date picker field not greyed');
+  assert.ok(dp.$('input').className.includes('te-active'), 'date picker field not greyed');
   dp.unmount();
 });
 
@@ -1125,4 +1126,104 @@ test('a control outside te-field is left alone', () => {
   assert.equal(select.getAttribute('aria-invalid'), null, 'a lone select claims a validity state');
   assert.equal(select.id, '', 'a lone select was given an id');
   w.unmount();
+});
+
+/* --------------------------------------------- avatar, skeleton & confirm */
+
+test('te-avatar falls back from a broken image to the initials', async () => {
+  const w = mount('te-avatar', { src: 'gone.png', name: 'Ada Lovelace' });
+  const img = w.$('img');
+  assert.equal(img.getAttribute('alt'), 'Ada Lovelace');
+
+  img.dispatchEvent(new Event('error'));
+  await nextTick();
+  assert.equal(w.$('img'), null, 'the broken image stayed on screen');
+  assert.equal(w.$('.avatar-initials').textContent.trim(), 'AL', 'wrong initials');
+
+  const avatar = w.$('.avatar');
+  assert.equal(avatar.getAttribute('role'), 'img', 'the initials are not exposed as an image');
+  assert.equal(avatar.getAttribute('aria-label'), 'Ada Lovelace');
+  w.unmount();
+});
+
+test('te-avatar draws its icon when there is no name either', () => {
+  const w = mount('te-avatar', {});
+  assert.ok(w.$('svg.avatar-icon'), 'no fallback icon');
+  assert.equal(w.$('.avatar-initials'), null);
+  w.unmount();
+});
+
+test('te-avatar gives a new src another chance', async () => {
+  const w = mount('te-avatar', { src: 'a.png', name: 'Ada' });
+  w.$('img').dispatchEvent(new Event('error'));
+  await nextTick();
+  assert.equal(w.$('img'), null);
+
+  w.state.src = 'b.png';
+  await nextTick();
+  assert.ok(w.$('img'), 'the fallback stuck after the source changed');
+  w.unmount();
+});
+
+test('te-skeleton draws a row per line and shortens the last one', () => {
+  const w = mount('te-skeleton', { shape: 'text', lines: 3 });
+  const rows = w.$$('.skeleton');
+  assert.equal(rows.length, 3);
+  assert.equal(rows[2].style.width, '60%', 'the last line runs the full width');
+  assert.equal(rows[0].style.width, '', 'the other lines were given a width');
+  assert.equal(w.$('.skeleton-root').getAttribute('aria-hidden'), 'true', 'a wordless skeleton is announced');
+  w.unmount();
+});
+
+test('te-skeleton announces itself once it has a label', () => {
+  const w = mount('te-skeleton', { shape: 'circle', lines: 3, label: 'Loading profile' });
+  const root = w.$('.skeleton-root');
+  assert.equal(root.getAttribute('role'), 'status');
+  assert.equal(root.getAttribute('aria-label'), 'Loading profile');
+  assert.equal(root.getAttribute('aria-hidden'), null);
+  assert.equal(w.$$('.skeleton').length, 1, 'lines multiplied a shape that is not text');
+  w.unmount();
+});
+
+/** The dialog showConfirm just mounted into <body>. */
+const confirmDialog = async () => {
+  await nextTick();
+  await nextTick();
+  return document.querySelector('dialog.modal');
+};
+
+/* The teardown is on a timer, so each test waits it out rather than leaving a
+   dialog behind for the next one. */
+const settled = () => new Promise((resolve) => setTimeout(resolve, 350));
+
+test('showConfirm resolves true from its confirm button', async () => {
+  const answer = showConfirm({ title: 'Delete', message: 'Sure?', confirmLabel: 'Delete' });
+  const dialog = await confirmDialog();
+  assert.ok(dialog, 'no dialog was mounted');
+  assert.equal(dialog.open, true, 'the dialog never opened');
+  assert.equal(dialog.querySelector('.confirm-message').textContent.trim(), 'Sure?');
+
+  const buttons = [...dialog.querySelectorAll('.modal-footer button')];
+  assert.deepEqual(buttons.map((b) => b.textContent.trim()), ['Cancel', 'Delete']);
+
+  await click(buttons[1]);
+  assert.equal(await answer, true);
+
+  await settled();
+  assert.equal(document.querySelector('dialog.modal'), null, 'the confirm was never torn down');
+});
+
+test('showConfirm resolves false from cancel and from a dismissal', async () => {
+  const cancelled = showConfirm({ message: 'Sure?' });
+  const first = await confirmDialog();
+  await click([...first.querySelectorAll('.modal-footer button')][0]);
+  assert.equal(await cancelled, false, 'Cancel did not answer no');
+  await settled();
+
+  const dismissed = showConfirm({ message: 'Sure?' });
+  const second = await confirmDialog();
+  // What Escape, the backdrop and the close button all end up calling.
+  second.close();
+  assert.equal(await dismissed, false, 'a dismissed dialog did not answer no');
+  await settled();
 });
