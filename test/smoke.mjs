@@ -31,6 +31,7 @@ const cases = {
   'te-chip': { closable: true, imgUrl: 'x.png', size: 'small' },
   'te-date-picker': { modelValue: new Date(2024, 0, 15) },
   'te-dropdown': { label: 'Actions', items: ['Edit', { label: 'Delete', disabled: true }] },
+  'te-field': { label: 'Email', helper: 'Never shared', required: true },
   'te-file': { accept: 'image/*' },
   'te-icon': { name: 'star', family: 'fa' },
   'te-input': { modelValue: 'abc', helperText: 'help', rightIcon: 'star', invalid: true },
