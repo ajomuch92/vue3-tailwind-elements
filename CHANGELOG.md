@@ -1,5 +1,45 @@
 # Changelog
 
+## 2.2.0
+
+### Added
+
+- `te-textarea` counts what has been typed. `counter` puts the count under the
+  field, and `maxlength` — a new prop, forwarded to the textarea so the browser
+  enforces it — turns that into `x/y`:
+
+  ```html
+  <te-textarea class="w-full" :maxlength="180" counter />
+  ```
+
+  The count is `.length` on the bound value, which measures the same UTF-16
+  code units `maxlength` is enforced in, so the number and the limit can never
+  disagree.
+
+- A `counter` slot on `te-textarea`, scoped with `{ length, maxlength }`, for
+  wording of your own instead of `x/y`:
+
+  ```html
+  <te-textarea :maxlength="180" counter>
+    <template #counter="{ length, maxlength }">
+      Quedan {{ maxlength - length }} caracteres
+    </template>
+  </te-textarea>
+  ```
+
+### Changed
+
+- `te-textarea` renders inside a `<div class="textarea-container">`, the way
+  `te-input` already did — the counter needs somewhere to live. The `class`,
+  `style` and every other attribute written on the component still land on the
+  `<textarea>` itself rather than on the wrapper, so nothing you have already
+  written changes. Only a CSS rule that matched the textarea as a direct child
+  of its own parent needs the extra level.
+
+  The counter sits at the right edge of that container, which is as wide as its
+  parent, while the field is only as wide as its `cols` — so give the field a
+  width (`class="w-full"`, `cols`) for the two to line up.
+
 ## 2.1.2
 
 ### Fixed
