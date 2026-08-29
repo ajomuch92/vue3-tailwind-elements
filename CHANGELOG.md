@@ -1,5 +1,23 @@
 # Changelog
 
+## 2.1.2
+
+### Fixed
+
+- `te-badge`'s `rounded` prop did nothing. The stylesheet matched
+  `.badge.rounded`, and Tailwind ships its own `rounded` utility — `@layer
+  utilities` outranks `@layer components` whatever the specificity — so the
+  pill radius was always overwritten. The rule is `.badge.is-rounded` now. The
+  prop is unchanged; only a stylesheet that overrode `.badge.rounded` needs the
+  new name.
+- The accordion header ignored its hover state for the same reason: a `bg-white`
+  utility sat on the button and outranked every rule in the components layer.
+  The white comes from `.accordion-button` itself now, so the header shades on
+  hover whether the panel is open or closed, and it shows a pointer cursor.
+- `te-scroll-to-top` showed the text caret over its button instead of a pointer.
+- `te-toast-light`'s `warning` icon drew the round exclamation used for `info`.
+  It is a triangle now.
+
 ## 2.1.1
 
 ### Changed
