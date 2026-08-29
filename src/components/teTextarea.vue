@@ -22,7 +22,7 @@
       @keypress="emit('keypress', $event as KeyboardEvent)"
       @keyup="emit('keyup', $event as KeyboardEvent)"
     />
-    <div v-if="counter" class="textarea-counter mt-1 text-right text-sm text-gray-500">
+    <div v-if="counter" class="textarea-counter mt-1 text-right text-sm te-text-muted">
       <slot name="counter" :length="length" :maxlength="maxlength">{{ counterText }}</slot>
     </div>
   </div>

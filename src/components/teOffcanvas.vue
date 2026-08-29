@@ -1,7 +1,7 @@
 <template>
   <dialog
     ref="dialogRef"
-    class="offcanvas max-w-full bg-white bg-clip-padding shadow-sm outline-none text-gray-700 w-96"
+    class="offcanvas max-w-full te-raised bg-clip-padding shadow-sm outline-none te-text-body w-96"
     :class="positionClass"
     :aria-label="title || undefined"
     @close="onNativeClose"

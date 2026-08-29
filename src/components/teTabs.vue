@@ -34,7 +34,7 @@
             :class="{
               'cursor-not-allowed pointer-events-none opacity-50': title.disabled,
               'active': key === model,
-              'hover:border-transparent hover:bg-gray-100 focus:border-transparent': !pills,
+              'hover:border-transparent te-hover focus:border-transparent': !pills,
               'focus:outline-none rounded': pills,
             }"
             :aria-selected="key === model"

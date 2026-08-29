@@ -1,8 +1,8 @@
 <template>
   <ul
     ref="list"
-    class="bg-white rounded-lg inline-block text-gray-900"
-    :class="{'border border-gray-200': !flush}"
+    class="te-surface rounded-lg inline-block te-text"
+    :class="{'border te-border': !flush}"
     :role="clickable ? 'listbox' : undefined"
     @keydown="onKeydown"
   >
@@ -14,10 +14,10 @@
         'rounded-t-lg': key===0,
         'rounded-b-lg': key===normalizedItems.length-1,
         'bg-blue-600 text-white': key===model,
-        'text-gray-400 pointer-events-none': item.disabled,
+        'te-text-faint pointer-events-none': item.disabled,
         'cursor-pointer': clickable,
-        'hover:bg-gray-100': clickable && key!==model,
-        'border-b border-gray-200': key<normalizedItems.length-1
+        'te-hover': clickable && key!==model,
+        'border-b te-border': key<normalizedItems.length-1
       }"
       :role="clickable ? 'option' : undefined"
       :aria-selected="clickable ? key === model : undefined"

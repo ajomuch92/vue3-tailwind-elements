@@ -26,7 +26,7 @@
     >
       <span v-for="key in quantity" :key="key" class="relative inline-flex">
         <te-icon
-          class="cursor-pointer text-gray-400 opacity-60 hover:opacity-100"
+          class="cursor-pointer te-text-faint opacity-60 hover:opacity-100"
           :class="iconSizeClass"
           :name="icon"
           :style="starStyle(key)"

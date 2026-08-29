@@ -23,14 +23,12 @@
           block
           w-full
           font-normal
-          text-gray-700
-          bg-white bg-clip-padding
-          border border-solid border-gray-300
+          bg-clip-padding
           rounded
           transition
           ease-in-out
           m-0
-          focus:bg-white focus:outline-none
+          focus:outline-none
         "
         :class="[sizeClass, disabledClass, invalidClass, paddingForIcons]"
         @blur="emit('blur', $event)"
@@ -55,7 +53,7 @@
       </button>
       <te-icon
         v-else-if="resolvedRightIcon && type !== 'number'"
-        class="text-gray-400 absolute right-2 top-1/2 -translate-y-1/2"
+        class="te-text-faint absolute right-2 top-1/2 -translate-y-1/2"
         :family="rightIconFamily"
         :class="rightIconClass ?? iconSizeClass"
         :name="resolvedRightIcon"
@@ -70,14 +68,14 @@
       </button>
       <te-icon
         v-else-if="leftIcon"
-        class="text-gray-400 absolute left-2 top-1/2 -translate-y-1/2"
+        class="te-text-faint absolute left-2 top-1/2 -translate-y-1/2"
         :family="leftIconFamily"
         :class="leftIconClass ?? iconSizeClass"
         :name="leftIcon"
       />
-      <label v-if="floating" :for="inputId" class="text-gray-700">{{placeholder}}</label>
+      <label v-if="floating" :for="inputId" class="te-text-body">{{placeholder}}</label>
     </div>
-    <div v-if="helperText" class="text-sm mt-1" :class="{'text-red-500':isInvalid, 'text-gray-700': !isInvalid}">{{helperText}}</div>
+    <div v-if="helperText" class="text-sm mt-1" :class="{'text-red-500':isInvalid, 'te-text-body': !isInvalid}">{{helperText}}</div>
   </div>
 </template>
 
@@ -178,11 +176,11 @@ const iconSizeClass = computed(() => ({
   large: 'text-xl leading-none',
 }[props.size]));
 
-const disabledClass = computed(() => ({ 'text-gray-700 bg-gray-100': props.disabled }));
+const disabledClass = computed(() => ({ 'opacity-100': props.disabled }));
 
 const invalidClass = computed(() => ({
   'border-red-500 focus:border-red-600 invalid': isInvalid.value,
-  'focus:text-gray-700 focus:border-blue-600': !isInvalid.value,
+  'focus:border-blue-600': !isInvalid.value,
 }));
 
 const paddingForIcons = computed(() => ({

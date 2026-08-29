@@ -3,7 +3,7 @@
     <div 
       v-for="(item, key) in items"
       :key="key" 
-      class="accordion-item bg-white border border-gray-200"
+      class="accordion-item te-surface border te-border"
       :class="{
         'border-l-0 border-r-0 rounded-none': flush,
         'border-t-0': flush && key === 0,
@@ -20,7 +20,7 @@
             w-full
             py-4
             px-5
-            text-base text-gray-800 text-left
+            text-base te-text-soft text-left
             border-0
             rounded-none
             transition

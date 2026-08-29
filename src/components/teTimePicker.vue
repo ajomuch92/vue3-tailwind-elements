@@ -1,5 +1,5 @@
 <template>
-  <div class="mt-2 px-5 py-2 bg-white rounded-lg border-2 time-picker" :class="{'pointer-events-none bg-gray-50': disabled}">
+  <div class="mt-2 px-5 py-2 te-raised rounded-lg border-2 time-picker" :class="{'pointer-events-none te-sunken': disabled}">
     <div class="flex">
       <select v-model="hours" name="hours" aria-label="Hours" class="bg-transparent text-xl appearance-none focus:outline-2 focus:outline-blue-500">
         <option v-for="hour in hourOptions" :key="hour" :value="hour">{{ pad(hour) }}</option>

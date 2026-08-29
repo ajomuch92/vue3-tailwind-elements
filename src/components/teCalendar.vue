@@ -8,7 +8,7 @@
           <button type="button" class="btn light small" :aria-label="labelNext" @click="next">&rsaquo;</button>
         </div>
 
-        <h2 class="text-lg font-semibold text-gray-700">{{ label }}</h2>
+        <h2 class="text-lg font-semibold te-text-body">{{ label }}</h2>
 
         <div class="flex items-center gap-1">
           <button
@@ -75,7 +75,7 @@
         </div>
       </div>
 
-      <div v-if="hasAllDay" class="grid border-t border-gray-200" :style="weekColumns">
+      <div v-if="hasAllDay" class="grid border-t te-border" :style="weekColumns">
         <div class="calendar-gutter calendar-gutter-label">{{ labelAllDay }}</div>
         <div
           v-for="day in weekCells"
@@ -100,7 +100,7 @@
         </div>
       </div>
 
-      <div class="grid overflow-y-auto border-t border-gray-200" :style="[weekColumns, { maxHeight: bodyHeight }]">
+      <div class="grid overflow-y-auto border-t te-border" :style="[weekColumns, { maxHeight: bodyHeight }]">
         <div class="calendar-gutter">
           <div v-for="hour in hours" :key="hour" class="calendar-hour-label" :style="{ height: `${hourHeight}px` }">
             {{ formatHour(hour) }}

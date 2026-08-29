@@ -14,8 +14,8 @@
       :placeholder="placeholder"
       :value="textValue"
       :disabled="disabled"
-      class="pl-1 bg-clip-padding border border-solid border-gray-300 h-10 cursor-pointer transition ease-in-out duration-200 outline-none"
-      :class="{'rounded-md': !open, 'rounded-tl-md rounded-tr-md': open, 'bg-white': !disabled, 'bg-gray-200 cursor-not-allowed': disabled, 'pr-10': clearable&&textValue, 'pr-6': !clearable, 'border-red-500': fieldInvalid}"
+      class="pl-1 bg-clip-padding border border-solid te-border-strong h-10 cursor-pointer transition ease-in-out duration-200 outline-none"
+      :class="{'rounded-md': !open, 'rounded-tl-md rounded-tr-md': open, 'te-surface': !disabled, 'te-active cursor-not-allowed': disabled, 'pr-10': clearable&&textValue, 'pr-6': !clearable, 'border-red-500': fieldInvalid}"
       @click="open=!open"
       @keydown="onFieldKeydown"
     />
@@ -42,17 +42,17 @@
         <div
           v-show="open"
           ref="dropdown"
-          class="absolute z-50 border border-gray-300 shadow-sm w-full bg-white"
+          class="absolute z-50 border te-border-strong shadow-sm w-full te-raised"
           :style="appendToBody ? { ...varCss, ...anchorStyle } : undefined"
           @keydown="onPanelKeydown">
           <div v-if="searchable" class="search p-2">
-            <input ref="searchField" v-model="search" type="search" class="border border-gray-100 w-full h-8 outline-none px-2" :placeholder="placeholderSearch" />
+            <input ref="searchField" v-model="search" type="search" class="border te-border-soft w-full h-8 outline-none px-2" :placeholder="placeholderSearch" />
           </div>
           <div :id="listId" class="list-container flex flex-col px-2" :role="singleSelect ? 'listbox' : 'group'">
             <template v-if="singleSelect">
               <div v-for="(option, key) in filteredOptions"
                 :key="key"
-                class="hover:bg-gray-100 rounded-md px-1 py-2 cursor-pointer"
+                class="te-hover rounded-md px-1 py-2 cursor-pointer"
                 :class="{'bg-blue-500 text-white hover:bg-blue-600': optionValue(option) === model}"
                 role="option"
                 tabindex="-1"
@@ -65,10 +65,10 @@
               </div>
             </template>
             <template v-else>
-              <te-checkbox v-if="showSelectAll&&search.length===0" v-model="selectAll" class="py-2 px-1 cursor-pointer rounded-md hover:bg-gray-100">
+              <te-checkbox v-if="showSelectAll&&search.length===0" v-model="selectAll" class="py-2 px-1 cursor-pointer rounded-md te-hover">
                 Select all
               </te-checkbox>
-              <te-checkbox v-for="(option, key) in filteredOptions" :key="key" v-model="checkedValues" :native-value="optionValue(option)" class="py-2 px-1 cursor-pointer rounded-md hover:bg-gray-100">
+              <te-checkbox v-for="(option, key) in filteredOptions" :key="key" v-model="checkedValues" :native-value="optionValue(option)" class="py-2 px-1 cursor-pointer rounded-md te-hover">
                 <slot name="item" v-bind="{option, key}">
                   {{ option[displayField] }}
                 </slot>

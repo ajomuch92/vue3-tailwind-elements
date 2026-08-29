@@ -10,10 +10,10 @@
       class="modal-dialog relative w-auto pointer-events-none"
       :class="[sizeClass, {'modal-dialog-scrollable': scrollable, 'modal-dialog-centered': centered}]"
     >
-      <div class="modal-content border-none shadow-lg relative flex flex-col w-full pointer-events-auto bg-white bg-clip-padding rounded-md outline-none text-current">
-        <div v-if="!hideHeader" class="modal-header flex shrink-0 items-center justify-between p-4 border-b border-gray-200 rounded-t-md">
+      <div class="modal-content border-none shadow-lg relative flex flex-col w-full pointer-events-auto te-raised bg-clip-padding rounded-md outline-none text-current">
+        <div v-if="!hideHeader" class="modal-header flex shrink-0 items-center justify-between p-4 border-b te-border rounded-t-md">
           <slot name="header">
-            <h5 class="text-xl font-medium leading-normal text-gray-800">{{ title }}</h5>
+            <h5 class="text-xl font-medium leading-normal te-text-soft">{{ title }}</h5>
           </slot>
           <button
             v-if="showCloseButton"
@@ -27,7 +27,7 @@
           <component :is="component" v-if="component" v-bind="componentProps" v-on="componentEvents" />
           <slot v-else name="default" />
         </div>
-        <div v-if="!hideFooter" class="modal-footer flex shrink-0 flex-wrap items-center justify-end p-4 border-t border-gray-200 rounded-b-md">
+        <div v-if="!hideFooter" class="modal-footer flex shrink-0 flex-wrap items-center justify-end p-4 border-t te-border rounded-b-md">
           <slot name="footer" />
         </div>
       </div>

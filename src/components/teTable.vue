@@ -95,7 +95,7 @@
 
               <td
                 v-if="showRowNum"
-                class="table-num-cell text-sm text-gray-900 font-medium"
+                class="table-num-cell text-sm te-text font-medium"
                 :class="[paddingClass, {'border-r': bordered}, pinClass(-1)]"
                 :style="pinStyle(-1)"
               >{{pageOffset + key + 1}}</td>
@@ -103,7 +103,7 @@
               <td
                 v-for="(header, index) in orderedHeaders"
                 :key="header.field"
-                class="text-sm text-gray-900 font-medium px-6 whitespace-nowrap"
+                class="text-sm te-text font-medium px-6 whitespace-nowrap"
                 :class="[{...paddingClass, 'border-r': bordered}, header.cellClass, pinClass(index)]"
                 :style="[pinStyle(index), widthStyle(header)]"
               >
@@ -124,7 +124,7 @@
           </template>
         </tbody>
       </table>
-      <div v-if="loading" class="h-full w-full bg-gray-50 rounded opacity-70 flex justify-center items-center absolute top-0 left-0 z-50">
+      <div v-if="loading" class="h-full w-full te-sunken rounded opacity-70 flex justify-center items-center absolute top-0 left-0 z-50">
         <te-spinner size="large" />
       </div>
     </div>
@@ -434,13 +434,13 @@ function onHeaderDrop(header: Header, event: DragEvent) {
 /* ----------------------------------------------------------------- misc */
 
 const headerBackgroundClass = computed(() => ({
-  'bg-white': props.headerType === 'normal',
-  'bg-gray-100': props.headerType === 'light',
+  'te-surface': props.headerType === 'normal',
+  'te-subtle': props.headerType === 'light',
   'bg-gray-800': props.headerType === 'dark',
 }));
 
 const headerCellClass = computed(() => ({
-  'text-gray-900': props.headerType !== 'dark',
+  'te-text': props.headerType !== 'dark',
   'text-white': props.headerType === 'dark',
 }));
 
@@ -452,9 +452,9 @@ const paddingClass = computed(() => ({
 function rowClass(index: number) {
   return {
     'border-b': !props.borderless,
-    'bg-gray-50': index % 2 === 0 && props.striped,
-    'bg-white': index % 2 === 1 && props.striped,
-    'transition duration-300 ease-in-out hover:bg-gray-100': props.hoverable,
+    'te-sunken': index % 2 === 0 && props.striped,
+    'te-surface': index % 2 === 1 && props.striped,
+    'transition duration-300 ease-in-out te-hover': props.hoverable,
   };
 }
 

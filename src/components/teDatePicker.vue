@@ -22,12 +22,12 @@
             leading-none
             rounded-lg
             focus:outline-none
-            text-gray-600
+            te-text-mild
             font-medium
             border-2
             z-0
           "
-          :class="{'bg-gray-200 cursor-not-allowed': disabled, 'border-red-500': fieldInvalid}"
+          :class="{'te-active cursor-not-allowed': disabled, 'border-red-500': fieldInvalid}"
           :placeholder="placeholder"
           :disabled="disabled"
         />
@@ -36,7 +36,7 @@
       <div class="absolute top-1/2 transform -translate-y-1/2 right-0 px-3 py-2">
         <slot name="icon">
           <svg
-            class="h-6 w-6 text-gray-400"
+            class="h-6 w-6 te-text-faint"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -54,7 +54,7 @@
       <Teleport to="body" :disabled="!appendToBody">
         <div
           class="
-            bg-white
+            te-raised
             mt-12
             rounded-lg
             shadow
@@ -76,7 +76,7 @@
             <select
               name="month"
               aria-label="Month"
-              class="bg-transparent text-lg font-bold text-gray-800 appearance-none focus:outline-2 focus:outline-blue-500"
+              class="bg-transparent text-lg font-bold te-text-soft appearance-none focus:outline-2 focus:outline-blue-500"
               v-model="month"
             >
               <option v-for="(month, key) in monthNames" :key="key" :value="key">{{ month }}</option>
@@ -84,7 +84,7 @@
             <select
               name="year"
               aria-label="Year"
-              class="bg-transparent text-lg font-normal text-gray-600 appearance-none focus:outline-2 focus:outline-blue-500"
+              class="bg-transparent text-lg font-normal te-text-mild appearance-none focus:outline-2 focus:outline-blue-500"
               v-model="year"
             >
               <option v-for="($year, key) in years" :key="key" :value="$year">{{ $year }}</option>
@@ -99,7 +99,7 @@
                 duration-100
                 inline-flex
                 cursor-pointer
-                hover:bg-gray-200
+                te-hover-strong
                 p-1
                 rounded-full
               "
@@ -107,7 +107,7 @@
               @click="deductMonth"
             >
               <svg
-                class="h-6 w-6 text-gray-500 inline-flex"
+                class="h-6 w-6 te-text-muted inline-flex"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -128,7 +128,7 @@
                 duration-100
                 inline-flex
                 cursor-pointer
-                hover:bg-gray-200
+                te-hover-strong
                 p-1
                 rounded-full
               "
@@ -136,7 +136,7 @@
               @click="addMonth"
             >
               <svg
-                class="h-6 w-6 text-gray-500 inline-flex"
+                class="h-6 w-6 te-text-muted inline-flex"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -155,7 +155,7 @@
         <div class="flex flex-wrap mb-3 -mx-1">
           <template v-for="(day, index) in days" :key="`d-${index}`">
             <div style="width: 14.26%" class="px-1">
-              <div class="text-gray-800 font-medium text-center text-xs">
+              <div class="te-text-soft font-medium text-center text-xs">
                 {{day}}
               </div>
             </div>
@@ -199,7 +199,7 @@
                 "
                 :class="{
                   'bg-blue-500 text-white': isToday(date), 
-                  'text-gray-700 hover:bg-blue-200': !isToday(date), 
+                  'te-text-body hover:bg-blue-200': !isToday(date), 
                   'opacity-25 pointer-events-none': isNotAllowedDate(date) || isOutOfRange(date)
                 }"
               >

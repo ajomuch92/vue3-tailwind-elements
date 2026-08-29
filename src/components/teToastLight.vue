@@ -47,7 +47,7 @@
     <div class="px-4 py-2 -mx-3">
       <div class="mx-3">
         <span class="toast-text" :class="[type]">{{title}}</span>
-        <p class="text-sm text-gray-600">
+        <p class="text-sm te-text-mild">
           {{subtitle}}
         </p>
       </div>

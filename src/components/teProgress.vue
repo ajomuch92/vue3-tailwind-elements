@@ -1,5 +1,5 @@
 <template>
-  <div class="w-full bg-gray-200 mb-6" :class="trackClass">
+  <div class="w-full te-active mb-6" :class="trackClass">
     <div class="progress" :class="[type, size]" :style="{ width: `${clamped}%` }" role="progressbar"
       :aria-valuenow="clamped" aria-valuemin="0" aria-valuemax="100">
       {{ showValue && size === 'large' && clamped > 0 ? `${clamped}%` : '' }}
