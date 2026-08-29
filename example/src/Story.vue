@@ -64,7 +64,7 @@ const preview = computed(() => ({
 <template>
   <div class="flex flex-col gap-6 lg:flex-row">
     <div class="min-w-0 flex-1 space-y-4">
-      <div class="overflow-x-auto rounded-lg border border-gray-200 bg-white p-4 sm:p-8">
+      <div class="te-surface te-border overflow-x-auto rounded-lg border p-4 sm:p-8">
         <component :is="preview" />
       </div>
 
@@ -72,11 +72,11 @@ const preview = computed(() => ({
     </div>
 
     <aside class="w-full shrink-0 space-y-4 lg:w-72">
-      <div v-if="controls.length" class="rounded-lg border border-gray-200 p-4">
-        <h3 class="mb-3 text-xs font-bold uppercase tracking-wide text-gray-400">Props</h3>
+      <div v-if="controls.length" class="te-border rounded-lg border p-4">
+        <h3 class="te-text-faint mb-3 text-xs font-bold uppercase tracking-wide">Props</h3>
         <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-1">
           <label v-for="control in controls" :key="control.key" class="block text-sm">
-            <span class="mb-1 block font-medium text-gray-600">{{ control.key }}</span>
+            <span class="te-text-mild mb-1 block font-medium">{{ control.key }}</span>
 
             <select v-if="control.kind === 'select'" v-model="state[control.key]" class="w-full rounded border border-gray-300 px-2 py-1">
               <option v-for="option in control.options" :key="option" :value="option">{{ option === '' ? 'default' : option }}</option>
@@ -91,9 +91,9 @@ const preview = computed(() => ({
         </div>
       </div>
 
-      <div v-if="hasModel" class="rounded-lg border border-gray-200 p-4">
-        <h3 class="mb-2 text-xs font-bold uppercase tracking-wide text-gray-400">v-model</h3>
-        <pre class="overflow-x-auto text-sm text-gray-600">{{ model ?? 'null' }}</pre>
+      <div v-if="hasModel" class="te-border rounded-lg border p-4">
+        <h3 class="te-text-faint mb-2 text-xs font-bold uppercase tracking-wide">v-model</h3>
+        <pre class="te-text-mild overflow-x-auto text-sm">{{ model ?? 'null' }}</pre>
       </div>
 
       <p v-if="story.note" class="rounded-lg bg-amber-50 p-3 text-sm text-amber-800">{{ story.note }}</p>
