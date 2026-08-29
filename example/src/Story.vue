@@ -79,7 +79,7 @@ const preview = computed(() => ({
             <span class="mb-1 block font-medium text-gray-600">{{ control.key }}</span>
 
             <select v-if="control.kind === 'select'" v-model="state[control.key]" class="w-full rounded border border-gray-300 px-2 py-1">
-              <option v-for="option in control.options" :key="option" :value="option">{{ option }}</option>
+              <option v-for="option in control.options" :key="option" :value="option">{{ option === '' ? 'default' : option }}</option>
             </select>
 
             <input v-else-if="control.kind === 'boolean'" v-model="state[control.key]" type="checkbox" class="h-4 w-4" />

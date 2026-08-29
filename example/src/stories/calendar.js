@@ -24,8 +24,19 @@ export default {
     maxPerDay: 3,
     snapMinutes: 15,
     weekStartsOn: 0,
-    locale: '',
+    // Day and month names come from Intl, so this one control translates every
+    // heading the label props below do not cover.
+    locale: { options: ['', 'es-ES', 'fr-FR', 'de-DE', 'ja-JP'] },
     editable: true,
+    // Every string the component writes itself. Edit one and it shows up in the
+    // code below, so the panel doubles as the list of what is translatable.
+    labelToday: 'Today',
+    labelMonth: 'Month',
+    labelWeek: 'Week',
+    labelAllDay: 'All day',
+    labelMore: 'more',
+    labelPrev: 'Previous',
+    labelNext: 'Next',
   },
   model: null,
   data: {
@@ -38,5 +49,5 @@ export default {
     },
   },
   template: (attrs) => `<te-calendar${attrs} v-model:view="view" :events="events" @move-event="onMove" />`,
-  note: 'Drag an event to another day or hour. Overlapping events split the column.',
+  note: 'Drag an event to another day or hour. Overlapping events split the column. The label props cover every string the component writes; day and month names follow `locale` — override them with the `day-header` and `toolbar` slots.',
 };
