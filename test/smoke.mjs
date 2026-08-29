@@ -54,7 +54,7 @@ const cases = {
     striped: true,
   },
   'te-tabs': { titles: ['One', { label: 'Two', disabled: true }], modelValue: 0 },
-  'te-textarea': { modelValue: 'hello', rows: 4 },
+  'te-textarea': { modelValue: 'hello', rows: 4, maxlength: 20, counter: true },
   'te-time-picker': { modelValue: new Date(2024, 0, 1, 13, 30).valueOf() },
   'te-toast': { title: 'Saved', subtitle: 'just now', message: 'All good', color: 'success' },
   'te-toast-light': { title: 'Saved', subtitle: 'just now', type: 'success' },

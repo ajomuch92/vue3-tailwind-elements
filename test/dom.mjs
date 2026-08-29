@@ -436,6 +436,36 @@ test('te-list-group accepts plain strings and item objects together', async () =
   w.unmount();
 });
 
+test('te-textarea counts what v-model holds', async () => {
+  const w = mount('te-textarea', { modelValue: 'hola', maxlength: 10, counter: true });
+  const textarea = w.$('textarea');
+  assert.equal(textarea.getAttribute('maxlength'), '10', 'maxlength never reached the field');
+  assert.equal(w.$('.textarea-counter').textContent.trim(), '4/10');
+
+  textarea.value = 'hola mundo';
+  textarea.dispatchEvent(new Event('input', { bubbles: true }));
+  await nextTick();
+  assert.equal(w.$('.textarea-counter').textContent.trim(), '10/10', 'counter did not follow v-model');
+  w.unmount();
+});
+
+test('te-textarea counts without a maxlength', () => {
+  const w = mount('te-textarea', { modelValue: 'hola', counter: true });
+  assert.equal(w.$('.textarea-counter').textContent.trim(), '4');
+  w.unmount();
+});
+
+/* The wrapper the counter needs is the root, so without inheritAttrs: false a
+   class written on <te-textarea> would stop reaching the field. */
+test('te-textarea keeps fallthrough attributes on the field', () => {
+  const w = mount('te-textarea', { modelValue: '', class: 'w-full' });
+  assert.equal(w.$('.textarea-counter'), null, 'counter rendered without the prop');
+  const textarea = w.$('textarea');
+  assert.ok(textarea.classList.contains('w-full'), 'class landed on the wrapper');
+  assert.ok(textarea.classList.contains('form-control'), 'form-control was overwritten');
+  w.unmount();
+});
+
 /* ------------------------------------------------------------------ misc */
 
 test('te-chip emits close from its button', async () => {
