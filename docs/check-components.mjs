@@ -9,8 +9,9 @@
 // a page should say so rather than deploy a blank one.
 import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-const here = new URL('.', import.meta.url).pathname;
+const here = fileURLToPath(new URL('.', import.meta.url));
 const { default: install } = await import('vue3-tailwind-elements');
 
 /* The plugin registers by calling app.component(name, …); collect the names it
