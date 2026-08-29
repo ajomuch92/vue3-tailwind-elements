@@ -12,18 +12,17 @@ import { compile } from 'tailwindcss';
 const here = dirname(fileURLToPath(import.meta.url));
 const root = join(here, '..');
 
+const loadStylesheet = async (id, base) => {
+  if (id === 'tailwindcss') {
+    return { path: 'tailwindcss', base, content: readFileSync(join(root, 'node_modules/tailwindcss/index.css'), 'utf8') };
+  }
+  const path = join(base, id.replace(/^\.\//, ''));
+  return { path, base: dirname(path), content: readFileSync(path, 'utf8') };
+};
+
 const css = await (async () => {
   const entry = '@import "tailwindcss";\n@import "./src/plugin/index.css";\n';
-  const compiler = await compile(entry, {
-    base: root,
-    loadStylesheet: async (id, base) => {
-      if (id === 'tailwindcss') {
-        return { path: 'tailwindcss', base, content: readFileSync(join(root, 'node_modules/tailwindcss/index.css'), 'utf8') };
-      }
-      const path = join(base, id.replace(/^\.\//, ''));
-      return { path, base: dirname(path), content: readFileSync(path, 'utf8') };
-    },
-  });
+  const compiler = await compile(entry, { base: root, loadStylesheet });
   return compiler.build([]);
 })();
 
@@ -152,4 +151,16 @@ test('calendar event chips inherit the variant palette', () => {
 test('pinned table cells follow the row hover', () => {
   assert.match(css, /tr\[class\*="hover:bg-gray-100"\]:hover \.table-pinned/);
   assert.match(css, /\.table-pinned\s*\{[^}]*position: sticky/);
+});
+
+/* v4 puts utilities in a later layer than components, so a state class that
+   shares its name with a utility loses however specific its selector is —
+   `.badge.rounded` silently kept the utility's 0.25rem instead of its pill. */
+test('no state class is shadowed by a Tailwind utility', async () => {
+  const source = readFileSync(join(root, 'src/plugin/index.css'), 'utf8');
+  const names = [...new Set([...source.matchAll(/&\.([a-z][a-z0-9-]*)/g)].map((m) => m[1]))];
+  const compiler = await compile('@import "tailwindcss";', { base: root, loadStylesheet });
+  const utilities = compiler.build(names);
+  const shadowed = names.filter((name) => utilities.includes(`.${name} {`));
+  assert.deepEqual(shadowed, [], `state classes a Tailwind utility outranks: ${shadowed}`);
 });
