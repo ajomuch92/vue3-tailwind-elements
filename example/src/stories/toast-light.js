@@ -7,11 +7,13 @@ export default {
     type: { options: ['info', 'success', 'warning', 'danger'] },
   },
   data: {
-    fire: (type) => showToast({ toast: { title: type, subtitle: 'via showToast', type }, type: 'light', timeout: 3000 }),
+    // `values` is the live props panel — see the toast story.
+    fire: (values) => showToast({ toast: { ...values }, type: 'light', timeout: 3000 }),
   },
   template: (attrs) => `<te-toast-light${attrs} />
 
 <div class="mt-6">
-  <te-button size="small" @click="fire('success')">showToast light</te-button>
+  <te-button size="small" @click="fire(values)">showToast light</te-button>
 </div>`,
+  note: 'The button fires the same toast through showToast(), using whatever the props panel holds.',
 };
