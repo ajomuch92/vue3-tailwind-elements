@@ -2,6 +2,7 @@ import type { App, Plugin } from 'vue';
 
 import TeAccordion from './components/teAccordion.vue';
 import TeAlert from './components/teAlert.vue';
+import TeAvatar from './components/teAvatar.vue';
 import TeBadge from './components/teBadge.vue';
 import TeBreadcrumb from './components/teBreadcrumb.vue';
 import TeButton from './components/teButton.vue';
@@ -29,6 +30,7 @@ import TeRange from './components/teRange.vue';
 import TeRating from './components/teRating.vue';
 import TeScrollToTop from './components/teScrollToTop.vue';
 import TeSelect from './components/teSelect.vue';
+import TeSkeleton from './components/teSkeleton.vue';
 import TeSpinner from './components/teSpinner.vue';
 import TeStepper from './components/teStepper.vue';
 import TeSwitch from './components/teSwitch.vue';
@@ -41,6 +43,7 @@ import TeToastLight from './components/teToastLight.vue';
 import TeTooltip from './components/teTooltip.vue';
 
 import clickOutside from './directives/v-outside';
+import showConfirm from './components/confirm';
 import showToast from './components/toast';
 import useOptions from './options';
 import type { TeOptions } from './types';
@@ -48,6 +51,7 @@ import type { TeOptions } from './types';
 const components = {
   'te-accordion': TeAccordion,
   'te-alert': TeAlert,
+  'te-avatar': TeAvatar,
   'te-badge': TeBadge,
   'te-breadcrumb': TeBreadcrumb,
   'te-button': TeButton,
@@ -75,6 +79,7 @@ const components = {
   'te-rating': TeRating,
   'te-scroll-to-top': TeScrollToTop,
   'te-select': TeSelect,
+  'te-skeleton': TeSkeleton,
   'te-spinner': TeSpinner,
   'te-stepper': TeStepper,
   'te-switch': TeSwitch,
@@ -98,13 +103,13 @@ const install: Plugin<[TeOptions?]> = (app: App, options: TeOptions = {}) => {
 export default install;
 
 export {
-  TeAccordion, TeAlert, TeBadge, TeBreadcrumb, TeButton, TeButtonGroup,
+  TeAccordion, TeAlert, TeAvatar, TeBadge, TeBreadcrumb, TeButton, TeButtonGroup,
   TeCalendar, TeCard, TeCheckbox, TeChip, TeDatePicker, TeDropdown, TeField, TeFile, TeIcon, TeInput,
   TeListGroup, TeLoading, TeModal, TeMultiselect, TeNotification, TeOffcanvas,
   TePagination, TeProgress, TeRadio, TeRange, TeRating, TeScrollToTop,
-  TeSelect, TeSpinner, TeStepper, TeSwitch, TeTable, TeTabs, TeTextarea,
+  TeSelect, TeSkeleton, TeSpinner, TeStepper, TeSwitch, TeTable, TeTabs, TeTextarea,
   TeTimePicker, TeToast, TeToastLight, TeTooltip,
-  clickOutside, showToast, useOptions,
+  clickOutside, showConfirm, showToast, useOptions,
 };
 
 export type * from './types';
@@ -113,6 +118,7 @@ declare module 'vue' {
   export interface GlobalComponents {
     TeAccordion: typeof TeAccordion;
     TeAlert: typeof TeAlert;
+    TeAvatar: typeof TeAvatar;
     TeBadge: typeof TeBadge;
     TeBreadcrumb: typeof TeBreadcrumb;
     TeButton: typeof TeButton;
@@ -140,6 +146,7 @@ declare module 'vue' {
     TeRating: typeof TeRating;
     TeScrollToTop: typeof TeScrollToTop;
     TeSelect: typeof TeSelect;
+    TeSkeleton: typeof TeSkeleton;
     TeSpinner: typeof TeSpinner;
     TeStepper: typeof TeStepper;
     TeSwitch: typeof TeSwitch;

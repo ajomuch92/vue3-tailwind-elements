@@ -12,6 +12,125 @@
 @source "../";
 
 /* ---------------------------------------------------------------------------
+ * Theme tokens.
+ *
+ * Every surface, text and border colour in this file is one of these, so a
+ * theme is a token swap rather than a rule-by-rule rewrite. The light values
+ * are the colours the components have always used: nothing moves until dark
+ * is on.
+ *
+ * Dark follows the operating system on its own, and a `dark` or `light` class
+ * — or `data-theme` — overrules it in both directions, so forcing one theme,
+ * or a light island inside a dark page, is one attribute.
+ *
+ * These live in the theme layer, which every other layer outranks: your own
+ * `:root { --te-surface: … }` needs no !important to win.
+ * ------------------------------------------------------------------------ */
+
+@layer theme {
+  :root, .light, [data-theme="light"] {
+    --te-surface: var(--color-white);
+    --te-surface-raised: var(--color-white);
+    --te-surface-sunken: var(--color-gray-50);
+    --te-surface-hover: var(--color-gray-100);
+    --te-surface-active: var(--color-gray-200);
+    --te-surface-strong: var(--color-gray-300);
+
+    --te-text: var(--color-gray-900);
+    --te-text-soft: var(--color-gray-800);
+    --te-text-body: var(--color-gray-700);
+    --te-text-mild: var(--color-gray-600);
+    --te-text-muted: var(--color-gray-500);
+    --te-text-faint: var(--color-gray-400);
+
+    --te-border-soft: var(--color-gray-100);
+    --te-border: var(--color-gray-200);
+    --te-border-strong: var(--color-gray-300);
+
+    color-scheme: light;
+  }
+
+  /* One list, applied twice: once for the system preference and once for the
+     class, so the two cannot drift apart. */
+  @media (prefers-color-scheme: dark) {
+    :root:not(.light):not([data-theme="light"]) {
+      --te-surface: var(--color-gray-900);
+      --te-surface-raised: var(--color-gray-800);
+      --te-surface-sunken: var(--color-gray-800);
+      --te-surface-hover: var(--color-gray-700);
+      --te-surface-active: var(--color-gray-600);
+      --te-surface-strong: var(--color-gray-600);
+
+      --te-text: var(--color-gray-50);
+      --te-text-soft: var(--color-gray-100);
+      --te-text-body: var(--color-gray-200);
+      --te-text-mild: var(--color-gray-300);
+      --te-text-muted: var(--color-gray-400);
+      --te-text-faint: var(--color-gray-500);
+
+      --te-border-soft: var(--color-gray-800);
+      --te-border: var(--color-gray-700);
+      --te-border-strong: var(--color-gray-600);
+
+      color-scheme: dark;
+    }
+  }
+
+  .dark, [data-theme="dark"] {
+    --te-surface: var(--color-gray-900);
+    --te-surface-raised: var(--color-gray-800);
+    --te-surface-sunken: var(--color-gray-800);
+    --te-surface-hover: var(--color-gray-700);
+    --te-surface-active: var(--color-gray-600);
+    --te-surface-strong: var(--color-gray-600);
+
+    --te-text: var(--color-gray-50);
+    --te-text-soft: var(--color-gray-100);
+    --te-text-body: var(--color-gray-200);
+    --te-text-mild: var(--color-gray-300);
+    --te-text-muted: var(--color-gray-400);
+    --te-text-faint: var(--color-gray-500);
+
+    --te-border-soft: var(--color-gray-800);
+    --te-border: var(--color-gray-700);
+    --te-border-strong: var(--color-gray-600);
+
+    color-scheme: dark;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * Theme classes.
+ *
+ * What the component templates use instead of `bg-white`, `text-gray-700` and
+ * the rest: the same colour in light, and a token that follows the theme in
+ * dark. They sit in the components layer, so a utility written by the caller
+ * still wins.
+ * ------------------------------------------------------------------------ */
+
+@layer components {
+  .te-surface { background-color: var(--te-surface); }
+  .te-raised  { background-color: var(--te-surface-raised); }
+  .te-sunken  { background-color: var(--te-surface-sunken); }
+  .te-subtle  { background-color: var(--te-surface-hover); }
+  .te-active  { background-color: var(--te-surface-active); }
+
+  .te-hover:hover        { background-color: var(--te-surface-hover); }
+  .te-hover-strong:hover { background-color: var(--te-surface-active); }
+
+  .te-text       { color: var(--te-text); }
+  .te-text-soft  { color: var(--te-text-soft); }
+  .te-text-body  { color: var(--te-text-body); }
+  .te-text-mild  { color: var(--te-text-mild); }
+  .te-text-muted { color: var(--te-text-muted); }
+  .te-text-faint { color: var(--te-text-faint); }
+
+  .te-border-soft   { border-color: var(--te-border-soft); }
+  .te-border        { border-color: var(--te-border); }
+  .te-border-strong { border-color: var(--te-border-strong); }
+}
+
+/* ---------------------------------------------------------------------------
  * Variant palette.
  *
  * Every themed component reads the same five --te-* slots, so a variant is
@@ -21,7 +140,7 @@
  * ------------------------------------------------------------------------ */
 
 @layer components {
-  .btn, .badge, .chip, .notification, .spinner, .alert, .progress,
+  .btn, .badge, .chip, .notification, .spinner, .alert, .progress, .avatar,
   .toast-wrapper, .toast, .toast-light, .toast-text, .page-link,
   .calendar-event {
     --te-400: var(--color-gray-400);
@@ -119,8 +238,8 @@
     &.only-text {
       background-color: transparent;
       color: var(--te-600);
-      &:hover { background-color: var(--color-gray-100); }
-      &:active { background-color: var(--color-gray-200); }
+      &:hover { background-color: var(--te-surface-hover); }
+      &:active { background-color: var(--te-surface-active); }
     }
 
     &.outlined {
@@ -156,7 +275,8 @@
     border-radius: var(--radius-full, 9999px);
     color: var(--te-600);
 
-    &.light { color: var(--color-gray-200); }
+    /* The palette already holds this exact grey for the light variant. */
+    &.light { color: var(--te-500); }
 
     &.small  { width: 1rem;   height: 1rem;   }
     &.medium { width: 2rem;   height: 2rem;   }
@@ -250,6 +370,84 @@
 }
 
 /* ---------------------------------------------------------------------------
+ * Avatars & skeletons
+ * ------------------------------------------------------------------------ */
+
+@layer components {
+  .avatar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    overflow: hidden;
+    border-radius: var(--radius-full, 9999px);
+    background-color: var(--te-500);
+    color: var(--te-on);
+    font-weight: var(--font-weight-semibold);
+    line-height: 1;
+    user-select: none;
+
+    &.square { border-radius: var(--radius-md); }
+
+    &.small  { width: 2rem;   height: 2rem;   font-size: var(--text-xs); }
+    &.medium { width: 2.5rem; height: 2.5rem; font-size: var(--text-sm); }
+    &.large  { width: 3.5rem; height: 3.5rem; font-size: var(--text-lg); }
+  }
+
+  /* The image fills the box whatever its aspect ratio, so a portrait and a
+     landscape upload are the same circle. */
+  .avatar-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .avatar-icon {
+    width: 60%;
+    height: 60%;
+  }
+
+  .skeleton-root {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .skeleton {
+    display: block;
+    background-color: var(--te-surface-hover);
+    border-radius: var(--radius-sm);
+    animation: te-skeleton 1.6s ease-in-out infinite;
+
+    &.text {
+      height: 0.75rem;
+      border-radius: var(--radius-full, 9999px);
+    }
+
+    &.rect { height: 6rem; }
+
+    &.circle {
+      width: 2.5rem;
+      height: 2.5rem;
+      border-radius: var(--radius-full, 9999px);
+    }
+  }
+
+  /* After .skeleton, so the same specificity wins on source order. */
+  .skeleton-still { animation: none; }
+
+  .confirm-message {
+    margin: 0;
+    color: var(--te-text-body);
+    white-space: pre-line;
+  }
+}
+
+@keyframes te-skeleton {
+  50% { opacity: 0.45; }
+}
+
+/* ---------------------------------------------------------------------------
  * Chips & notification badges
  * ------------------------------------------------------------------------ */
 
@@ -318,7 +516,7 @@
     display: block;
     background-color: var(--te-500);
 
-    &.normal { background-color: var(--color-white); }
+    &.normal { background-color: var(--te-surface-raised); }
   }
 
   .toast {
@@ -334,9 +532,9 @@
     color: var(--te-on);
 
     &.normal {
-      background-color: var(--color-white);
-      border-bottom-color: var(--color-gray-200);
-      color: var(--color-gray-900);
+      background-color: var(--te-surface-raised);
+      border-bottom-color: var(--te-border);
+      color: var(--te-text);
     }
   }
 
@@ -346,7 +544,7 @@
     max-width: 100%;
     margin-inline: auto;
     overflow: hidden;
-    background-color: var(--color-white);
+    background-color: var(--te-surface-raised);
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-lg);
   }
@@ -383,13 +581,13 @@
     transition: all 300ms;
     user-select: none;
     cursor: pointer;
-    color: var(--color-gray-800);
+    color: var(--te-text-soft);
 
     /* These four were nested as descendants (`.page-link .prev`), so they
        never matched the anchor that carries the class. */
     &.prev:hover,
     &.next:hover,
-    &.inactive:hover { color: var(--color-gray-900); background-color: var(--color-gray-200); }
+    &.inactive:hover { color: var(--te-text); background-color: var(--te-surface-active); }
 
     &.active { color: var(--color-white); background-color: var(--color-blue-500); }
 
@@ -410,25 +608,25 @@
   textarea.form-control {
     display: block;
     font-weight: var(--font-weight-normal);
-    color: var(--color-gray-700);
-    background-color: var(--color-white);
+    color: var(--te-text-body);
+    background-color: var(--te-surface);
     background-clip: padding-box;
-    border: 1px solid var(--color-gray-300);
+    border: 1px solid var(--te-border-strong);
     border-radius: var(--radius-sm);
     margin: 0;
     transition-property: color, background-color, border-color, box-shadow;
     transition-duration: 150ms;
 
     &:focus {
-      color: var(--color-gray-700);
-      background-color: var(--color-white);
+      color: var(--te-text-body);
+      background-color: var(--te-surface);
       border-color: var(--color-blue-600);
       outline: none;
       box-shadow: 0 0 0 1px var(--color-blue-600);
     }
 
     &:disabled {
-      background-color: var(--color-gray-100);
+      background-color: var(--te-surface-hover);
       cursor: not-allowed;
     }
   }
@@ -453,7 +651,7 @@
     margin-bottom: 0.25rem;
     font-size: var(--text-sm);
     font-weight: var(--font-weight-medium);
-    color: var(--color-gray-700);
+    color: var(--te-text-body);
   }
 
   .field-required {
@@ -464,7 +662,7 @@
   .field-message {
     margin-top: 0.25rem;
     font-size: var(--text-sm);
-    color: var(--color-gray-500);
+    color: var(--te-text-muted);
   }
 
   .field-invalid {
@@ -481,17 +679,17 @@
     padding: 0.375rem 0.75rem;
     margin: -0.375rem -0.75rem;
     margin-inline-end: 0.75rem;
-    color: var(--color-gray-700);
-    background-color: var(--color-gray-100);
+    color: var(--te-text-body);
+    background-color: var(--te-surface-hover);
     pointer-events: none;
     border: 0;
-    border-inline-end: 1px solid var(--color-gray-300);
+    border-inline-end: 1px solid var(--te-border-strong);
     border-radius: 0;
     transition: background-color 150ms ease-in-out;
   }
 
   .form-control:hover:not(:disabled):not([readonly])::file-selector-button {
-    background-color: var(--color-gray-200);
+    background-color: var(--te-surface-active);
   }
 
   select.form-select {
@@ -532,7 +730,7 @@
        the control rendered as an invisible strip. */
     &::-webkit-slider-runnable-track {
       height: 0.375rem;
-      background-color: var(--color-gray-300);
+      background-color: var(--te-surface-strong);
       border-radius: var(--radius-full, 9999px);
     }
 
@@ -548,7 +746,7 @@
 
     &::-moz-range-track {
       height: 0.375rem;
-      background-color: var(--color-gray-300);
+      background-color: var(--te-surface-strong);
       border-radius: var(--radius-full, 9999px);
     }
 
@@ -572,7 +770,7 @@
     vertical-align: top;
     background-repeat: no-repeat;
     background-size: contain;
-    background-color: var(--color-gray-300);
+    background-color: var(--te-surface-strong);
     cursor: pointer;
     box-shadow: var(--shadow-sm);
     &:focus { outline: none; }
@@ -583,9 +781,9 @@
     appearance: none;
     width: 1rem;
     height: 1rem;
-    border: 1px solid var(--color-gray-300);
+    border: 1px solid var(--te-border-strong);
     border-radius: var(--radius-full, 9999px);
-    background-color: var(--color-white);
+    background-color: var(--te-surface);
     background-repeat: no-repeat;
     background-position: center;
     background-size: contain;
@@ -656,7 +854,7 @@
   .accordion-button {
     overflow-anchor: none;
     cursor: pointer;
-    background-color: var(--color-white);
+    background-color: var(--te-surface);
 
     /* One chevron drawn with a mask so it inherits `color`, instead of two
        hard-coded SVG data URIs that only came in black and blue. */
@@ -673,17 +871,17 @@
 
     &:not(.collapsed) {
       color: var(--color-blue-600);
-      box-shadow: inset 0 -1px 0 var(--color-gray-200);
+      box-shadow: inset 0 -1px 0 var(--te-border);
       &::after { transform: rotate(-180deg); }
     }
 
     /* After the open-state rule: equal specificity, so source order decides
        and the hover reads in both states. */
-    &:hover { background-color: var(--color-gray-50); }
+    &:hover { background-color: var(--te-surface-sunken); }
   }
 
   .card {
-    background-color: var(--color-white);
+    background-color: var(--te-surface-raised);
   }
 }
 
@@ -719,7 +917,7 @@
     width: 2rem;
     height: 1rem;
     margin-left: -2.5rem;
-    background-color: var(--color-gray-300);
+    background-color: var(--te-surface-strong);
     background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3ccircle cx='8' cy='8' r='6' fill='white'/%3e%3c/svg%3e");
     background-position: left center;
     background-size: 1rem 1rem;
@@ -779,11 +977,11 @@
 @layer components {
   .nav-tabs .nav-link {
     border-bottom-color: transparent;
-    color: var(--color-gray-600);
+    color: var(--te-text-mild);
   }
 
   .nav-tabs .nav-link:hover {
-    border-bottom-color: var(--color-gray-300);
+    border-bottom-color: var(--te-border-strong);
   }
 
   .nav-tabs .nav-link.active {
@@ -793,11 +991,11 @@
 
   .nav-pills .nav-link {
     border-radius: var(--radius-md);
-    color: var(--color-gray-600);
+    color: var(--te-text-mild);
   }
 
   .nav-pills .nav-link:hover {
-    background-color: var(--color-gray-100);
+    background-color: var(--te-surface-hover);
   }
 
   .nav-pills .nav-link.active {
@@ -942,10 +1140,10 @@
     min-width: 10rem;
     max-height: 60vh;
     overflow-y: auto;
-    border: 1px solid var(--color-gray-200);
+    border: 1px solid var(--te-border);
     border-radius: var(--radius-md);
-    background-color: var(--color-white);
-    color: var(--color-gray-900);
+    background-color: var(--te-surface-raised);
+    color: var(--te-text);
     box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
   }
 
@@ -958,7 +1156,7 @@
     background-color: transparent;
     cursor: pointer;
 
-    &:hover:not(:disabled) { background-color: var(--color-gray-100); }
+    &:hover:not(:disabled) { background-color: var(--te-surface-hover); }
     &:focus-visible {
       outline: 2px solid var(--color-blue-500);
       outline-offset: -2px;
@@ -986,7 +1184,7 @@
     gap: 0.75rem;
     /* A light scrim keeps the default (dark) spinner and label readable.
        Override .te-backdrop in your own CSS for a dark one. */
-    background-color: color-mix(in oklab, var(--color-white) 70%, transparent);
+    background-color: color-mix(in oklab, var(--te-surface) 70%, transparent);
     backdrop-filter: blur(2px);
   }
 }
@@ -1037,10 +1235,10 @@
 
 @layer components {
   .calendar-grid {
-    border: 1px solid var(--color-gray-200);
+    border: 1px solid var(--te-border);
     border-radius: var(--radius-lg);
     overflow: hidden;
-    background-color: var(--color-white);
+    background-color: var(--te-surface);
   }
 
   .calendar-heading {
@@ -1050,8 +1248,8 @@
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    color: var(--color-gray-500);
-    background-color: var(--color-gray-50);
+    color: var(--te-text-muted);
+    background-color: var(--te-surface-sunken);
 
     &.is-today { color: var(--color-blue-600); }
   }
@@ -1059,16 +1257,16 @@
   .calendar-cell {
     min-height: 6rem;
     padding: 0.25rem;
-    border-top: 1px solid var(--color-gray-200);
-    border-left: 1px solid var(--color-gray-200);
+    border-top: 1px solid var(--te-border);
+    border-left: 1px solid var(--te-border);
     cursor: pointer;
     transition: background-color 150ms;
 
     /* The first column of every row would otherwise carry a left edge that
        sits on top of the container's own border. */
     &:nth-child(7n + 1) { border-left: 0; }
-    &:hover { background-color: var(--color-gray-50); }
-    &.is-outside { background-color: var(--color-gray-50); color: var(--color-gray-400); }
+    &:hover { background-color: var(--te-surface-sunken); }
+    &.is-outside { background-color: var(--te-surface-sunken); color: var(--te-text-faint); }
   }
 
   .calendar-daynum {
@@ -1091,18 +1289,18 @@
   .calendar-more {
     padding-left: 0.25rem;
     font-size: var(--text-xs);
-    color: var(--color-gray-500);
+    color: var(--te-text-muted);
   }
 
   .calendar-gutter {
-    border-right: 1px solid var(--color-gray-200);
-    background-color: var(--color-gray-50);
+    border-right: 1px solid var(--te-border);
+    background-color: var(--te-surface-sunken);
   }
 
   .calendar-gutter-label {
     padding: 0.25rem;
     font-size: var(--text-xs);
-    color: var(--color-gray-500);
+    color: var(--te-text-muted);
     text-align: right;
   }
 
@@ -1113,7 +1311,7 @@
     padding-right: 0.5rem;
     text-align: right;
     font-size: var(--text-xs);
-    color: var(--color-gray-400);
+    color: var(--te-text-faint);
 
     & > * { position: relative; top: -0.5em; }
   }
@@ -1124,18 +1322,18 @@
     gap: 0.125rem;
     min-height: 1.75rem;
     padding: 0.125rem;
-    border-left: 1px solid var(--color-gray-200);
+    border-left: 1px solid var(--te-border);
   }
 
   .calendar-column {
     position: relative;
-    border-left: 1px solid var(--color-gray-200);
+    border-left: 1px solid var(--te-border);
 
     &.is-today { background-color: color-mix(in oklab, var(--color-blue-500) 4%, transparent); }
   }
 
   .calendar-slot {
-    border-top: 1px solid var(--color-gray-100);
+    border-top: 1px solid var(--te-border-soft);
 
     &:first-child { border-top: 0; }
   }
@@ -1168,7 +1366,7 @@
     width: auto;
     white-space: normal;
     padding-right: 0.25rem;
-    outline: 1px solid var(--color-white);
+    outline: 1px solid var(--te-surface);
     min-height: 1rem;
   }
 
@@ -1203,13 +1401,13 @@
   /* A pinned header cell is sticky on both axes, so it has to outrank both. */
   .table-sticky-head th.table-pinned { z-index: 30; }
 
-  tbody .table-pinned { background-color: var(--color-white); }
+  tbody .table-pinned { background-color: var(--te-surface); }
 
-  tr.bg-gray-50 .table-pinned { background-color: var(--color-gray-50); }
+  tr.te-sunken .table-pinned { background-color: var(--te-surface-sunken); }
 
   /* A pinned cell paints its own background, so it would sit out the row's
      hover. Matched on the utility itself rather than re-declaring `hoverable`. */
-  tr[class*="hover:bg-gray-100"]:hover .table-pinned { background-color: var(--color-gray-100); }
+  tr.te-hover:hover .table-pinned { background-color: var(--te-surface-hover); }
 
   .table-select-cell,
   .table-num-cell {
