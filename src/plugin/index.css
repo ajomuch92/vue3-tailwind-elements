@@ -442,6 +442,36 @@
     &.large  { padding: 0.5rem 1rem;      font-size: var(--text-xl);   }
   }
 
+  /* te-field's label, hint and error line.
+
+     The invalid border stops at the controls whose border is written in this
+     layer: te-input, te-multiselect and te-date-picker paint theirs with
+     utilities, which outrank anything here, so those three bind the red
+     themselves. */
+  .field-label {
+    display: block;
+    margin-bottom: 0.25rem;
+    font-size: var(--text-sm);
+    font-weight: var(--font-weight-medium);
+    color: var(--color-gray-700);
+  }
+
+  .field-required {
+    margin-left: 0.125rem;
+    color: var(--color-red-500);
+  }
+
+  .field-message {
+    margin-top: 0.25rem;
+    font-size: var(--text-sm);
+    color: var(--color-gray-500);
+  }
+
+  .field-invalid {
+    & .field-message { color: var(--color-red-500); }
+    & :is(.form-control, .form-select, .file-control) { border-color: var(--color-red-500); }
+  }
+
   .form-control[type="file"] {
     overflow: hidden;
     &:not(:disabled):not([readonly]) { cursor: pointer; }
