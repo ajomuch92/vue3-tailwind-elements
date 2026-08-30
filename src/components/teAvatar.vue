@@ -2,8 +2,9 @@
   <span
     class="avatar"
     :class="[type, size, { square }]"
-    :role="showsImage ? undefined : 'img'"
-    :aria-label="showsImage ? undefined : (alt || name || undefined)"
+    :role="named && !showsImage ? 'img' : undefined"
+    :aria-label="named && !showsImage ? (alt || name) : undefined"
+    :aria-hidden="decorative ? 'true' : undefined"
   >
     <img
       v-if="showsImage"
@@ -22,10 +23,12 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue';
+import { computed, ref, useSlots, watch } from 'vue';
 import { oneOf, SIZES, VARIANTS } from '../types';
 
 defineOptions({ name: 'TeAvatar' });
+
+const slots = useSlots();
 
 const props = defineProps({
   /** Image URL. Falls back to the initials, and then to the icon, if it fails to load. */
@@ -49,6 +52,14 @@ const failed = ref(false);
 watch(() => props.src, () => { failed.value = false; });
 
 const showsImage = computed(() => !!props.src && !failed.value);
+
+const named = computed(() => !!(props.alt || props.name));
+
+/* Nobody to name: what is left is the generic icon, which says nothing a
+   screen reader can use. An unnamed `role="img"` is worse than no role at all,
+   so the whole thing steps out of the accessibility tree — unless the caller
+   put something of their own in the slot, which is theirs to describe. */
+const decorative = computed(() => !showsImage.value && !named.value && !slots.default);
 
 /* First letter of the first two words: "Ada Lovelace" is AL. Array.from, not
    [0], so an emoji or a surrogate pair is not cut in half. */

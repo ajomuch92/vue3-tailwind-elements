@@ -1153,6 +1153,27 @@ test('te-avatar draws its icon when there is no name either', () => {
   w.unmount();
 });
 
+/* An image role with no name is worse than no role: a screen reader announces
+   "image" and stops. Nothing left to say means nothing to announce. */
+test('te-avatar keeps a nameless avatar out of the accessibility tree', () => {
+  const bare = mount('te-avatar', {});
+  const el = bare.$('.avatar');
+  assert.equal(el.getAttribute('role'), null, 'an unnamed avatar still claims to be an image');
+  assert.equal(el.getAttribute('aria-hidden'), 'true', 'the generic icon is announced to nobody');
+  bare.unmount();
+
+  const named = mount('te-avatar', { name: 'Ada' });
+  assert.equal(named.$('.avatar').getAttribute('role'), 'img');
+  assert.equal(named.$('.avatar').getAttribute('aria-hidden'), null, 'a named avatar was hidden');
+  named.unmount();
+});
+
+test('te-avatar leaves slot content of its own visible to a screen reader', () => {
+  const w = mount('te-avatar', {}, () => 'JS');
+  assert.equal(w.$('.avatar').getAttribute('aria-hidden'), null, 'the slot content was hidden');
+  w.unmount();
+});
+
 test('te-avatar gives a new src another chance', async () => {
   const w = mount('te-avatar', { src: 'a.png', name: 'Ada' });
   w.$('img').dispatchEvent(new Event('error'));
