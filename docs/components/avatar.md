@@ -24,6 +24,11 @@ the layout.
 two words — and it is what a screen reader hears, whether the picture loaded or
 not. Pass `alt` when the two should differ.
 
+With neither `name` nor `alt`, all that is left is the generic icon, which says
+nothing a screen reader can use: the avatar is treated as decoration and stays
+out of the accessibility tree. Content of your own in the default slot is
+yours to describe, so it is left visible.
+
 ## Sizes and shape
 
 <Demo>
