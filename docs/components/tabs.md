@@ -70,6 +70,18 @@ interface TabTitle {
 }
 ```
 
+## Keyboard
+
+The tablist is a single stop in the tab order: Tab reaches the selected tab,
+and the arrows move between them. Disabled tabs are skipped, and the selection
+follows the focus.
+
+| Key | Does |
+|---|---|
+| <kbd>←</kbd> <kbd>→</kbd> | Previous / next tab. <kbd>↑</kbd> <kbd>↓</kbd> when `vertical`. |
+| <kbd>Home</kbd> <kbd>End</kbd> | First / last tab. |
+| <kbd>Tab</kbd> | Out of the tablist and into the panel. |
+
 ## Props
 
 | Prop | Type | Default | Description |

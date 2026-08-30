@@ -1,6 +1,6 @@
 <template>
   <div class="overflow-hidden card" :class="{'shadow-md rounded-md': !shadowless}">
-    <div v-if="hasHeader" class="py-3 px-6 border-b border-gray-300 text-center">
+    <div v-if="hasHeader" class="py-3 px-6 border-b te-border-strong text-center">
       <slot name="header" />
     </div>
     <img
@@ -15,7 +15,7 @@
       </h5>
       <slot name="default"></slot>
     </div>
-    <div v-if="hasFooter" class="py-3 px-6 border-t border-gray-300 text-gray-600 text-center">
+    <div v-if="hasFooter" class="py-3 px-6 border-t te-border-strong te-text-mild text-center">
       <slot name="footer" />
     </div>
   </div>

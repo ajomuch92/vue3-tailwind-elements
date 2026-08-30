@@ -2,6 +2,8 @@
 
 `te-select` is a native `<select>`. Options can be plain values or objects.
 
+Inside a [`te-field`](/components/field) it takes the id its label points at, its description and its invalid state from the wrapper.
+
 ## Objects and plain values
 
 <Demo block>

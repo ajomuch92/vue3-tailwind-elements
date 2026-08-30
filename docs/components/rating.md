@@ -42,6 +42,20 @@ const score = ref(3);
 <te-rating v-model="score" icon="heart-fill" color="crimson" />
 ```
 
+## Keyboard
+
+The stars are a slider: one tab stop, and the arrows set the value. The step is
+half a star while `hasHalfValues` is on, a whole one otherwise.
+
+| Key | Does |
+|---|---|
+| <kbd>→</kbd> <kbd>↑</kbd> | One step up. |
+| <kbd>←</kbd> <kbd>↓</kbd> | One step down. |
+| <kbd>Home</kbd> <kbd>End</kbd> | Zero / the maximum. |
+
+`label` and `clearLabel` name the slider and the clear button for a screen
+reader; pass your own to translate them.
+
 ## Props
 
 | Prop | Type | Default | Description |
@@ -55,6 +69,8 @@ const score = ref(3);
 | `hasHalfValues` | `boolean` | `true` | Enables half selections. |
 | `clearable` | `boolean` | `false` | Adds an eraser that resets to `0`. |
 | `disabled` | `boolean` | `false` | Makes it read-only. |
+| `label` | `string` | `'Rating'` | Accessible name for the slider. |
+| `clearLabel` | `string` | `'Clear rating'` | Accessible name for the eraser button. |
 
 ## Events
 

@@ -8,7 +8,7 @@
       role="switch"
       :disabled="disabled"
     >
-    <label class="form-check-label inline-block text-gray-800" :for="switchId" :class="{'opacity-50': disabled}">
+    <label class="form-check-label inline-block te-text-soft" :for="switchId" :class="{'opacity-50': disabled}">
       <slot name="default" :selected="model">
         {{ label }}
       </slot>

@@ -12,7 +12,7 @@ GlobalRegistrator.register();
 
 // Imported after the DOM globals exist, so Vue picks up its browser build.
 const { createApp, h, reactive, resolveComponent, nextTick } = await import('vue');
-const { default: install } = await import('../dist/vue3-tailwind-elements.js');
+const { default: install, showConfirm } = await import('../dist/vue3-tailwind-elements.js');
 
 // happy-dom keeps timers and the window alive; without this the runner sits
 // on an open event loop and aborts the file with SIGABRT after its timeout.
@@ -82,6 +82,11 @@ const click = async (el, init = {}) => {
     if (!(k in event)) Object.defineProperty(event, k, { value: v });
   }
   el.dispatchEvent(event);
+  await nextTick();
+};
+
+const press = async (el, key, init = {}) => {
+  el.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true, ...init }));
   await nextTick();
 };
 
@@ -771,16 +776,17 @@ test('disabled te-multiselect and te-date-picker fade out and stay inert', async
     options: [{ text: 'One', value: 1 }],
   });
   assert.ok(ms.$('.multiselect-wrapper').className.includes('opacity-50'), 'multiselect not faded');
-  // bg-white and bg-gray-200 would fight over CSS order, so only one is ever bound
-  assert.ok(ms.$('input').className.includes('bg-gray-200'), 'multiselect field not greyed');
-  assert.ok(!ms.$('input').className.includes('bg-white'), 'disabled field still asks for bg-white');
+  // The surface and the greyed-out state would fight over CSS order, so only
+  // one of them is ever bound.
+  assert.ok(ms.$('input').className.includes('te-active'), 'multiselect field not greyed');
+  assert.ok(!ms.$('input').className.includes('te-surface'), 'disabled field still asks for the plain surface');
   await click(ms.$('button.clear'));
   assert.deepEqual(ms.state.modelValue, [1], 'clear button fired while disabled');
   ms.unmount();
 
   const dp = mount('te-date-picker', { disabled: true });
   assert.ok(dp.$('.date-picker').className.includes('opacity-50'), 'date picker not faded');
-  assert.ok(dp.$('input').className.includes('bg-gray-200'), 'date picker field not greyed');
+  assert.ok(dp.$('input').className.includes('te-active'), 'date picker field not greyed');
   dp.unmount();
 });
 
@@ -800,4 +806,445 @@ test('te-calendar Today jumps back and is inert while today is on screen', async
   assert.equal(label(), start, 'Today did not jump back');
   assert.ok(today.disabled, 'Today did not go inert again');
   w.unmount();
+});
+
+/* ---------------------------------------------------------------- keyboard */
+
+test('te-tabs moves with the arrows and skips a disabled tab', async () => {
+  const w = mount('te-tabs', { titles: ['One', { label: 'Two', disabled: true }, 'Three'], modelValue: 0 });
+  const tabs = w.$$('[role="tab"]');
+  assert.deepEqual(tabs.map((t) => t.tabIndex), [0, -1, -1], 'more than one tab is in the tab order');
+
+  await press(tabs[0], 'ArrowRight');
+  assert.equal(w.state.modelValue, 2, 'the disabled tab was not skipped');
+  assert.deepEqual(tabs.map((t) => t.tabIndex), [-1, -1, 0], 'the tab stop did not move');
+
+  await press(tabs[2], 'ArrowRight');
+  assert.equal(w.state.modelValue, 0, 'the arrows do not wrap around');
+
+  await press(tabs[0], 'End');
+  assert.equal(w.state.modelValue, 2, 'End did not jump to the last tab');
+  w.unmount();
+});
+
+test('te-tabs moves with up/down when it is vertical', async () => {
+  const w = mount('te-tabs', { titles: ['One', 'Two'], modelValue: 0, vertical: true });
+  assert.equal(w.$('[role="tablist"]').getAttribute('aria-orientation'), 'vertical');
+
+  await press(w.$$('[role="tab"]')[0], 'ArrowRight');
+  assert.equal(w.state.modelValue, 0, 'a vertical tablist answered a horizontal arrow');
+
+  await press(w.$$('[role="tab"]')[0], 'ArrowDown');
+  assert.equal(w.state.modelValue, 1);
+  w.unmount();
+});
+
+/* The ids used to be `tab-0`, `tab-content-0`… — global, so a second set of
+   tabs pointed every aria-controls at the first one on the page. */
+test('te-tabs gives every instance its own ids', () => {
+  const host = document.createElement('div');
+  document.body.appendChild(host);
+  const app = createApp({
+    render: () => h('div', [
+      h(resolveComponent('te-tabs'), { titles: ['One'] }),
+      h(resolveComponent('te-tabs'), { titles: ['One'] }),
+    ]),
+  });
+  app.use(install, OPTIONS);
+  app.mount(host);
+
+  const tabs = [...host.querySelectorAll('[role="tab"]')];
+  assert.equal(new Set(tabs.map((t) => t.id)).size, 2, 'two sets of tabs share their ids');
+  for (const panel of host.querySelectorAll('[role="tabpanel"]')) {
+    assert.ok(tabs.some((t) => t.id === panel.getAttribute('aria-labelledby')), 'a panel names no tab');
+  }
+  app.unmount();
+  host.remove();
+});
+
+test('te-list-group walks with the arrows and selects with Enter', async () => {
+  const w = mount('te-list-group', { items: ['a', { label: 'b', disabled: true }, 'c'], activeItem: null });
+  const options = w.$$('[role="option"]');
+  assert.equal(options.length, 3, 'the rows are not options');
+  assert.deepEqual(options.map((o) => o.tabIndex), [0, -1, -1]);
+
+  await press(options[0], 'ArrowDown');
+  assert.deepEqual(options.map((o) => o.tabIndex), [-1, -1, 0], 'the disabled row was not skipped');
+  assert.equal(w.state.activeItem, null, 'moving the focus changed the selection');
+
+  await press(options[2], 'Enter');
+  assert.equal(w.state.activeItem, 2, 'Enter did not select the focused row');
+  assert.equal(options[2].getAttribute('aria-selected'), 'true');
+  w.unmount();
+});
+
+test('te-list-group stays a plain list when it is not clickable', () => {
+  const w = mount('te-list-group', { items: ['a', 'b'], clickable: false });
+  assert.equal(w.$('[role="listbox"]'), null, 'a static list claims to be a listbox');
+  assert.equal(w.$$('li')[0].tabIndex, -1, 'a static list is in the tab order');
+  w.unmount();
+});
+
+test('te-rating answers the arrow keys', async () => {
+  const w = mount('te-rating', { modelValue: 2 });
+  const slider = w.$('[role="slider"]');
+  assert.equal(slider.getAttribute('aria-valuenow'), '2');
+  assert.equal(slider.getAttribute('aria-valuemax'), '5');
+  assert.equal(slider.tabIndex, 0, 'the rating cannot be reached with Tab');
+
+  await press(slider, 'ArrowRight');
+  assert.equal(w.state.modelValue, 2.5, 'half a star is out of the keyboard');
+
+  await press(slider, 'End');
+  assert.equal(w.state.modelValue, 5);
+  await press(slider, 'ArrowRight');
+  assert.equal(w.state.modelValue, 5, 'the value ran past the maximum');
+
+  await press(slider, 'Home');
+  assert.equal(w.state.modelValue, 0);
+  await press(slider, 'ArrowLeft');
+  assert.equal(w.state.modelValue, 0, 'the value ran below zero');
+  w.unmount();
+});
+
+test('te-rating steps by one without half values, and not at all when disabled', async () => {
+  const whole = mount('te-rating', { modelValue: 2, hasHalfValues: false });
+  await press(whole.$('[role="slider"]'), 'ArrowRight');
+  assert.equal(whole.state.modelValue, 3);
+  whole.unmount();
+
+  const off = mount('te-rating', { modelValue: 2, disabled: true });
+  assert.equal(off.$('[role="slider"]').tabIndex, -1, 'a disabled rating is still a tab stop');
+  await press(off.$('[role="slider"]'), 'ArrowRight');
+  assert.equal(off.state.modelValue, 2, 'a disabled rating still changed');
+  off.unmount();
+});
+
+test('te-dropdown moves focus through its items', async () => {
+  const w = mount('te-dropdown', {
+    items: ['Edit', { label: 'Delete', disabled: true }, 'Archive'],
+    modelValue: true,
+  });
+  const panel = w.$('.dropdown-menu');
+  const items = w.$$('.dropdown-item');
+
+  await press(w.$('.dropdown-toggle'), 'ArrowDown');
+  assert.equal(document.activeElement, items[0], 'ArrowDown did not enter the open menu');
+
+  await press(panel, 'ArrowDown');
+  assert.equal(document.activeElement, items[2], 'a disabled item took the focus');
+
+  await press(panel, 'ArrowDown');
+  assert.equal(document.activeElement, items[0], 'the menu does not wrap around');
+
+  await press(panel, 'End');
+  assert.equal(document.activeElement, items[2]);
+  await press(panel, 'Home');
+  assert.equal(document.activeElement, items[0]);
+
+  // happy-dom ships no Popover API, so the close path is stubbed the way the
+  // other dropdown tests stub it.
+  let hidden = 0;
+  panel.hidePopover = () => { hidden++; };
+  await press(panel, 'Tab');
+  assert.equal(hidden, 1, 'tabbing out of the menu left it open');
+  w.unmount();
+});
+
+test('te-multiselect opens with the keyboard and walks its options', async () => {
+  const options = [{ value: 1, text: 'One' }, { value: 2, text: 'Two' }];
+  const w = mount('te-multiselect', { options, modelValue: [], searchable: false, showSelectAll: false });
+  const field = w.$('input[role="combobox"]');
+  assert.equal(field.getAttribute('aria-expanded'), 'false');
+  assert.equal(field.getAttribute('aria-controls'), w.$('.list-container').id);
+
+  await press(field, 'ArrowDown');
+  await nextTick();
+  assert.equal(field.getAttribute('aria-expanded'), 'true', 'ArrowDown did not open the panel');
+
+  const boxes = w.$$('input[type="checkbox"]');
+  assert.equal(document.activeElement, boxes[0], 'focus never reached the list');
+
+  await press(boxes[0], 'ArrowDown');
+  assert.equal(document.activeElement, boxes[1]);
+
+  await press(boxes[1], 'Enter');
+  assert.deepEqual(w.state.modelValue, [2], 'Enter did not tick the focused option');
+
+  await press(boxes[1], 'Escape');
+  assert.equal(field.getAttribute('aria-expanded'), 'false', 'Escape left the panel open');
+  assert.equal(document.activeElement, field, 'focus never came back to the field');
+  w.unmount();
+});
+
+test('te-multiselect lands on the search box when it has one', async () => {
+  const w = mount('te-multiselect', {
+    options: [{ value: 1, text: 'One' }],
+    singleSelect: true,
+    modelValue: undefined,
+  });
+  await press(w.$('input[role="combobox"]'), 'ArrowDown');
+  await nextTick();
+  assert.equal(document.activeElement, w.$('input[type="search"]'), 'the search box was skipped');
+  assert.equal(w.$('.list-container').getAttribute('role'), 'listbox');
+
+  await press(w.$('input[type="search"]'), 'ArrowDown');
+  assert.equal(document.activeElement, w.$('[role="option"]'), 'the arrows did not reach the list');
+
+  await press(w.$('[role="option"]'), 'Enter');
+  assert.equal(w.state.modelValue, 1, 'Enter did not pick the focused option');
+  w.unmount();
+});
+
+test('te-date-picker walks the grid with the arrows', async () => {
+  const w = mount('te-date-picker', { modelValue: new Date(2024, 0, 15) });
+  const input = w.$('input');
+  const cell = (day) => w.$(`[data-day="${day}"]`);
+
+  await press(input, 'ArrowDown');
+  await nextTick();
+  assert.equal(input.getAttribute('aria-expanded'), 'true', 'ArrowDown did not open the calendar');
+  assert.equal(document.activeElement, cell(15), 'the grid did not open on the selected day');
+
+  await press(cell(15), 'ArrowRight');
+  await nextTick();
+  assert.equal(document.activeElement, cell(16));
+
+  await press(cell(16), 'ArrowDown');
+  await nextTick();
+  assert.equal(document.activeElement, cell(23), 'ArrowDown did not move a whole week');
+
+  await press(cell(23), 'Home');
+  await nextTick();
+  assert.equal(document.activeElement, cell(21), 'Home did not go to the start of the week');
+
+  await press(cell(21), 'Enter');
+  const [picked] = w.emitted['update:modelValue'].at(-1);
+  assert.equal(picked.getDate(), 21, 'Enter did not pick the focused day');
+  assert.equal(input.getAttribute('aria-expanded'), 'false', 'picking left the calendar open');
+  assert.equal(document.activeElement, input, 'focus never came back to the field');
+  w.unmount();
+});
+
+test('te-date-picker crosses a month boundary with the arrows', async () => {
+  const w = mount('te-date-picker', { modelValue: new Date(2024, 1, 1) });
+  const month = () => Number(w.$('select[name="month"]').value);
+
+  await press(w.$('input'), 'ArrowDown');
+  await nextTick();
+  await press(w.$('[data-day="1"]'), 'ArrowLeft');
+  await nextTick();
+  await nextTick();
+
+  assert.equal(month(), 0, 'stepping off the 1st did not go back a month');
+  assert.equal(document.activeElement.dataset.day, '31', 'focus did not land on January 31');
+
+  await press(document.activeElement, 'PageDown');
+  await nextTick();
+  await nextTick();
+  assert.equal(month(), 1, 'PageDown did not move on a month');
+  assert.equal(document.activeElement.dataset.day, '29', 'February 31 was not clamped to the 29th');
+  w.unmount();
+});
+
+/* ------------------------------------------------------------------- field */
+
+/** Mounts te-field around one control and returns both, plus the app. */
+function mountField(fieldProps, tag, controlProps = {}) {
+  const host = document.createElement('div');
+  document.body.appendChild(host);
+  const app = createApp({
+    render: () => h(resolveComponent('te-field'), fieldProps, () => h(resolveComponent(tag), controlProps)),
+  });
+  app.use(install, OPTIONS);
+  app.mount(host);
+  return { host, unmount: () => { app.unmount(); host.remove(); } };
+}
+
+test('te-field labels and describes the control it wraps', async () => {
+  const f = mountField({ label: 'Email', helper: 'Never shared' }, 'te-input', { modelValue: '' });
+  await nextTick();
+
+  const input = f.host.querySelector('input');
+  const label = f.host.querySelector('label');
+  const message = f.host.querySelector('.field-message');
+
+  assert.ok(input.id, 'the control got no id');
+  assert.equal(label.getAttribute('for'), input.id, 'the label points at nothing');
+  assert.equal(input.getAttribute('aria-describedby'), message.id, 'the hint is not wired to the control');
+  assert.equal(message.textContent.trim(), 'Never shared');
+  assert.equal(input.getAttribute('aria-invalid'), 'false');
+  f.unmount();
+});
+
+test('te-field turns invalid on an error message alone', async () => {
+  const f = mountField({ label: 'Country', helper: 'Where you live', error: 'Pick one' }, 'te-select', {
+    options: ['Spain', 'Honduras'],
+  });
+  await nextTick();
+
+  const select = f.host.querySelector('select');
+  assert.ok(f.host.querySelector('.field-invalid'), 'the field is not marked invalid');
+  assert.equal(f.host.querySelector('.field-message').textContent.trim(), 'Pick one', 'the hint hid the error');
+  assert.equal(select.getAttribute('aria-invalid'), 'true');
+  assert.equal(f.host.querySelector('label').getAttribute('for'), select.id);
+  f.unmount();
+});
+
+test('te-field wires a textarea and a multiselect the same way', async () => {
+  const area = mountField({ label: 'Notes', error: 'Too short' }, 'te-textarea', { modelValue: '' });
+  await nextTick();
+  const textarea = area.host.querySelector('textarea');
+  assert.equal(area.host.querySelector('label').getAttribute('for'), textarea.id);
+  assert.equal(textarea.getAttribute('aria-invalid'), 'true');
+  assert.equal(textarea.getAttribute('aria-describedby'), area.host.querySelector('.field-message').id);
+  area.unmount();
+
+  const multi = mountField({ label: 'Tags', error: 'Pick at least one' }, 'te-multiselect', {
+    options: [{ value: 1, text: 'One' }],
+    modelValue: [],
+  });
+  await nextTick();
+  const combobox = multi.host.querySelector('[role="combobox"]');
+  assert.equal(multi.host.querySelector('label').getAttribute('for'), combobox.id);
+  assert.ok(combobox.classList.contains('border-red-500'), 'the invalid border never reached the field');
+  multi.unmount();
+});
+
+test('te-field points its label at an id the control brought itself', async () => {
+  const f = mountField({ label: 'Email' }, 'te-input', { modelValue: '', id: 'my-own-id' });
+  await nextTick();
+  assert.equal(f.host.querySelector('input').id, 'my-own-id', 'the control lost its own id');
+  assert.equal(f.host.querySelector('label').getAttribute('for'), 'my-own-id', 'the label kept the generated id');
+  f.unmount();
+});
+
+test('a control outside te-field is left alone', () => {
+  const w = mount('te-select', { options: ['a'] });
+  const select = w.$('select');
+  assert.equal(select.getAttribute('aria-describedby'), null, 'a lone select describes something');
+  assert.equal(select.getAttribute('aria-invalid'), null, 'a lone select claims a validity state');
+  assert.equal(select.id, '', 'a lone select was given an id');
+  w.unmount();
+});
+
+/* --------------------------------------------- avatar, skeleton & confirm */
+
+test('te-avatar falls back from a broken image to the initials', async () => {
+  const w = mount('te-avatar', { src: 'gone.png', name: 'Ada Lovelace' });
+  const img = w.$('img');
+  assert.equal(img.getAttribute('alt'), 'Ada Lovelace');
+
+  img.dispatchEvent(new Event('error'));
+  await nextTick();
+  assert.equal(w.$('img'), null, 'the broken image stayed on screen');
+  assert.equal(w.$('.avatar-initials').textContent.trim(), 'AL', 'wrong initials');
+
+  const avatar = w.$('.avatar');
+  assert.equal(avatar.getAttribute('role'), 'img', 'the initials are not exposed as an image');
+  assert.equal(avatar.getAttribute('aria-label'), 'Ada Lovelace');
+  w.unmount();
+});
+
+test('te-avatar draws its icon when there is no name either', () => {
+  const w = mount('te-avatar', {});
+  assert.ok(w.$('svg.avatar-icon'), 'no fallback icon');
+  assert.equal(w.$('.avatar-initials'), null);
+  w.unmount();
+});
+
+/* An image role with no name is worse than no role: a screen reader announces
+   "image" and stops. Nothing left to say means nothing to announce. */
+test('te-avatar keeps a nameless avatar out of the accessibility tree', () => {
+  const bare = mount('te-avatar', {});
+  const el = bare.$('.avatar');
+  assert.equal(el.getAttribute('role'), null, 'an unnamed avatar still claims to be an image');
+  assert.equal(el.getAttribute('aria-hidden'), 'true', 'the generic icon is announced to nobody');
+  bare.unmount();
+
+  const named = mount('te-avatar', { name: 'Ada' });
+  assert.equal(named.$('.avatar').getAttribute('role'), 'img');
+  assert.equal(named.$('.avatar').getAttribute('aria-hidden'), null, 'a named avatar was hidden');
+  named.unmount();
+});
+
+test('te-avatar leaves slot content of its own visible to a screen reader', () => {
+  const w = mount('te-avatar', {}, () => 'JS');
+  assert.equal(w.$('.avatar').getAttribute('aria-hidden'), null, 'the slot content was hidden');
+  w.unmount();
+});
+
+test('te-avatar gives a new src another chance', async () => {
+  const w = mount('te-avatar', { src: 'a.png', name: 'Ada' });
+  w.$('img').dispatchEvent(new Event('error'));
+  await nextTick();
+  assert.equal(w.$('img'), null);
+
+  w.state.src = 'b.png';
+  await nextTick();
+  assert.ok(w.$('img'), 'the fallback stuck after the source changed');
+  w.unmount();
+});
+
+test('te-skeleton draws a row per line and shortens the last one', () => {
+  const w = mount('te-skeleton', { shape: 'text', lines: 3 });
+  const rows = w.$$('.skeleton');
+  assert.equal(rows.length, 3);
+  assert.equal(rows[2].style.width, '60%', 'the last line runs the full width');
+  assert.equal(rows[0].style.width, '', 'the other lines were given a width');
+  assert.equal(w.$('.skeleton-root').getAttribute('aria-hidden'), 'true', 'a wordless skeleton is announced');
+  w.unmount();
+});
+
+test('te-skeleton announces itself once it has a label', () => {
+  const w = mount('te-skeleton', { shape: 'circle', lines: 3, label: 'Loading profile' });
+  const root = w.$('.skeleton-root');
+  assert.equal(root.getAttribute('role'), 'status');
+  assert.equal(root.getAttribute('aria-label'), 'Loading profile');
+  assert.equal(root.getAttribute('aria-hidden'), null);
+  assert.equal(w.$$('.skeleton').length, 1, 'lines multiplied a shape that is not text');
+  w.unmount();
+});
+
+/** The dialog showConfirm just mounted into <body>. */
+const confirmDialog = async () => {
+  await nextTick();
+  await nextTick();
+  return document.querySelector('dialog.modal');
+};
+
+/* The teardown is on a timer, so each test waits it out rather than leaving a
+   dialog behind for the next one. */
+const settled = () => new Promise((resolve) => setTimeout(resolve, 350));
+
+test('showConfirm resolves true from its confirm button', async () => {
+  const answer = showConfirm({ title: 'Delete', message: 'Sure?', confirmLabel: 'Delete' });
+  const dialog = await confirmDialog();
+  assert.ok(dialog, 'no dialog was mounted');
+  assert.equal(dialog.open, true, 'the dialog never opened');
+  assert.equal(dialog.querySelector('.confirm-message').textContent.trim(), 'Sure?');
+
+  const buttons = [...dialog.querySelectorAll('.modal-footer button')];
+  assert.deepEqual(buttons.map((b) => b.textContent.trim()), ['Cancel', 'Delete']);
+
+  await click(buttons[1]);
+  assert.equal(await answer, true);
+
+  await settled();
+  assert.equal(document.querySelector('dialog.modal'), null, 'the confirm was never torn down');
+});
+
+test('showConfirm resolves false from cancel and from a dismissal', async () => {
+  const cancelled = showConfirm({ message: 'Sure?' });
+  const first = await confirmDialog();
+  await click([...first.querySelectorAll('.modal-footer button')][0]);
+  assert.equal(await cancelled, false, 'Cancel did not answer no');
+  await settled();
+
+  const dismissed = showConfirm({ message: 'Sure?' });
+  const second = await confirmDialog();
+  // What Escape, the backdrop and the close button all end up calling.
+  second.close();
+  assert.equal(await dismissed, false, 'a dismissed dialog did not answer no');
+  await settled();
 });

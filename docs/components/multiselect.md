@@ -12,6 +12,8 @@ const clipped = ref([]);
 multiple selection. It closes on an outside click, so the plugin's
 `v-click-outside` directive has to be registered.
 
+Inside a [`te-field`](/components/field) it takes the id its label points at, its description and its invalid state from the wrapper.
+
 ## Multiple
 
 <Demo block>
@@ -73,6 +75,21 @@ the page or the container scrolls.
   <te-multiselect v-model="picked" append-to-body :options="options" />
 </div>
 ```
+
+## Keyboard
+
+<kbd>Enter</kbd>, <kbd>Space</kbd> or <kbd>↓</kbd> on the field opens the list.
+The focus lands on the search box when there is one, so you can type first and
+then walk the results with the arrows.
+
+| Key | Does |
+|---|---|
+| <kbd>↑</kbd> <kbd>↓</kbd> | Previous / next option. |
+| <kbd>Home</kbd> <kbd>End</kbd> | First / last option. |
+| <kbd>Enter</kbd> | Pick the focused option, or tick it when several can be chosen. |
+| <kbd>Space</kbd> | Ticks a checkbox, as it does anywhere else. |
+| <kbd>Esc</kbd> | Close and go back to the field. |
+| <kbd>Tab</kbd> | Close and move on. |
 
 ## Props
 

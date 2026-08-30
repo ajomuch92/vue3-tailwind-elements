@@ -3,6 +3,8 @@
 `te-file` reads the selected files and emits them as base64 data URLs, so
 `v-model` gives you the content rather than a `File` handle.
 
+Inside a [`te-field`](/components/field) it takes the id its label points at, its description and its invalid state from the wrapper.
+
 ## Basic
 
 <Demo block>

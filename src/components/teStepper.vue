@@ -13,14 +13,14 @@
           }"
           @click="select(key)"
         >
-          <span class="px-2 py-1 bg-white flex items-center z-10">
+          <span class="px-2 py-1 te-surface flex items-center z-10">
             <span
               class="step mr-2 flex items-center justify-center rounded-full text-sm w-8 h-8"
               :class="{ 'active': key === model, 'success': key < model, 'cursor-not-allowed': step.disabled }"
             >
               <slot name="icon" :step="step" :index="key">{{ key + 1 }}</slot>
             </span>
-            <span class="font-medium text-gray-500">
+            <span class="font-medium te-text-muted">
               <slot name="label" :step="step" :index="key">{{ step.label }}</slot>
             </span>
           </span>

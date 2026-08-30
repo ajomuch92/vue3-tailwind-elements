@@ -13,6 +13,20 @@ const Home = (await vite.ssrLoadModule('/src/Home.vue')).default;
 let failed = 0;
 const pages = readdirSync('./src/stories').sort();
 
+/* Every .vue in src, compiled and evaluated. App.vue is never rendered here —
+   its setup reads localStorage — but loading it catches a template or script
+   that does not compile, which is how a broken App.vue once reached the
+   browser with the whole check passing. */
+for (const file of readdirSync('./src').filter((f) => f.endsWith('.vue')).sort()) {
+  try {
+    await vite.ssrLoadModule(`/src/${file}`);
+    console.log(`ok   ${file}`);
+  } catch (error) {
+    failed++;
+    console.error(`FAIL ${file}: ${error.message.split('\n')[0]}`);
+  }
+}
+
 const render = async (label, vnode) => {
   const app = createSSRApp({ render: () => vnode });
   app.use(plugin);

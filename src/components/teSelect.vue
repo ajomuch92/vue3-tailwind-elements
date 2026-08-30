@@ -1,7 +1,10 @@
 <template>
   <select
+    :id="fieldId"
     v-model="model"
     class="form-select"
+    :aria-describedby="fieldDescribedBy"
+    :aria-invalid="fieldInvalid || undefined"
     :class="[size]"
     :disabled="disabled"
     :multiple="multiple"
@@ -19,8 +22,11 @@
 import { computed } from 'vue';
 import type { PropType } from 'vue';
 import { oneOf, SIZES } from '../types';
+import { useField } from '../composables/useField';
 
 defineOptions({ name: 'TeSelect' });
+
+const { fieldId, fieldDescribedBy, fieldInvalid } = useField();
 
 type SelectValue = string | number;
 type SelectOption = Record<string, unknown>;

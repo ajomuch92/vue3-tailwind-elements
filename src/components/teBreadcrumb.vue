@@ -5,8 +5,8 @@
         <li v-if="key < options.length - 1">
           <component :is="linkTag" v-bind="getBindValues(option)" class="text-blue-600 hover:text-blue-700">{{option.label}}</component>
         </li>
-        <li v-else class="text-gray-500">{{option.label}}</li>
-        <li v-if="key < options.length - 1"><span class="text-gray-500 mx-2">{{separator}}</span></li>
+        <li v-else class="te-text-muted">{{option.label}}</li>
+        <li v-if="key < options.length - 1"><span class="te-text-muted mx-2">{{separator}}</span></li>
       </template>
     </ol>
   </nav>

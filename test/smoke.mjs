@@ -18,6 +18,7 @@ const render = (tag, props = {}, slots = undefined) => {
 const cases = {
   'te-accordion': { items: ['a', 'b'], defaultOpen: [0] },
   'te-alert': { text: 'hi', type: 'danger' },
+  'te-avatar': { name: 'Ada Lovelace', type: 'primary', size: 'large' },
   'te-badge': { text: 'new', type: 'pink', size: 'large' },
   'te-breadcrumb': { options: [{ label: 'Home', href: '/' }, { label: 'Now' }] },
   'te-button': { type: 'primary', loading: true },
@@ -31,6 +32,7 @@ const cases = {
   'te-chip': { closable: true, imgUrl: 'x.png', size: 'small' },
   'te-date-picker': { modelValue: new Date(2024, 0, 15) },
   'te-dropdown': { label: 'Actions', items: ['Edit', { label: 'Delete', disabled: true }] },
+  'te-field': { label: 'Email', helper: 'Never shared', required: true },
   'te-file': { accept: 'image/*' },
   'te-icon': { name: 'star', family: 'fa' },
   'te-input': { modelValue: 'abc', helperText: 'help', rightIcon: 'star', invalid: true },
@@ -46,6 +48,7 @@ const cases = {
   'te-rating': { modelValue: 3, quantity: 5 },
   'te-scroll-to-top': {},
   'te-select': { options: [{ id: 1, label: 'One' }], modelValue: 1, placeholder: 'Pick' },
+  'te-skeleton': { shape: 'text', lines: 3, label: 'Loading' },
   'te-stepper': { steps: [{ label: 'One' }, { label: 'Two' }], modelValue: 0 },
   'te-switch': { label: 'On', modelValue: true },
   'te-table': {

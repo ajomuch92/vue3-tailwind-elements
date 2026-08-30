@@ -10,6 +10,8 @@ const password = ref('hunter2');
 `te-input` wraps a native `<input>`, so every value you pass through reaches
 the real element. Non-HTML props such as `size` or `helperText` are kept off it.
 
+Inside a [`te-field`](/components/field) it takes the id its label points at, its description and its invalid state from the wrapper.
+
 ## Sizes
 
 <Demo block>

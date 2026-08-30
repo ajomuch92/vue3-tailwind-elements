@@ -3,6 +3,9 @@
        field, but it would also swallow a `w-full` written on the component. -->
   <div class="textarea-container">
     <textarea
+      :id="fieldId"
+      :aria-describedby="fieldDescribedBy"
+      :aria-invalid="fieldInvalid || undefined"
       v-bind="$attrs"
       v-model="model"
       class="form-control"
@@ -19,7 +22,7 @@
       @keypress="emit('keypress', $event as KeyboardEvent)"
       @keyup="emit('keyup', $event as KeyboardEvent)"
     />
-    <div v-if="counter" class="textarea-counter mt-1 text-right text-sm text-gray-500">
+    <div v-if="counter" class="textarea-counter mt-1 text-right text-sm te-text-muted">
       <slot name="counter" :length="length" :maxlength="maxlength">{{ counterText }}</slot>
     </div>
   </div>
@@ -27,6 +30,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
+import { useField } from '../composables/useField';
 
 /* The wrapper is the root now, so `class` and the rest would land on it
    instead of the textarea the way they used to. */
@@ -42,6 +46,10 @@ const emit = defineEmits<{
   keypress: [event: KeyboardEvent];
   keyup: [event: KeyboardEvent];
 }>();
+
+/* $attrs comes after these in the template, so an id written on the
+   component still wins over the one te-field hands down. */
+const { fieldId, fieldDescribedBy, fieldInvalid } = useField();
 
 const model = defineModel<string>({ default: '' });
 

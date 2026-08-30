@@ -1,9 +1,11 @@
 <template>
   <div class="tabs-container" :class="{'flex items-start': vertical}">
     <ul
+      ref="tablist"
       class="nav flex flex-col flex-wrap list-none border-b-0 pl-0 mb-3"
       :class="{'md:flex-row': !vertical, 'nav-tabs': !pills, 'nav-pills': pills}"
       role="tablist"
+      :aria-orientation="vertical ? 'vertical' : 'horizontal'"
     >
       <li
         v-for="(title, key) in normalizedTitles"
@@ -21,7 +23,7 @@
           style="margin: 0px;"
         >
           <button
-            :id="`tab-${key}`"
+            :id="tabId(key)"
             type="button"
             role="tab"
             class="
@@ -32,13 +34,15 @@
             :class="{
               'cursor-not-allowed pointer-events-none opacity-50': title.disabled,
               'active': key === model,
-              'hover:border-transparent hover:bg-gray-100 focus:border-transparent': !pills,
+              'hover:border-transparent te-hover focus:border-transparent': !pills,
               'focus:outline-none rounded': pills,
             }"
             :aria-selected="key === model"
-            :aria-controls="`tab-content-${key}`"
+            :aria-controls="panelId(key)"
             :disabled="title.disabled"
+            :tabindex="key === model ? 0 : -1"
             @click="model = key"
+            @keydown="onKeydown"
           >
             {{ title.label }}
           </button>
@@ -49,9 +53,11 @@
       <template v-for="index in normalizedTitles.length" :key="index">
         <div
           v-show="index - 1 === model"
-          :id="`tab-content-${index - 1}`"
+          :id="panelId(index - 1)"
           class="tab-panel relative float-left w-full"
           role="tabpanel"
+          :aria-labelledby="tabId(index - 1)"
+          tabindex="0"
         >
           <slot :name="`tab-${index}`" />
         </div>
@@ -61,9 +67,10 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, ref, useId } from 'vue';
 import type { PropType } from 'vue';
 import TeNotification from './teNotification.vue';
+import { edgeIndex, stepIndex } from '../composables/keyboard';
 
 defineOptions({ name: 'TeTabs' });
 
@@ -92,6 +99,40 @@ const navItemClass = computed(() => ({
   'flex-grow text-center': props.vertical,
   'mx-1': props.pills && !props.vertical,
 }));
+
+/* The ids were `tab-0`, `tab-content-0`… — global, so two sets of tabs on one
+   page pointed every aria-controls at the first of them. */
+const uid = useId();
+const tabId = (index: number) => `${uid}-tab-${index}`;
+const panelId = (index: number) => `${uid}-panel-${index}`;
+
+const tablist = ref<HTMLElement | null>(null);
+
+/* Only one tab is in the tab order (the selected one); the rest are reached
+   with the arrow keys, as the tablist pattern asks. */
+function activate(index: number) {
+  if (index === -1 || index === model.value) return;
+  model.value = index;
+  tablist.value?.querySelectorAll<HTMLButtonElement>('[role="tab"]')[index]?.focus();
+}
+
+function onKeydown(event: KeyboardEvent) {
+  const disabled = (index: number) => !!normalizedTitles.value[index]?.disabled;
+  const count = normalizedTitles.value.length;
+  const [next, previous] = props.vertical
+    ? ['ArrowDown', 'ArrowUp']
+    : ['ArrowRight', 'ArrowLeft'];
+
+  let target: number | undefined;
+  if (event.key === next) target = stepIndex(model.value, 1, count, disabled);
+  else if (event.key === previous) target = stepIndex(model.value, -1, count, disabled);
+  else if (event.key === 'Home') target = edgeIndex(count, 1, disabled);
+  else if (event.key === 'End') target = edgeIndex(count, -1, disabled);
+  if (target === undefined) return;
+
+  event.preventDefault();
+  activate(target);
+}
 </script>
 
 <style scoped>

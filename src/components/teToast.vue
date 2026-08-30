@@ -50,7 +50,7 @@ const props = defineProps({
 const isTinted = computed(() => props.color !== 'normal');
 
 const fontColorClass = computed(() => ({
-  'text-gray-700': !isTinted.value,
+  'te-text-body': !isTinted.value,
   'text-white': isTinted.value,
 }));
 

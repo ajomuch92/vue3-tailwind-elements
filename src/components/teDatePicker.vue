@@ -3,11 +3,17 @@
     <div ref="wrapper" class="relative">
       <slot name="trigger">
         <input
+          :id="fieldId"
+          ref="trigger"
           type="text"
           readonly
+          aria-haspopup="dialog"
+          :aria-describedby="fieldDescribedBy"
+          :aria-invalid="fieldInvalid || undefined"
+          :aria-expanded="showDatepicker"
           :value="datepickerValue"
           @click="showDatepicker = !showDatepicker"
-          @keydown.esc="showDatepicker = false"
+          @keydown="onTriggerKeydown"
           class="
             w-full
             pl-4
@@ -16,12 +22,12 @@
             leading-none
             rounded-lg
             focus:outline-none
-            text-gray-600
+            te-text-mild
             font-medium
             border-2
             z-0
           "
-          :class="{'bg-gray-200 cursor-not-allowed': disabled}"
+          :class="{'te-active cursor-not-allowed': disabled, 'border-red-500': fieldInvalid}"
           :placeholder="placeholder"
           :disabled="disabled"
         />
@@ -30,7 +36,7 @@
       <div class="absolute top-1/2 transform -translate-y-1/2 right-0 px-3 py-2">
         <slot name="icon">
           <svg
-            class="h-6 w-6 text-gray-400"
+            class="h-6 w-6 te-text-faint"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -48,7 +54,7 @@
       <Teleport to="body" :disabled="!appendToBody">
         <div
           class="
-            bg-white
+            te-raised
             mt-12
             rounded-lg
             shadow
@@ -61,13 +67,16 @@
           :style="appendToBody ? { ...anchorStyle, width: '17rem' } : { width: '17rem' }"
           v-show="showDatepicker"
           v-click-outside="hideCalendar"
+          role="dialog"
+          :aria-label="`${monthNames[month]} ${year}`"
+          @keydown.esc.prevent="closeAndRestore"
         >
         <div class="flex justify-between items-center mb-2">
           <div>
             <select
               name="month"
               aria-label="Month"
-              class="bg-transparent text-lg font-bold text-gray-800 appearance-none focus:outline-2 focus:outline-blue-500"
+              class="bg-transparent text-lg font-bold te-text-soft appearance-none focus:outline-2 focus:outline-blue-500"
               v-model="month"
             >
               <option v-for="(month, key) in monthNames" :key="key" :value="key">{{ month }}</option>
@@ -75,7 +84,7 @@
             <select
               name="year"
               aria-label="Year"
-              class="bg-transparent text-lg font-normal text-gray-600 appearance-none focus:outline-2 focus:outline-blue-500"
+              class="bg-transparent text-lg font-normal te-text-mild appearance-none focus:outline-2 focus:outline-blue-500"
               v-model="year"
             >
               <option v-for="($year, key) in years" :key="key" :value="$year">{{ $year }}</option>
@@ -90,7 +99,7 @@
                 duration-100
                 inline-flex
                 cursor-pointer
-                hover:bg-gray-200
+                te-hover-strong
                 p-1
                 rounded-full
               "
@@ -98,7 +107,7 @@
               @click="deductMonth"
             >
               <svg
-                class="h-6 w-6 text-gray-500 inline-flex"
+                class="h-6 w-6 te-text-muted inline-flex"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -119,7 +128,7 @@
                 duration-100
                 inline-flex
                 cursor-pointer
-                hover:bg-gray-200
+                te-hover-strong
                 p-1
                 rounded-full
               "
@@ -127,7 +136,7 @@
               @click="addMonth"
             >
               <svg
-                class="h-6 w-6 text-gray-500 inline-flex"
+                class="h-6 w-6 te-text-muted inline-flex"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -146,14 +155,14 @@
         <div class="flex flex-wrap mb-3 -mx-1">
           <template v-for="(day, index) in days" :key="`d-${index}`">
             <div style="width: 14.26%" class="px-1">
-              <div class="text-gray-800 font-medium text-center text-xs">
+              <div class="te-text-soft font-medium text-center text-xs">
                 {{day}}
               </div>
             </div>
           </template>
         </div>
 
-        <div class="flex flex-wrap -mx-1">
+        <div ref="grid" class="flex flex-wrap -mx-1" @keydown="onGridKeydown">
           <template v-for="key in blankdays.length" :key="`bd-${key}`">
             <div
               style="width: 14.28%"
@@ -172,6 +181,12 @@
           >
             <div style="width: 14.28%" class="px-1 mb-1">
               <div
+                :data-day="date"
+                role="button"
+                :tabindex="date === focusedDay ? 0 : -1"
+                :aria-label="dayLabel(date)"
+                :aria-pressed="isToday(date)"
+                :aria-disabled="isNotAllowedDate(date) || isOutOfRange(date) ? true : undefined"
                 @click="getDateValue(date)"
                 class="
                   cursor-pointer
@@ -184,7 +199,7 @@
                 "
                 :class="{
                   'bg-blue-500 text-white': isToday(date), 
-                  'text-gray-700 hover:bg-blue-200': !isToday(date), 
+                  'te-text-body hover:bg-blue-200': !isToday(date), 
                   'opacity-25 pointer-events-none': isNotAllowedDate(date) || isOutOfRange(date)
                 }"
               >
@@ -200,10 +215,11 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue';
+import { computed, nextTick, ref, watch } from 'vue';
 import type { PropType } from 'vue';
 import { clickOutside as vClickOutside } from '../directives';
 import { useBodyAnchor } from '../composables/useBodyAnchor';
+import { useField } from '../composables/useField';
 
 defineOptions({ name: 'TeDatePicker' });
 
@@ -234,8 +250,15 @@ const props = defineProps({
   },
 });
 
+const { fieldId, fieldDescribedBy, fieldInvalid } = useField();
+
 const showDatepicker = ref(false);
 const wrapper = ref<HTMLElement | null>(null);
+const trigger = ref<HTMLInputElement | null>(null);
+const grid = ref<HTMLElement | null>(null);
+/* The day the arrows stand on. One cell is in the tab order and the rest are
+   reached with the keyboard, so the grid is a single stop, not thirty-one. */
+const focusedDay = ref(1);
 const { anchorStyle } = useBodyAnchor(wrapper, showDatepicker, () => props.appendToBody);
 const month = ref(0);
 const year = ref(0);
@@ -271,7 +294,65 @@ function isOutOfRange(date: number | Date) {
 
 function getDateValue(date: number) {
   model.value = new Date(year.value, month.value, date);
+  closeAndRestore();
+}
+
+function closeAndRestore() {
   showDatepicker.value = false;
+  /* Only reachable when the default trigger is in use; a custom one owns its
+     own focus. */
+  trigger.value?.focus();
+}
+
+const dayLabel = (date: number) => `${props.monthNames[month.value]} ${date}, ${year.value}`;
+
+const focusDay = () =>
+  grid.value?.querySelector<HTMLElement>(`[data-day="${focusedDay.value}"]`)?.focus();
+
+/** Moves the grid to `target`, crossing into another month when it has to. */
+function goTo(target: Date) {
+  month.value = target.getMonth();
+  year.value = target.getFullYear();
+  focusedDay.value = target.getDate();
+  nextTick(focusDay);
+}
+
+const moveDays = (delta: number) => goTo(new Date(year.value, month.value, focusedDay.value + delta));
+
+function moveMonths(delta: number) {
+  /* Clamped, so leaving the 31st never lands two months ahead. */
+  const daysInTarget = new Date(year.value, month.value + delta + 1, 0).getDate();
+  goTo(new Date(year.value, month.value + delta, Math.min(focusedDay.value, daysInTarget)));
+}
+
+function onTriggerKeydown(event: KeyboardEvent) {
+  if (event.key === 'Escape') { showDatepicker.value = false; return; }
+  if (props.disabled || !['Enter', ' ', 'ArrowDown'].includes(event.key)) return;
+  event.preventDefault();
+  showDatepicker.value = true;
+}
+
+function onGridKeydown(event: KeyboardEvent) {
+  const weekday = new Date(year.value, month.value, focusedDay.value).getDay();
+
+  switch (event.key) {
+    case 'ArrowLeft': moveDays(-1); break;
+    case 'ArrowRight': moveDays(1); break;
+    case 'ArrowUp': moveDays(-7); break;
+    case 'ArrowDown': moveDays(7); break;
+    case 'Home': moveDays(-weekday); break;
+    case 'End': moveDays(6 - weekday); break;
+    case 'PageUp': moveMonths(-1); break;
+    case 'PageDown': moveMonths(1); break;
+    case 'Enter':
+    case ' ':
+      if (!isNotAllowedDate(focusedDay.value) && !isOutOfRange(focusedDay.value)) {
+        getDateValue(focusedDay.value);
+      }
+      break;
+    default: return;
+  }
+  event.preventDefault();
 }
 
 function addMonth() {
@@ -330,6 +411,16 @@ const isNextAllowed = computed(() => {
 
 watch(model, initDate);
 watch([month, year], getNoOfDays);
+
+/* Opening hands the keyboard the grid, starting on the selected day when it is
+   the one on screen. */
+watch(showDatepicker, (open) => {
+  if (!open) return;
+  const start = model.value ?? new Date();
+  const onScreen = start.getMonth() === month.value && start.getFullYear() === year.value;
+  focusedDay.value = onScreen ? start.getDate() : 1;
+  nextTick(focusDay);
+});
 
 initDate();
 getNoOfDays();
