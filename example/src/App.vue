@@ -31,10 +31,9 @@ const applyTheme = () => {
 const cycleTheme = () => {
   theme.value = theme.value === null ? 'dark' : theme.value === 'dark' ? 'light' : null;
   applyTheme();
-
-const themeLabel = computed(() => ({ dark: '🌙 Dark', light: '☀️ Light' }[theme.value] ?? '💻 System'));
 };
 
+// Puts the stored choice back on the page before the first paint.
 applyTheme();
 
 const themeLabel = computed(() => ({ dark: '🌙 Dark', light: '☀️ Light' }[theme.value] ?? '💻 System'));
