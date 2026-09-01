@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.0.1
+
+Removing font-weight: var(--font-weight-bold) from .btn and .notification.
+
 ## 3.0.0
 
 Every prop, event and slot from 2.x still works. The major is for one thing:
